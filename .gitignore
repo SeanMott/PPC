@@ -1,0 +1,9 @@
+
+/.vs
+/DTK_PPC_Lexer/bin
+*.user
+*.vcxproj
+/DTK_PPC_Lexer/obj
+*.sln
+/PPC/bin
+/PPC/obj
