@@ -4,6 +4,10 @@ import subprocess
 import os
 import sys
 
-if not os.path.exists(sys.argv[1] + "/DTK"):
-    subprocess.run(["git", "clone", "https://github.com/encounter/dtk-template.git", sys.argv[1] + "/DTK"],
+git = sys.argv[1]
+projectDir = sys.argv[2]
+
+#gets DTK
+if not os.path.exists(projectDir + "/DTK"):
+    subprocess.call(["git", "clone", "https://github.com/encounter/dtk-template.git", projectDir + "/DTK"],
     shell=True)

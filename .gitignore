@@ -7,3 +7,7 @@
 *.sln
 /PPC/bin
 /PPC/obj
+/DTK_PowerPCDecoder/bin
+/DTK_PowerPCDecoder/obj
+/tools/Windows_X64
+/Venders

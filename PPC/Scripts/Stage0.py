@@ -13,17 +13,17 @@ projectDir = sys.argv[5]
 ROMPath = sys.argv[6]
 
 #gets DTK
-if not os.path.exists(sys.argv[1] + "/DTK"):
-    subprocess.run([git, "clone", "https://github.com/encounter/dtk-template.git", projectDir + "/DTK"],
+if not os.path.exists(projectDir + "/DTK"):
+    subprocess.call([git, "clone", "https://github.com/encounter/dtk-template.git", projectDir + "/DTK"],
     shell=True)
 
 #extract ROM contents
-subprocess.run([dtk, "disc", "extract", ROMPath, projectDir + "/DTK/orig/GAMEID"],
-    shell=False)
+subprocess.call([dtk, "disc", "extract", ROMPath, projectDir + "/DTK/orig/GAMEID"],
+    shell=True)
 
 #generate config
-subprocess.run([dtk, "dol", "config", projectDir + "/DTK/orig/GAMEID/sys/main.dol", "-o", projectDir + "/DTK/config/GAMEID/config.yml"],
-    shell=False)
+subprocess.call([dtk, "dol", "config", projectDir + "/DTK/orig/GAMEID/sys/main.dol", "-o", projectDir + "/DTK/config/GAMEID/config.yml"],
+    shell=True)
 configFile = open(projectDir + "/DTK/config/GAMEID/config.yml", "a")
 configFile.write("""symbols: config/GAMEID/symbols.txt\n"""
 		"""splits: config/GAMEID/splits.txt\n"""
@@ -36,5 +36,7 @@ configFile.write("""symbols: config/GAMEID/symbols.txt\n"""
 configFile.close()
 
 #decompile
-subprocess.run([python, "Configure.py"], cwd= projectDir + "/DTK")
-subprocess.run([ninja], cwd= projectDir + "/DTK")
+subprocess.call([python, "configure.py"], cwd= projectDir + "/DTK",
+    shell=False)
+subprocess.call([ninja], cwd= projectDir + "/DTK",
+    shell=False)
