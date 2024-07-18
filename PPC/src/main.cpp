@@ -9,6 +9,7 @@ WIP Transcompiler for converting Game Cube Assembly to C++
 #include <filesystem>
 #include <process.h>
 #include <fstream>
+#include <iostream>
 
 #include <DTK_PPC_Lexer/Lexer.hpp>
 
@@ -94,24 +95,24 @@ int main(int args, const char* argv)
 	const std::string ASMDir = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm";
 	//const std::string ASMDir = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm";
 	const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/__init_cpp_exceptions.s";
+	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
+	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
 
 	//loads the symbol data
 
 	//reads the ASM code
-	FILE* file = nullptr;
-	file = fopen(ASMFile.c_str(), "r");
-	fseek(file, 0, SEEK_END);
-	long length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	char* text = (char*)calloc(length, length);
-	if (text)
-		fread(text, 1, length, file);
-	fclose(file);
+	std::ifstream t(ASMFile);
+	t.seekg(0, std::ios::end);
+	size_t size = t.tellg();
+	std::string buffer(size, '\0');
+	t.seekg(0);
+	t.read(&buffer[0], size);
+	t.close();
 
 	//lexes
-	PPC::Frontend::DTK::ASMParser(text);
-	if(text)
-		free(text);
+	std::vector<PPC::Frontend::DTK::Token> tokens = PPC::Frontend::DTK::ASMParser(buffer);
+	for (size_t t = 0; t < tokens.size(); ++t)
+		tokens[t].Print();
 
 	//perform stage 0
 	//Stage_Zero(ROMPath, projectPath);

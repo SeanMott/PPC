@@ -1,89 +1,112 @@
 #include <DTK_PPC_Lexer/Lexer.hpp>
 
-#define FMT_HEADER_ONLY
-#include "C:/Compilers/PPC/Venders/fmt/include/fmt/color.h"
-#include "C:/Compilers/PPC/Venders/fmt/include/fmt/core.h"
-
-#include <DTK_PowerPCDecoder/AssemblyInstructions.hpp>
-#include <DTK_PowerPCDecoder/Registers.hpp>
-
-//prints genaric line info
-static inline void PrintGenaricDataInfo(const size_t& lineCount, const std::string& data)
+//prints token data
+void PPC::Frontend::DTK::Token::Print()
 {
-	//prints line info
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print("{}\n", data);
+	switch (type)
+	{
+	case TokenType::Identifier:
+		//prints line info
+		fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+		fmt::print(fg(fmt::color::fire_brick), " || ");
+		fmt::print("Identitfier: {}\n", data);
+		break;
+
+		case TokenType::Comment_ASMIntel:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::green), "ASM Extra Info: {}\n", data);
+			break;
+		case TokenType::Comment_ASMInstructionAddress:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::green), "ASM Instruction Address: /* {}\n", data);
+			break;
+
+		case TokenType::Literal_Integer:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::olive), "Integer Literal: {}\n", data);
+			break;
+		case TokenType::Literal_Float:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::olive), "Float Literal: {}\n", data);
+			break;
+
+		case TokenType::Literal_Hex:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::olive), "Hex Literal: {}\n", data);
+			break;
+		case TokenType::Literal_String:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::pink), "String Literal: \"{}\"\n", data);
+			break;
+
+		case TokenType::Register_Int:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::dark_salmon), "Int Register: {}\n", data);
+			break;
+		case TokenType::Register_Float:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::dark_salmon), "Float Register: {}\n", data);
+			break;
+		case TokenType::Register_Keyword:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::dark_salmon), "Keyword Register: {}\n", data);
+			break;
+
+		case TokenType::DotDirective_Keyword:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::dark_golden_rod), "Dot Directive: {}\n", data);
+			break;
+		case TokenType::DotDirective_Datatype:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::dark_golden_rod), "Dot Directive Datatype: {}\n", data);
+			break;
+
+		case TokenType::Operator:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::rebecca_purple), "Operator: {}\n", data);
+			break;
+
+		case TokenType::ASMInstruction:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::orange), "ASM Instruction: {}\n", data);
+			break;
+
+		case TokenType::ScopeKeyword:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::dark_gray), "Scope Keyword: {}\n", data);
+			break;
+
+		default:
+			//prints line info
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print("UNKNOWN TOKEN: {}\n", data);
+			break;
+	}
 }
-
-//creates a ASM info comment || a little bit of info on sector and byte size DTK adds
-static inline void GenerateToken_ASMIntelComment(const size_t& lineCount, const std::string& data)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::green), "ASM Extra Info: {}\n", data);
-}
-
-//creates a ASM intruction address comment
-static inline void GenerateToken_InstructionAddressComment(const size_t& lineCount, const std::string& data)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::green), "ASM Instruction Address: /* {}\n", data);
-}
-
-//creates a string literal token
-static inline void GenerateToken_StringLiteral(const size_t& lineCount, const std::string& data)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::pink), "String: \"{}\"\n", data);
-}
-
-//creates a dot directive token
-static inline void GenerateToken_DotDirective(const size_t& lineCount, const std::string& data)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::dark_golden_rod), "Dot Directive: {}\n", data);
-}
-
-//creates a operator token
-static inline void GenerateToken_Operator(const size_t& lineCount, const char op)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::rebecca_purple), "Operator: {}\n", op);
-}
-
-//creates a digit literal token
-static inline void GenerateToken_DigitLiteral(const size_t& lineCount, const std::string& data)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::olive), "Digit: {}\n", data);
-}
-
-//creates a hex literal token
-static inline void GenerateToken_HexLiteral(const size_t& lineCount, const std::string& data)
-{
-	fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
-	fmt::print(fg(fmt::color::fire_brick), " || ");
-	fmt::print(fg(fmt::color::olive), "Hex: {}\n", data);
-}
-
-
-//creates a genaric token
-
-//creates a sector dot directive
-
-//creates a aligment dot directive
 
 //checks if something is a digit
-static inline bool IsDigit(const char* str)
+static inline bool IsDigit(const std::string& data)
 {
+	if (data.empty()) //if there's no data
+		return false;
+
 	char* p;
-	long converted = strtol(str, &p, 10);
+	long converted = strtol(data.c_str(), &p, 10);
 	if (*p) {
 		return false;
 	}
@@ -95,8 +118,11 @@ static inline bool IsDigit(const char* str)
 //checks if something is a hex value
 static inline bool IsHex(const std::string& hexStr)
 {
+	if (hexStr.empty()) //if there's no data
+		return false;
+
 	//checks for hex
-	if (hexStr.size() < 2 || hexStr[0] != '0' || hexStr[1] != 'x')
+	if (hexStr.size() < 3 || hexStr[0] != '0' || hexStr[1] != 'x')
 		return false;
 
 	//shave off the hex part
@@ -113,48 +139,222 @@ static inline bool IsHex(const std::string& hexStr)
 	}
 }
 
+//checks if it's a floating number
+static inline bool isFloatNumber(const std::string& string) {
+	std::string::const_iterator it = string.begin();
+	bool decimalPoint = false;
+	int minSize = 0;
+	if (string.size() > 0 && (string[0] == '-' || string[0] == '+')) {
+		it++;
+		minSize++;
+	}
+	while (it != string.end()) {
+		if (*it == '.') {
+			if (!decimalPoint) decimalPoint = true;
+			else break;
+		}
+		else if (!std::isdigit(*it) && ((*it != 'f') || it + 1 != string.end() || !decimalPoint)) {
+			break;
+		}
+		++it;
+	}
+	return string.size() > minSize && it == string.end();
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Identifier(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Identifier;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_DotDirective(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::DotDirective_Keyword;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_ScopeKeyword(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::ScopeKeyword;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_IntRegister(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Register_Int;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_FloatRegister(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Register_Float;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_KeywordRegister(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Register_Keyword;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_ASMInstruction(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::ASMInstruction;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Literal_Hex(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Literal_Hex;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Literal_Integer(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Literal_Integer;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Literal_Float(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Literal_Float;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Literal_String(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Literal_String;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Comment_ASMIntel(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Comment_ASMIntel;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Comment_ASMInstructionAddress(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Comment_ASMInstructionAddress;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_Operator(const size_t& lineCount, const char data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Operator;
+	return t;
+}
+
 //process a chunk of data
-static inline bool ProcessData(const size_t& lineCount, std::string& data)
+static inline bool ProcessData(const size_t& lineCount, std::string& data, PPC::Frontend::DTK::Token& token)
 {
 	if (data.empty()) //if there's no data
 		return false;
 
 	bool found = false;
 
+	uint32_t arrayIndex = 0; 
+	PPC::Decoder::ASM::EInstruction instruction; 
+	PPC::Decoder::Register::IntegerGeneralPurposeRegister intRegister; PPC::Decoder::Register::FloatingGeneralPurposeRegister floatRegister;
+	PPC::Decoder::Register::Register_Keword_Enum keywordRegister;
+
 	//if data is a dot directive
 	if (data[0] == '.')
 	{
-		GenerateToken_DotDirective(lineCount, data);
+		token = GenerateToken_DotDirective(lineCount, data);
 		found = true;
 	}
 
-	//if data is a keyword
+	//scope keyword
+	else if (!strcmp("global", data.c_str()))
+	{
+		token = GenerateToken_ScopeKeyword(lineCount, data);
+		found = true;
+	}
 
-	//if data is a register
+	//if data is a int register
+	else if (PPC::Decoder::Register::IsString_GeneralIntegerRegister(data.c_str(), arrayIndex, intRegister))
+	{
+		token = GenerateToken_IntRegister(lineCount, data);
+		found = true;
+	}
+
+	//if data is a floating register
+	else if (PPC::Decoder::Register::IsString_GeneralFloatingRegister(data.c_str(), arrayIndex, floatRegister))
+	{
+		token = GenerateToken_FloatRegister(lineCount, data);
+		found = true;
+	}
+
+	//if data is a keyword register
+	else if (PPC::Decoder::Register::IsKeywordRegister(data.c_str(), arrayIndex, keywordRegister))
+	{
+		token = GenerateToken_KeywordRegister(lineCount, data);
+		found = true;
+	}
 
 	//if data is a instruction
+	else if (PPC::Decoder::ASM::IsASMInstructionStr(data.c_str(), arrayIndex, instruction))
+	{
+		token = GenerateToken_ASMInstruction(lineCount, data);
+		found = true;
+	}
 
 	//if it's a digit literal
 	else if (IsDigit(data.c_str()))
 	{
-		GenerateToken_DigitLiteral(lineCount, data);
+		token = GenerateToken_Literal_Integer(lineCount, data);
 		found = true;
 	}
 
 	//if it's a hex literal
 	else if (IsHex(data.c_str()))
 	{
-		GenerateToken_HexLiteral(lineCount, data);
+		token = GenerateToken_Literal_Hex(lineCount, data);
 		found = true;
 	}
 
-	//if it's a float/double
-
-	//if it's a integer
+	//if it's a float
+	else if (isFloatNumber(data))
+	{
+		token = GenerateToken_Literal_Float(lineCount, data);
+		found = true;
+	}
 
 	//if nothing print genaric
 	else
-		PrintGenaricDataInfo(lineCount, data);
+	{
+		token = GenerateToken_Identifier(lineCount, data);
+		found = true;
+	}
 
 	data = "";
 
@@ -162,11 +362,12 @@ static inline bool ProcessData(const size_t& lineCount, std::string& data)
 }
 
 //defines a parser for DTK Assembly
-void PPC::Frontend::DTK::ASMParser(const std::string& code)
+std::vector<PPC::Frontend::DTK::Token> PPC::Frontend::DTK::ASMParser(const std::string& code)
 {
 	const size_t codeLength = code.size();
 
-	bool isInQuotes = false; //are we inside quoates
+	std::vector<Token> tokens; tokens.reserve(codeLength);
+	Token t;
 
 	//breaks the code into lines
 	std::string data = ""; size_t lineCount = 1;
@@ -174,30 +375,23 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 	{
 		//skips tabs
 		if (code[c] == '\t')
+		{
+			//process previous data if anything is left
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
+
 			continue;
+		}
 
 		//new line
 		if (code[c] == '\n')
 		{
 			//process previous data if anything is left
-			ProcessData(lineCount, data);
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
 
 			//moves to next line
 			lineCount++;
-			continue;
-		}
-
-		//if space or comma process the data
-		if (code[c] == ' ' || code[c] == ',')
-			ProcessData(lineCount, data);
-
-		//if operator ( or ) or @ or -
-		else if (code[c] == '(' || code[c] == ')' || code[c] == '@' || code[c] == '-')
-		{
-			//process previous data if anything is left
-			ProcessData(lineCount, data);
-
-			GenerateToken_Operator(lineCount, code[c]);
 			continue;
 		}
 
@@ -205,7 +399,8 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 		else if (code[c] == '#')
 		{
 			//process previous data if anything is left
-			ProcessData(lineCount, data);
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
 
 			//process current comment
 			while (code[c] != '\n')
@@ -213,17 +408,18 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 				c++;
 				data += code[c];
 			}
-			GenerateToken_ASMIntelComment(lineCount, data);
+			tokens.emplace_back(GenerateToken_Comment_ASMIntel(lineCount, data));
 			data = "";
 
 			continue;
 		}
 
 		//if it starts a /*, it's a start of a address comment, go until */
-		else if (code[c] == '/' && code[c + 1] == '*')
+		else if (code[c] == '/' && c + 1 <= codeLength && code[c + 1] == '*')
 		{
 			//process previous data if anything is left
-			ProcessData(lineCount, data);
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
 
 			//process current comment
 			c++; //skip the first / so we don't instantly break out
@@ -232,9 +428,27 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 				c++;
 				data += code[c];
 			}
-			GenerateToken_InstructionAddressComment(lineCount, data);
+			tokens.emplace_back(GenerateToken_Comment_ASMInstructionAddress(lineCount, data));
 			data = "";
 
+			continue;
+		}
+
+		//if space or comma process the data
+		if (code[c] == ' ' || code[c] == ',')
+		{
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
+		}
+
+		//if operator ( or ) or @ or -
+		else if (code[c] == '(' || code[c] == ')' || code[c] == '@' || code[c] == '-')
+		{
+			//process previous data if anything is left
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
+
+			tokens.emplace_back(GenerateToken_Operator(lineCount, code[c]));
 			continue;
 		}
 
@@ -242,7 +456,8 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 		else if (code[c] == '"')
 		{
 			//process previous data if anything is left
-			ProcessData(lineCount, data);
+			if (ProcessData(lineCount, data, t))
+				tokens.emplace_back(t);
 
 			//process current string
 			c++; //skip the first " so we don't instantly break out
@@ -251,7 +466,7 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 				data += code[c];
 				c++;
 			}
-			GenerateToken_StringLiteral(lineCount, data);
+			tokens.emplace_back(GenerateToken_Literal_String(lineCount, data));
 			data = "";
 
 			continue;
@@ -261,4 +476,6 @@ void PPC::Frontend::DTK::ASMParser(const std::string& code)
 		else
 			data += code[c];
 	}
+
+	return tokens;
 }
