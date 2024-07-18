@@ -21,6 +21,7 @@
     <ClInclude Include="includes\DTK_PowerPCDecoder\Registers.hpp">
       <Filter>includes\DTK_PowerPCDecoder</Filter>
     </ClInclude>
+    <ClInclude Include="includes\DTK_PowerPCDecoder\DotDirectives.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">

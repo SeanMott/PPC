@@ -5,9 +5,11 @@
 #define FMT_HEADER_ONLY
 #include "C:/Compilers/PPC/Venders/fmt/include/fmt/color.h"
 #include "C:/Compilers/PPC/Venders/fmt/include/fmt/core.h"
+#include "C:/Compilers/PPC/Venders/fmt/include/fmt/os.h"
 
 #include <DTK_PowerPCDecoder/AssemblyInstructions.hpp>
 #include <DTK_PowerPCDecoder/Registers.hpp>
+#include <DTK_PowerPCDecoder/DotDirectives.hpp>
 
 #include <string>
 #include <vector>
@@ -40,6 +42,8 @@ namespace PPC::Frontend::DTK
 
 		ScopeKeyword,
 
+		Newline,
+
 		Count
 	};
 
@@ -52,7 +56,7 @@ namespace PPC::Frontend::DTK
 		std::string data = "";
 
 		//prints data
-		void Print();
+		std::string Print();
 	};
 
 	//defines a parser for DTK Assembly

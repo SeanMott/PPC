@@ -81,10 +81,25 @@ static inline void Stage_One()
 	//generate metadata
 }
 
+//prints the version of the PPC
+static inline void PrintVer()
+{
+	fmt::print(fmt::fg(fmt::color::deep_sky_blue), "Power PC To C Compiler (PPC) ");
+	fmt::print("Ver: ");
+	fmt::print(fmt::fg(fmt::color::crimson), "0.2.1");
+	fmt::print(" || ");
+	fmt::print(fmt::fg(fmt::color::dark_violet), "Apocrypha-Beta\n\n");
+}
+
 //if no arguments are passed
 static inline void Help()
 {
-	
+	//prints version information
+	PrintVer();
+
+	//stage 0 || decompiles a ROM and extracts all the symbol and ASM
+
+	//stage 1 || inital ASM and symbol analisys and generates lex caches to use in other stages
 }
 
 //entry point
@@ -92,10 +107,12 @@ int main(int args, const char* argv)
 {
 	//--arg
 
+	//Help();
+
 	const std::string ASMDir = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm";
 	//const std::string ASMDir = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm";
-	const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/__init_cpp_exceptions.s";
-	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
+	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/__init_cpp_exceptions.s";
+	const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
 	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
 
 	//loads the symbol data
@@ -110,9 +127,18 @@ int main(int args, const char* argv)
 	t.close();
 
 	//lexes
+	//std::string output = "";
 	std::vector<PPC::Frontend::DTK::Token> tokens = PPC::Frontend::DTK::ASMParser(buffer);
-	for (size_t t = 0; t < tokens.size(); ++t)
-		tokens[t].Print();
+	//for (size_t t = 0; t < tokens.size(); ++t)
+	//	output += tokens[t].Print();
+
+	//gets file name
+
+	//writes lex cache
+
+	//generate AST
+
+	//generate Translation Unit
 
 	//perform stage 0
 	//Stage_Zero(ROMPath, projectPath);

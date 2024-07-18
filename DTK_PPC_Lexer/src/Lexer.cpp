@@ -1,8 +1,10 @@
 #include <DTK_PPC_Lexer/Lexer.hpp>
 
 //prints token data
-void PPC::Frontend::DTK::Token::Print()
+std::string PPC::Frontend::DTK::Token::Print()
 {
+	std::string output = "";
+
 	switch (type)
 	{
 	case TokenType::Identifier:
@@ -10,84 +12,106 @@ void PPC::Frontend::DTK::Token::Print()
 		fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 		fmt::print(fg(fmt::color::fire_brick), " || ");
 		fmt::print("Identitfier: {}\n", data);
+		output = fmt::format("Line: {} || Identitfier: {}\n", lineCount, data);
 		break;
 
 		case TokenType::Comment_ASMIntel:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::green), "ASM Extra Info: {}\n", data);
+			output = fmt::format("Line: {} || ASM Extra Info: {}\n", lineCount, data);
 			break;
 		case TokenType::Comment_ASMInstructionAddress:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::green), "ASM Instruction Address: /* {}\n", data);
+			output = fmt::format("Line: {} || ASM Instruction Address: {}\n", lineCount, data);
 			break;
 
 		case TokenType::Literal_Integer:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::olive), "Integer Literal: {}\n", data);
+			output = fmt::format("Line: {} || Integer Literal: {}\n", lineCount, data);
 			break;
 		case TokenType::Literal_Float:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::olive), "Float Literal: {}\n", data);
+			output = fmt::format("Line: {} || Float Literal: {}\n", lineCount, data);
 			break;
 
 		case TokenType::Literal_Hex:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::olive), "Hex Literal: {}\n", data);
+			output = fmt::format("Line: {} || Hex Literal: {}\n", lineCount, data);
 			break;
 		case TokenType::Literal_String:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::pink), "String Literal: \"{}\"\n", data);
+			output = fmt::format("Line: {} || String Literal: {}\n", lineCount, data);
 			break;
 
 		case TokenType::Register_Int:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_salmon), "Int Register: {}\n", data);
+			output = fmt::format("Line: {} || Int Register: {}\n", lineCount, data);
 			break;
 		case TokenType::Register_Float:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_salmon), "Float Register: {}\n", data);
+			output = fmt::format("Line: {} || Float Register: {}\n", lineCount, data);
 			break;
 		case TokenType::Register_Keyword:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_salmon), "Keyword Register: {}\n", data);
+			output = fmt::format("Line: {} || Keyword Register: {}\n", lineCount, data);
 			break;
 
 		case TokenType::DotDirective_Keyword:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_golden_rod), "Dot Directive: {}\n", data);
+			output = fmt::format("Line: {} || Dot Directive: {}\n", lineCount, data);
 			break;
 		case TokenType::DotDirective_Datatype:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_golden_rod), "Dot Directive Datatype: {}\n", data);
+			output = fmt::format("Line: {} || Dot Directive Datatype: {}\n", lineCount, data);
 			break;
 
 		case TokenType::Operator:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::rebecca_purple), "Operator: {}\n", data);
+			output = fmt::format("Line: {} || Operator: {}\n", lineCount, data);
 			break;
 
 		case TokenType::ASMInstruction:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::orange), "ASM Instruction: {}\n", data);
+			output = fmt::format("Line: {} || ASM Instruction: {}\n", lineCount, data);
 			break;
 
 		case TokenType::ScopeKeyword:
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_gray), "Scope Keyword: {}\n", data);
+			output = fmt::format("Line: {} || Scope Keyword: {}\n", lineCount, data);
+			break;
+
+		case TokenType::Newline:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::aqua), "New Line: {}\n", data);
+			output = fmt::format("Line: {} || New Line: {}\n", lineCount, data);
 			break;
 
 		default:
@@ -95,8 +119,11 @@ void PPC::Frontend::DTK::Token::Print()
 			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print("UNKNOWN TOKEN: {}\n", data);
+			output = fmt::format("Line: {} || UNKNOWN TOKEN: {}\n", lineCount, data);
 			break;
 	}
+
+	return output;
 }
 
 //checks if something is a digit
@@ -174,6 +201,14 @@ static inline PPC::Frontend::DTK::Token GenerateToken_DotDirective(const size_t&
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::DotDirective_Keyword;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_DotDirectiveDatatype(const size_t& lineCount, const std::string& data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::DotDirective_Datatype;
 	return t;
 }
 
@@ -273,6 +308,14 @@ static inline PPC::Frontend::DTK::Token GenerateToken_Operator(const size_t& lin
 	return t;
 }
 
+static inline PPC::Frontend::DTK::Token GenerateToken_Newline(const size_t& lineCount, const char data)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::Newline;
+	return t;
+}
+
 //process a chunk of data
 static inline bool ProcessData(const size_t& lineCount, std::string& data, PPC::Frontend::DTK::Token& token)
 {
@@ -285,11 +328,20 @@ static inline bool ProcessData(const size_t& lineCount, std::string& data, PPC::
 	PPC::Decoder::ASM::EInstruction instruction; 
 	PPC::Decoder::Register::IntegerGeneralPurposeRegister intRegister; PPC::Decoder::Register::FloatingGeneralPurposeRegister floatRegister;
 	PPC::Decoder::Register::Register_Keword_Enum keywordRegister;
+	PPC::Decoder::DotDirectives::DotDirective_Keyword dotDirective;
+	PPC::Decoder::DotDirectives::DotDirective_Datatype datatype;
 
-	//if data is a dot directive
-	if (data[0] == '.')
+	//-----if data is a dot directive
+	if (PPC::Decoder::DotDirectives::IsDotDirectiveKeyword(data.c_str(), arrayIndex, dotDirective))
 	{
 		token = GenerateToken_DotDirective(lineCount, data);
+		found = true;
+	}
+
+	//-----if it's a datatype
+	else if (PPC::Decoder::DotDirectives::IsDotDirectiveDatatype(data.c_str(), arrayIndex, datatype))
+	{
+		token = GenerateToken_DotDirectiveDatatype(lineCount, data);
 		found = true;
 	}
 
@@ -391,6 +443,7 @@ std::vector<PPC::Frontend::DTK::Token> PPC::Frontend::DTK::ASMParser(const std::
 				tokens.emplace_back(t);
 
 			//moves to next line
+			tokens.emplace_back(GenerateToken_Newline(lineCount, '\n'));
 			lineCount++;
 			continue;
 		}
