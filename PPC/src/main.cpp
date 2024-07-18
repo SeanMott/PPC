@@ -12,6 +12,8 @@ WIP Transcompiler for converting Game Cube Assembly to C++
 #include <iostream>
 
 #include <DTK_PPC_Lexer/Lexer.hpp>
+#include <DTK_PPC_Lexer/AST.hpp>
+#include <DTK_PPC_Lexer/Symbol.hpp>
 
 //calculates the position of what programs to use
 const std::string workingDir = std::filesystem::current_path().string();
@@ -102,20 +104,95 @@ static inline void Help()
 	//stage 1 || inital ASM and symbol analisys and generates lex caches to use in other stages
 }
 
+//renames all structs based on type
+static inline void ActionFlag_RenameStructsBasedOnType()
+{
+	//gets all the files and lexes them, store in temporary cache
+
+	//turn lexed files into ASTs
+
+	//parse current symbols
+
+	//generate names for stucts based on type
+
+	//copy symbol list and change names
+
+	//run symbol patcher and update names in the lex cache then write back to file
+
+	//delete temp cache of lexed data
+}
+
 //entry point
 int main(int args, const char* argv)
 {
 	//--arg
+
+	//--set flag for generating sudo-C human readable code
+	//this assembly is just a cleaned up version of with less of the extra syntax needed for compiling ASM
+	//if also provides type information
 
 	//Help();
 
 	const std::string ASMDir = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm";
 	//const std::string ASMDir = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm";
 	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/__init_cpp_exceptions.s";
-	const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
+	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
 	//const std::string ASMFile = "C:/KARTools/PPC-KAR-HP-Decomp/BaseNA/asm/auto_11_805DE700_sdata2.s";
 
+	const std::string ASMFile = "C:/Decomps/TOD/asm/auto_09_8004FDA0_sdata2.s";
+	const std::string symbolFile = "C:/Decomps/TOD/symbols.txt";
+
 	//loads the symbol data
+	//std::vector<PPC::Frontend::Symbol::Symbol> symbols = PPC::Frontend::Symbol::ParseSymbolFile(symbolFile);
+	std::vector<PPC::Frontend::DTK::Symbol::Symbol> symbols; symbols.reserve(200);
+	std::ifstream input(symbolFile);
+	for (std::string line; getline(input, line); )
+	{
+		PPC::Frontend::DTK::Symbol::Symbol symbol;
+		//splits line
+		const size_t lineCount = line.size();
+		std::vector<std::string> parts; parts.reserve(5);
+		std::string data = "";
+		for (size_t i = 0; i < lineCount; ++i)
+		{
+			if (line[i] == ' ' || line[i] == '\n')
+			{
+				parts.emplace_back(data);
+				data = "";
+				continue;
+			}
+
+			data += line[i];
+		}
+
+		//gets the name, always 0
+		symbol.name = parts[0];
+
+		//searches for the type
+		for (uint32_t i = 4; i < parts.size(); ++i)
+		{
+			if (!strcmp("type:object", parts[i].c_str()))
+			{
+				symbol.type = PPC::Frontend::DTK::Symbol::SymbolType::Object;
+				break;
+			}
+			else if (!strcmp("type:function", parts[i].c_str()))
+			{
+				symbol.type = PPC::Frontend::DTK::Symbol::SymbolType::Function;
+				break;
+			}
+			else if (!strcmp("type:label", parts[i].c_str()))
+			{
+				symbol.type = PPC::Frontend::DTK::Symbol::SymbolType::Label;
+				break;
+			}
+
+			fmt::print("part {}: {} || ", i, parts[i]);
+			fmt::print("\n");
+		}
+
+		symbols.emplace_back(symbol);
+	}
 
 	//reads the ASM code
 	std::ifstream t(ASMFile);
@@ -130,13 +207,23 @@ int main(int args, const char* argv)
 	//std::string output = "";
 	std::vector<PPC::Frontend::DTK::Token> tokens = PPC::Frontend::DTK::ASMParser(buffer);
 	//for (size_t t = 0; t < tokens.size(); ++t)
-	//	output += tokens[t].Print();
+		//output += tokens[t].Print();
 
 	//gets file name
 
 	//writes lex cache
 
 	//generate AST
+	std::vector<PPC::Frontend::DTK::ASTNode> tree = PPC::Frontend::DTK::GenerateAST(tokens, symbols);
+	for (size_t t = 0; t < tree.size(); ++t)
+	{
+		tree[t].Print();
+
+		// std::string data = ""
+		//fmt::print("struct {} {\n",tree[t].structMetadata.structName.c_str());
+
+		//fmt::print("};\n");
+	}
 
 	//generate Translation Unit
 

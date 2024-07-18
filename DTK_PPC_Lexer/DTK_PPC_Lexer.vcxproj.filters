@@ -16,6 +16,7 @@
       <Filter>includes\DTK_PPC_Lexer</Filter>
     </ClInclude>
     <ClInclude Include="includes\DTK_PPC_Lexer\AST.hpp" />
+    <ClInclude Include="includes\DTK_PPC_Lexer\Symbol.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Lexer.cpp">

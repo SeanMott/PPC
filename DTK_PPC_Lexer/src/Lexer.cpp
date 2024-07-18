@@ -1,7 +1,7 @@
 #include <DTK_PPC_Lexer/Lexer.hpp>
 
 //prints token data
-std::string PPC::Frontend::DTK::Token::Print()
+std::string PPC::Frontend::DTK::Token::Print() const
 {
 	std::string output = "";
 
@@ -84,6 +84,12 @@ std::string PPC::Frontend::DTK::Token::Print()
 			fmt::print(fg(fmt::color::fire_brick), " || ");
 			fmt::print(fg(fmt::color::dark_golden_rod), "Dot Directive Datatype: {}\n", data);
 			output = fmt::format("Line: {} || Dot Directive Datatype: {}\n", lineCount, data);
+			break;
+		case TokenType::BitDirective:
+			fmt::print(fg(fmt::color::cyan), "Line: {}", lineCount);
+			fmt::print(fg(fmt::color::fire_brick), " || ");
+			fmt::print(fg(fmt::color::lemon_chiffon), "Bit Directive: {}\n", data);
+			output = fmt::format("Line: {} || Bit Directive: {}\n", lineCount, data);
 			break;
 
 		case TokenType::Operator:
@@ -196,59 +202,83 @@ static inline PPC::Frontend::DTK::Token GenerateToken_Identifier(const size_t& l
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_DotDirective(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_DotDirective(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::DotDirectives::DotDirective_Keyword& directive)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::DotDirective_Keyword;
+	t.dotDirective = directive;
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_DotDirectiveDatatype(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_DotDirectiveDatatype(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::DotDirectives::DotDirective_Datatype& datatype)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::DotDirective_Datatype;
+	t.datatype = datatype;
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_ScopeKeyword(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_BitDirective(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::BitDirectives::BitDirectiveType& bitDirective)
+{
+	PPC::Frontend::DTK::Token t;
+	t.data = data; t.lineCount = lineCount;
+	t.type = PPC::Frontend::DTK::TokenType::BitDirective;
+	t.bitDirective = bitDirective;
+	return t;
+}
+
+static inline PPC::Frontend::DTK::Token GenerateToken_ScopeKeyword(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::Scope::ScopeType scope)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::ScopeKeyword;
+	t.scope = scope;
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_IntRegister(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_IntRegister(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::Register::IntegerGeneralPurposeRegister& reg)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::Register_Int;
+	t.intRegister = reg;
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_FloatRegister(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_FloatRegister(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::Register::FloatingGeneralPurposeRegister& reg)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::Register_Float;
+	t.floatRegister = reg;
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_KeywordRegister(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_KeywordRegister(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::Register::Register_Keword_Enum& reg)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::Register_Keyword;
+	t.keywordRegister = reg;
 	return t;
 }
 
-static inline PPC::Frontend::DTK::Token GenerateToken_ASMInstruction(const size_t& lineCount, const std::string& data)
+static inline PPC::Frontend::DTK::Token GenerateToken_ASMInstruction(const size_t& lineCount, const std::string& data,
+	const PPC::Decoder::ASM::EInstruction& inst)
 {
 	PPC::Frontend::DTK::Token t;
 	t.data = data; t.lineCount = lineCount;
 	t.type = PPC::Frontend::DTK::TokenType::ASMInstruction;
+	t.instruction = inst;
 	return t;
 }
 
@@ -330,53 +360,62 @@ static inline bool ProcessData(const size_t& lineCount, std::string& data, PPC::
 	PPC::Decoder::Register::Register_Keword_Enum keywordRegister;
 	PPC::Decoder::DotDirectives::DotDirective_Keyword dotDirective;
 	PPC::Decoder::DotDirectives::DotDirective_Datatype datatype;
+	PPC::Decoder::BitDirectives::BitDirectiveType bitDirective;
+	PPC::Decoder::Scope::ScopeType scope;
 
 	//-----if data is a dot directive
 	if (PPC::Decoder::DotDirectives::IsDotDirectiveKeyword(data.c_str(), arrayIndex, dotDirective))
 	{
-		token = GenerateToken_DotDirective(lineCount, data);
+		token = GenerateToken_DotDirective(lineCount, data, dotDirective);
 		found = true;
 	}
 
 	//-----if it's a datatype
 	else if (PPC::Decoder::DotDirectives::IsDotDirectiveDatatype(data.c_str(), arrayIndex, datatype))
 	{
-		token = GenerateToken_DotDirectiveDatatype(lineCount, data);
+		token = GenerateToken_DotDirectiveDatatype(lineCount, data, datatype);
+		found = true;
+	}
+
+	//-----if it's a bit directive
+	else if (PPC::Decoder::BitDirectives::IsBitDirective(data.c_str(), arrayIndex, bitDirective))
+	{
+		token = GenerateToken_BitDirective(lineCount, data, bitDirective);
 		found = true;
 	}
 
 	//scope keyword
-	else if (!strcmp("global", data.c_str()))
+	else if (PPC::Decoder::Scope::IsScopeKeyword(data.c_str(), arrayIndex, scope))
 	{
-		token = GenerateToken_ScopeKeyword(lineCount, data);
+		token = GenerateToken_ScopeKeyword(lineCount, data, scope);
 		found = true;
 	}
 
 	//if data is a int register
 	else if (PPC::Decoder::Register::IsString_GeneralIntegerRegister(data.c_str(), arrayIndex, intRegister))
 	{
-		token = GenerateToken_IntRegister(lineCount, data);
+		token = GenerateToken_IntRegister(lineCount, data, intRegister);
 		found = true;
 	}
 
 	//if data is a floating register
 	else if (PPC::Decoder::Register::IsString_GeneralFloatingRegister(data.c_str(), arrayIndex, floatRegister))
 	{
-		token = GenerateToken_FloatRegister(lineCount, data);
+		token = GenerateToken_FloatRegister(lineCount, data, floatRegister);
 		found = true;
 	}
 
 	//if data is a keyword register
 	else if (PPC::Decoder::Register::IsKeywordRegister(data.c_str(), arrayIndex, keywordRegister))
 	{
-		token = GenerateToken_KeywordRegister(lineCount, data);
+		token = GenerateToken_KeywordRegister(lineCount, data, keywordRegister);
 		found = true;
 	}
 
 	//if data is a instruction
 	else if (PPC::Decoder::ASM::IsASMInstructionStr(data.c_str(), arrayIndex, instruction))
 	{
-		token = GenerateToken_ASMInstruction(lineCount, data);
+		token = GenerateToken_ASMInstruction(lineCount, data, instruction);
 		found = true;
 	}
 
@@ -487,15 +526,15 @@ std::vector<PPC::Frontend::DTK::Token> PPC::Frontend::DTK::ASMParser(const std::
 			continue;
 		}
 
-		//if space or comma process the data
-		if (code[c] == ' ' || code[c] == ',')
+		//if space process the data
+		if (code[c] == ' ')
 		{
 			if (ProcessData(lineCount, data, t))
 				tokens.emplace_back(t);
 		}
 
-		//if operator ( or ) or @ or -
-		else if (code[c] == '(' || code[c] == ')' || code[c] == '@' || code[c] == '-')
+		//if operator ( or ) or @ or - or + or ,
+		else if (code[c] == '(' || code[c] == ')' || code[c] == '@' || code[c] == '-' || code[c] == '+' || code[c] == ',')
 		{
 			//process previous data if anything is left
 			if (ProcessData(lineCount, data, t))
@@ -517,6 +556,11 @@ std::vector<PPC::Frontend::DTK::Token> PPC::Frontend::DTK::ASMParser(const std::
 			while (code[c] != '"')
 			{
 				data += code[c];
+
+				//if it's a back slash, append another
+				if (code[c] == '\\')
+					data += '\\';
+
 				c++;
 			}
 			tokens.emplace_back(GenerateToken_Literal_String(lineCount, data));

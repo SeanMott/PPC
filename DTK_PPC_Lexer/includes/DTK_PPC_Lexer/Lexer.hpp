@@ -10,6 +10,7 @@
 #include <DTK_PowerPCDecoder/AssemblyInstructions.hpp>
 #include <DTK_PowerPCDecoder/Registers.hpp>
 #include <DTK_PowerPCDecoder/DotDirectives.hpp>
+#include <DTK_PowerPCDecoder/ScopeKeywords.hpp>
 
 #include <string>
 #include <vector>
@@ -35,6 +36,7 @@ namespace PPC::Frontend::DTK
 
 		DotDirective_Keyword,
 		DotDirective_Datatype,
+		BitDirective,
 
 		Operator,
 
@@ -51,12 +53,23 @@ namespace PPC::Frontend::DTK
 	//defines a token
 	struct Token
 	{
+		//genaric data
 		TokenType type = TokenType::Count;
 		size_t lineCount = 0;
 		std::string data = "";
 
+		//specific data
+		uint32_t arrayIndex = 0;
+		PPC::Decoder::ASM::EInstruction instruction;
+		PPC::Decoder::Register::IntegerGeneralPurposeRegister intRegister; PPC::Decoder::Register::FloatingGeneralPurposeRegister floatRegister;
+		PPC::Decoder::Register::Register_Keword_Enum keywordRegister;
+		PPC::Decoder::DotDirectives::DotDirective_Keyword dotDirective;
+		PPC::Decoder::DotDirectives::DotDirective_Datatype datatype;
+		PPC::Decoder::BitDirectives::BitDirectiveType bitDirective;
+		PPC::Decoder::Scope::ScopeType scope;
+
 		//prints data
-		std::string Print();
+		std::string Print() const;
 	};
 
 	//defines a parser for DTK Assembly
