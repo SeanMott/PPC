@@ -92,19 +92,21 @@ static inline PPC::Frontend::DTK::ASTNode GenerateASTNode_Struct(const std::vect
 			{
 				var.isValueTokensAIdentifier = true;
 			
-				//checks if it contains a function, label, or struct
+				//checks if it contains a function, label, or struct and change the datatype to match
 				const char* maybeFuncName = var.valueTokens[0].data.c_str();
 				for (size_t s = 0; s < symbols.size(); ++s)
 				{
 					if (!strcmp(symbols[s].name.c_str(), maybeFuncName) && symbols[s].type == PPC::Frontend::DTK::Symbol::SymbolType::Function)
 					{
 						var.valueTokensContainsAFucntion = true;
+						var.datatype = PPC::Decoder::DotDirectives::DotDirective_Datatype::Byte4_FunctionPtr;
 						break;
 					}
 
 					if (!strcmp(symbols[s].name.c_str(), maybeFuncName) && symbols[s].type == PPC::Frontend::DTK::Symbol::SymbolType::Object)
 					{
 						var.valueTokensContainsAStruct = true;
+						var.datatype = PPC::Decoder::DotDirectives::DotDirective_Datatype::Byte4_Struct;
 						break;
 					}
 
