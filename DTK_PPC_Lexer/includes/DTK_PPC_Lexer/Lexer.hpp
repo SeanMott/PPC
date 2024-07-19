@@ -70,8 +70,11 @@ namespace PPC::Frontend::DTK
 
 		//prints data
 		std::string Print() const;
+
+		//generates DTK valid assembly
+		std::string GenerateDTKAssembly() const;
 	};
 
-	//defines a parser for DTK Assembly
+	//defines a parser for DTK Assembly into lexed tokens
 	std::vector<Token> ASMParser(const std::string& code);
 }

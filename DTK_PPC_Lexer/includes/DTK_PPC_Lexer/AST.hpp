@@ -57,6 +57,8 @@ namespace PPC::Frontend::DTK
 		bool valueTokensContainsAStruct = false; //the value tokens for this variable contains a name matching a struct symbol
 		bool valueTokensContainsALabel = false; //the value tokens for this variable contains a name matching a label symbol
 
+		uint32_t indexForTokenThatContainsEitherAFuncOrStruct = 0; //if the value token contains either this index points to it
+
 		std::vector<PPC::Frontend::DTK::Token> valueTokens; //value tokens
 	};
 
@@ -103,7 +105,8 @@ namespace PPC::Frontend::DTK
 				for (size_t v = 0; v < structMetadata.variables.size(); ++v)
 				{
 					fmt::print(fmt::fg(fmt::color::fire_brick), "---Datatype {} ||",
-						PPC::Decoder::DotDirectives::DOT_DIRECTIVE_DATATYPE_STRS[(uint64_t)structMetadata.variables[v].datatype]);
+						(((uint64_t)structMetadata.variables[v].datatype) >= PPC::Decoder::DotDirectives::DOT_DIRECTIVE_DATATYPE_STRS_LENGTH ? "UNKNOWN DATATYPE" :
+							PPC::Decoder::DotDirectives::DOT_DIRECTIVE_DATATYPE_STRS[(uint64_t)structMetadata.variables[v].datatype]));
 					for(uint32_t d = 0; d < structMetadata.variables[v].valueTokens.size(); ++d)
 					fmt::print(fmt::fg(fmt::color::cadet_blue), " {} ",
 						structMetadata.variables[v].valueTokens[d].data);

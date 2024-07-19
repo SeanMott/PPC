@@ -132,6 +132,81 @@ std::string PPC::Frontend::DTK::Token::Print() const
 	return output;
 }
 
+//generates DTK valid assembly
+std::string PPC::Frontend::DTK::Token::GenerateDTKAssembly() const
+{
+	std::string output = "";
+
+	switch (type)
+	{
+	case TokenType::Identifier:
+		output = data;
+		break;
+
+	case TokenType::Comment_ASMIntel:
+		output = "# " + data;
+		break;
+	case TokenType::Comment_ASMInstructionAddress:
+		output = "/*" + data + "*/ ";
+		break;
+
+	case TokenType::Literal_Integer:
+		output = data;
+		break;
+	case TokenType::Literal_Float:
+		output = data;
+		break;
+
+	case TokenType::Literal_Hex:
+		output = data;
+		break;
+	case TokenType::Literal_String:
+		output = " \"" + data + "\" ";
+		break;
+
+	case TokenType::Register_Int:
+		output = data;
+		break;
+	case TokenType::Register_Float:
+		output = data;
+		break;
+	case TokenType::Register_Keyword:
+		output = data;
+		break;
+
+	case TokenType::DotDirective_Keyword:
+		output = data + " ";
+		break;
+	case TokenType::DotDirective_Datatype:
+		output = data + " ";
+		break;
+	case TokenType::BitDirective:
+		output = data;
+		break;
+
+	case TokenType::Operator:
+		output = " " + data + " ";
+		break;
+
+	case TokenType::ASMInstruction:
+		output = data + " ";
+		break;
+
+	case TokenType::ScopeKeyword:
+		output = " " + data;
+		break;
+
+	case TokenType::Newline:
+		output = "\n";
+		break;
+
+	default:
+		output = "WHATEVER THIS WAS AS A TOKEN, WE CAN'T CONVERT IT BACK TO DTK ASSEMBLY!!!!!!!!!!!!!!!!!";
+		break;
+	}
+
+	return output;
+}
 //checks if something is a digit
 static inline bool IsDigit(const std::string& data)
 {
@@ -461,7 +536,7 @@ std::vector<PPC::Frontend::DTK::Token> PPC::Frontend::DTK::ASMParser(const std::
 	Token t;
 
 	//breaks the code into lines
-	std::string data = ""; size_t lineCount = 1;
+	size_t lineCount = 1; std::string data = "";
 	for (size_t c = 0; c < codeLength; ++c)
 	{
 		//skips tabs

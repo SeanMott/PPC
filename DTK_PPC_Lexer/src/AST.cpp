@@ -131,18 +131,21 @@ static inline PPC::Frontend::DTK::ASTNode GenerateASTNode_Struct(const std::vect
 						if (!strcmp(symbols[s].name.c_str(), maybeFuncName) && symbols[s].type == PPC::Frontend::DTK::Symbol::SymbolType::Function)
 						{
 							var.valueTokensContainsAFucntion = true;
+							var.indexForTokenThatContainsEitherAFuncOrStruct = s;
 							break;
 						}
 
 						if (!strcmp(symbols[s].name.c_str(), maybeFuncName) && symbols[s].type == PPC::Frontend::DTK::Symbol::SymbolType::Object)
 						{
 							var.valueTokensContainsAStruct = true;
+							var.indexForTokenThatContainsEitherAFuncOrStruct = s;
 							break;
 						}
 
 						if (!strcmp(symbols[s].name.c_str(), maybeFuncName) && symbols[s].type == PPC::Frontend::DTK::Symbol::SymbolType::Label)
 						{
 							var.valueTokensContainsALabel = true;
+							var.indexForTokenThatContainsEitherAFuncOrStruct = s;
 							break;
 						}
 					}
