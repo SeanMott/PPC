@@ -7,6 +7,6 @@ namespace PPC::Data
 	//defines compiler settings
 	struct CompilerSettings
 	{
-
+		
 	};
 }

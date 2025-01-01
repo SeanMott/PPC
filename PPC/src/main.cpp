@@ -4,11 +4,9 @@ Power PC transcompiler || created by Sean Mott 2024+
 Allows a Game Cube/Wii ROM to be converted to C++
 */
 
-#define FMT_HEADER_ONLY
-#include <fmt/color.h>
-#include <fmt/core.h>
 
-#include <PPC/Data/TranslationUnit.hpp>
+
+#include <PPC/Stage1/Token.hpp>
 
 //the modes PPC can be in
 enum class PPCMode
@@ -25,8 +23,10 @@ int main(int args, const char* argv[])
 	//parse comments
 
 	//lexes assembly into tokens
-	PPC::Data::TranslationUnit tu; tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
-	fmt::print("{}\n", tu.code);
+	PPC::Data::TranslationUnit tu; 
+	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
+	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
+	PPC::Stage1::LexTokens(tu);
 
 	getchar();
 	return 0;

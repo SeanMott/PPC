@@ -4,6 +4,8 @@
 
 #include <PPC/Data/TranslationUnit.hpp>
 
+#include <PPC/Logger.hpp>
+
 #include <vector>
 
 namespace PPC::Stage1
