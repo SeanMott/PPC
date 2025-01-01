@@ -46,4 +46,50 @@ Each Keyword is has a more specific type of keyword as well. We use that for typ
 In this case it is a pointer, but as far as the compiler is concerned, right now it is just a Anything Datatype.
 We will make this a void* later when we give it more context and processing.
 
-For a full list of [Tokens]("TokenSpec.md") and the [Token Source Code]("Token.hpp")
+For a full list of [Tokens]("TokenSpec.md") and the Token Source Code 
+[header]("Token.hpp") || [source]("Token.cpp")
+
+## Technical details
+
+This goes into more details breaking down the "subpasses" inside the Stage 1 for lexing. 
+As PPC may be a one pass transcompiler, internally, each stage breaks it down into passes to make it easier.
+
+## Subpass 1: Genaric Token Splits
+
+The first subpass breaks the entire file into lines and breaks everything in Genaric Tokens. This skips any spaces and tabs not in comments or strings.
+Theses tokens just store the raw text data and line count it was found one, and the char position value in the entire file that started the Genaric Token.
+Go to the [header]("Token.hpp") to see the Token struct. This struct is re-used for theses Genaric Tokens and the special Tokens.
+
+The total types of Tokens generated during this subpass is the Genaric Token, Comma Operator, New Line, and String Literal Token.
+The reason we generate String Literal Tokens now is cuz it's convient at this point. Since we are parsing the differance here anyway.
+We generate Comma Operator Token since some of the would-be Identifiers have commas after them, since that's how ASM works.
+This means the Identifiers for Objects and Functions in the DTK macro uses commans. They are also used with instructions for the parameters.
+We mark them here cuz it's also convient at this pass.
+New Line Tokens for the first pass and token parsing are handy so we don't need to perform line pos compute checks.
+Adding more data for us to work with when making the AST is useful for parsing.
+
+From Tower of Druga || auto_05_8002E140_data.s
+```
+# .data:0x18D8C | 0x80046ECC | size: 0x23
+.obj "@74_80046ECC", global
+	.string "FPU-unavailable handler installed\n"
+.endobj "@74_80046ECC"
+```
+The "@74_80046ECC" has a comma after it.
+
+From Tower of Druga || auto_01_800056A0_text.s
+```
+/* 8000597C 0000297C  39 8C 00 08 */	addi r12, r12, 0x8
+```
+The addi has a Register Comma Register Comma Hex_Literal in that order. We parse out the commas so we know it's a series of valid parameters.
+We will use that later to generate the sudo-C when putting the parameters in the proper order.
+
+From Tower of Druga || auto_04_8002DE60_rodata.s
+```
+# .rodata:0x8 | 0x8002DE68 | size: 0x10
+.obj lbl_8002DE68, global
+	.byte 0x1E, 0xB4, 0x0F, 0x48, 0x28, 0x0F, 0x3B, 0x1F
+	.byte 0x38, 0x2C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+.endobj lbl_8002DE68
+```
+.byte 0x1E, 0xB4, 0x0F, 0x48, 0x28, 0x0F, 0x3B, 0x1F is going to be treated as a array. We mark the commas so we parse it as such later
