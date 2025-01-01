@@ -81,11 +81,41 @@ static inline void Subpass1_GenerateToken_BlockLineComment()
 		c = Parser_GetNextChar();
 		
 		if (c == '*' && Parser_PeekNextChar() == '/')
+		{
+			c = Parser_GetNextChar(); //skip the /
 			break;
+		}
 	}
-	c = Parser_GetNextChar();
 
 	//fmt::print("Line: {}, Char: {} || Block Comment || {}\n", lineCount, charCount, data);
+}
+
+//processes the string literal
+static inline void Subpass1_GenerateToken_StringLiteral()
+{
+	std::string data = "";
+
+	//goes till the end of the string
+	char c = Parser_GetNextChar();
+	while (c != -1)
+	{
+		data += c;
+		c = Parser_GetNextChar();
+
+		//if the next char is the "
+		if (c != '\\' && Parser_PeekNextChar() == '"')
+		{
+			data += c; //gets the last token of the string
+			Parser_GetNextChar(); //skip the "
+			break;
+		}
+
+		//if the current char is the "
+		if (c == '"')
+			break;
+	}
+
+	fmt::print("Line: {}, Char: {} || String Literal || {}\n", lineCount, charCount, data);
 }
 
 //makes a word
@@ -120,6 +150,11 @@ static inline std::vector<PPC::Stage1::Token> Subpass1_GenerateGeneralTokens(con
 			Subpass1_GenerateTokenFromWord(word);
 
 		//if string literal
+		else if (c == '"')
+		{
+			Subpass1_GenerateTokenFromWord(word);
+			Subpass1_GenerateToken_StringLiteral();
+		}
 
 		//if operator
 		else if (Subpass1_IsOperator(c))

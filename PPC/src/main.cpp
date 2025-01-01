@@ -24,8 +24,8 @@ int main(int args, const char* argv[])
 
 	//lexes assembly into tokens
 	PPC::Data::TranslationUnit tu; 
-	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
-	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
+	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
+	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
 	PPC::Stage1::LexTokens(tu);
 
 	getchar();
