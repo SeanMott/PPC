@@ -60,13 +60,15 @@ The first subpass breaks the entire file into lines and breaks everything in Gen
 Theses tokens just store the raw text data and line count it was found one, and the char position value in the entire file that started the Genaric Token.
 Go to the [header]("Token.hpp") to see the Token struct. This struct is re-used for theses Genaric Tokens and the special Tokens.
 
-The total types of Tokens generated during this subpass is the Genaric Token, Comma Operator, New Line, and String Literal Token.
-The reason we generate String Literal Tokens now is cuz it's convient at this point. Since we are parsing the differance here anyway.
-We generate Comma Operator Token since some of the would-be Identifiers have commas after them, since that's how ASM works.
-This means the Identifiers for Objects and Functions in the DTK macro uses commans. They are also used with instructions for the parameters.
-We mark them here cuz it's also convient at this pass.
-New Line Tokens for the first pass and token parsing are handy so we don't need to perform line pos compute checks.
-Adding more data for us to work with when making the AST is useful for parsing.
+The total types of Tokens generated during this subpass is the Genaric Token, Single and Block Comments, Operators, New Line, and String Literal Token.
+
+We sort out String Literals and Operators, since they're the easiest to define at this stage. Since we're not concerning ourselves on keywords.
+
+Single and Block Comments only hold data that would be useful to someone reading the code. So we can ignore them, the only useful one we need is the invalid comment generated.
+The comments are not discarded though, we will bring them into the sudo-C and typed ASM stages. So some of the structure can be perserved.
+But in the event we are doing a straight shot from ASM to C. We can ignore all the extra comments.
+
+New Lines are handy in place of semi-colons and let us know the end of statments.
 
 From Tower of Druga || auto_05_8002E140_data.s
 ```

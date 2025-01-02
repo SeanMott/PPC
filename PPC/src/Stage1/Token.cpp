@@ -1,37 +1,41 @@
 #include <PPC/Stage1/Token.hpp>
 
-size_t lineCount = 1, charCount = 0,
-codeIndex = 0, codeLength = 0;
-std::string code = "";
-
-//sets the code
-static inline void Parser_SetCodeForParsing(const std::string rawCode)
+//defines a parser
+struct Parser
 {
-	code = rawCode;
-	codeLength = rawCode.size();
-	codeIndex = 0;
-	lineCount = 1;
-	charCount = 0;
-}
+	size_t lineCount = 1, charCount = 0,
+		codeIndex = 0, codeLength = 0;
+	std::string code = "";
 
-//gets the next char
-static inline char Parser_GetNextChar()
-{
-	if (codeIndex + 1 >= codeLength)
-		return -1;
+	//sets the code
+	inline void Parser_SetCodeForParsing(const std::string rawCode)
+	{
+		code = rawCode;
+		codeLength = rawCode.size();
+		codeIndex = 0;
+		lineCount = 1;
+		charCount = 0;
+	}
 
-	codeIndex++;
-	return code[codeIndex];
-}
+	//gets the next char
+	inline char Parser_GetNextChar()
+	{
+		if (codeIndex + 1 >= codeLength)
+			return -1;
 
-//peeks the next char
-static inline char Parser_PeekNextChar()
-{
-	if (codeIndex + 1 >= codeLength)
-		return -1;
+		codeIndex++;
+		return code[codeIndex];
+	}
 
-	return code[codeIndex + 1];
-}
+	//peeks the next char
+	inline char Parser_PeekNextChar()
+	{
+		if (codeIndex + 1 >= codeLength)
+			return -1;
+
+		return code[codeIndex + 1];
+	}
+};
 
 //list all operator tokens
 #define PPC_LEXER_OPERATOR_COUNT 4
@@ -50,39 +54,39 @@ static inline bool Subpass1_IsOperator(const char op)
 }
 
 //processes a operator token
-static inline void Subpass1_GenerateToken_Operator(const char data)
+static inline void Subpass1_GenerateToken_Operator(const char data, Parser* parser)
 {
-	fmt::print("Line: {}, Char: {} || Operator || {}\n", lineCount, charCount, data);
+	fmt::print("Line: {}, Char: {} || Operator || {}\n", parser->lineCount, parser->charCount, data);
 }
 
 //processes the # comment
-static inline void Subpass1_GenerateToken_PoundSingleLineComment()
+static inline void Subpass1_GenerateToken_PoundSingleLineComment(Parser* parser)
 {
 	std::string data = "";
 
 	//goes till the new line
-	while (Parser_PeekNextChar() != '\n')
-		data += Parser_GetNextChar();
+	while (parser->Parser_PeekNextChar() != '\n')
+		data += parser->Parser_GetNextChar();
 
 	//fmt::print("Line: {}, Char: {} || Single Line Comment || {}\n", lineCount, charCount, data);
 }
 
 //processes the block comment
-static inline void Subpass1_GenerateToken_BlockLineComment()
+static inline void Subpass1_GenerateToken_BlockLineComment(Parser* parser)
 {
 	std::string data = "";
 
 	//goes till the end of the block
-	Parser_GetNextChar(); //skip the * after the /
-	char c = Parser_GetNextChar();
+	parser->Parser_GetNextChar(); //skip the * after the /
+	char c = parser->Parser_GetNextChar();
 	while (c != -1)
 	{
 		data += c;
-		c = Parser_GetNextChar();
+		c = parser->Parser_GetNextChar();
 		
-		if (c == '*' && Parser_PeekNextChar() == '/')
+		if (c == '*' && parser->Parser_PeekNextChar() == '/')
 		{
-			c = Parser_GetNextChar(); //skip the /
+			c = parser->Parser_GetNextChar(); //skip the /
 			break;
 		}
 	}
@@ -91,22 +95,22 @@ static inline void Subpass1_GenerateToken_BlockLineComment()
 }
 
 //processes the string literal
-static inline void Subpass1_GenerateToken_StringLiteral()
+static inline void Subpass1_GenerateToken_StringLiteral(Parser* parser)
 {
 	std::string data = "";
 
 	//goes till the end of the string
-	char c = Parser_GetNextChar();
+	char c = parser->Parser_GetNextChar();
 	while (c != -1)
 	{
 		data += c;
-		c = Parser_GetNextChar();
+		c = parser->Parser_GetNextChar();
 
 		//if the next char is the "
-		if (c != '\\' && Parser_PeekNextChar() == '"')
+		if (c != '\\' && parser->Parser_PeekNextChar() == '"')
 		{
 			data += c; //gets the last token of the string
-			Parser_GetNextChar(); //skip the "
+			parser->Parser_GetNextChar(); //skip the "
 			break;
 		}
 
@@ -115,13 +119,13 @@ static inline void Subpass1_GenerateToken_StringLiteral()
 			break;
 	}
 
-	fmt::print("Line: {}, Char: {} || String Literal || {}\n", lineCount, charCount, data);
+	fmt::print("Line: {}, Char: {} || String Literal || {}\n", parser->lineCount, parser->charCount, data);
 }
 
 //makes a word
-static inline void Subpass1_GenerateTokenFromWord(std::string& word)
+static inline void Subpass1_GenerateTokenFromWord(std::string& word, Parser* parser)
 {
-	fmt::print("Line: {}, Char: {} || {}\n", lineCount, charCount, word);
+	fmt::print("Line: {}, Char: {} || {}\n", parser->lineCount, parser->charCount, word);
 	word = "";
 }
 
@@ -129,52 +133,53 @@ static inline void Subpass1_GenerateTokenFromWord(std::string& word)
 //read the Subpass 1: Genaric Token Splits in the README
 static inline std::vector<PPC::Stage1::Token> Subpass1_GenerateGeneralTokens(const std::string& rawCode)
 {
-	Parser_SetCodeForParsing(rawCode);
+	Parser parser;
+	parser.Parser_SetCodeForParsing(rawCode);
 	std::vector<PPC::Stage1::Token> subpass1_Tokens;
 	subpass1_Tokens.reserve(20);
 
 	//goes through the code, removing extra spaces and tabs
 	std::string word = "";
-	char c = code[codeIndex];
+	char c = parser.code[parser.codeIndex];
 	while(c != -1)
 	{
 		//if new line
 		if (c == '\n')
 		{
-			Subpass1_GenerateTokenFromWord(word);
-			lineCount++;
+			Subpass1_GenerateTokenFromWord(word, &parser);
+			parser.lineCount++;
 		}
 
 		//if space or tab or new line
 		else if (c == ' ' || c == '\t' || c == '\n')
-			Subpass1_GenerateTokenFromWord(word);
+			Subpass1_GenerateTokenFromWord(word, &parser);
 
 		//if string literal
 		else if (c == '"')
 		{
-			Subpass1_GenerateTokenFromWord(word);
-			Subpass1_GenerateToken_StringLiteral();
+			Subpass1_GenerateTokenFromWord(word, &parser);
+			Subpass1_GenerateToken_StringLiteral(&parser);
 		}
 
 		//if operator
 		else if (Subpass1_IsOperator(c))
 		{
-			Subpass1_GenerateTokenFromWord(word);
-			Subpass1_GenerateToken_Operator(c);
+			Subpass1_GenerateTokenFromWord(word, &parser);
+			Subpass1_GenerateToken_Operator(c, &parser);
 		}
 
 		//if # comment
 		else if (c == '#')
 		{
-			Subpass1_GenerateTokenFromWord(word);
-			Subpass1_GenerateToken_PoundSingleLineComment();
+			Subpass1_GenerateTokenFromWord(word, &parser);
+			Subpass1_GenerateToken_PoundSingleLineComment(&parser);
 		}
 
 		//if block comment
-		else if (c == '/' && Parser_PeekNextChar() == '*')
+		else if (c == '/' && parser.Parser_PeekNextChar() == '*')
 		{
-			Subpass1_GenerateTokenFromWord(word);
-			Subpass1_GenerateToken_BlockLineComment();
+			Subpass1_GenerateTokenFromWord(word, &parser);
+			Subpass1_GenerateToken_BlockLineComment(&parser);
 		}
 
 		//else if build the word
@@ -182,7 +187,7 @@ static inline std::vector<PPC::Stage1::Token> Subpass1_GenerateGeneralTokens(con
 			word += c;
 
 		//gets the next char
-		c = Parser_GetNextChar();
+		c = parser.Parser_GetNextChar();
 	}
 
 	return subpass1_Tokens;
