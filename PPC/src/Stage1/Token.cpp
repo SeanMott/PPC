@@ -54,13 +54,19 @@ static inline bool Subpass1_IsOperator(const char op)
 }
 
 //processes a operator token
-static inline void Subpass1_GenerateToken_Operator(const char data, Parser* parser)
+static inline PPC::Stage1::Token Subpass1_GenerateToken_Operator(const char data, Parser* parser)
 {
+	PPC::Stage1::Token t;
+	t.type = PPC::Stage1::TokenType::Operator;
+	t.data = data;
+	t.lineCount = parser->lineCount;
+	t.charCount = parser->charCount;
 	fmt::print("Line: {}, Char: {} || Operator || {}\n", parser->lineCount, parser->charCount, data);
+	return t;
 }
 
 //processes the # comment
-static inline void Subpass1_GenerateToken_PoundSingleLineComment(Parser* parser)
+static inline PPC::Stage1::Token Subpass1_GenerateToken_PoundSingleLineComment(Parser* parser)
 {
 	std::string data = "";
 
@@ -69,10 +75,17 @@ static inline void Subpass1_GenerateToken_PoundSingleLineComment(Parser* parser)
 		data += parser->Parser_GetNextChar();
 
 	//fmt::print("Line: {}, Char: {} || Single Line Comment || {}\n", lineCount, charCount, data);
+
+	PPC::Stage1::Token t;
+	t.type = PPC::Stage1::TokenType::SingleLineComment;
+	t.data = data;
+	t.lineCount = parser->lineCount;
+	t.charCount = parser->charCount;
+	return t;
 }
 
 //processes the block comment
-static inline void Subpass1_GenerateToken_BlockLineComment(Parser* parser)
+static inline PPC::Stage1::Token Subpass1_GenerateToken_BlockLineComment(Parser* parser)
 {
 	std::string data = "";
 
@@ -92,10 +105,16 @@ static inline void Subpass1_GenerateToken_BlockLineComment(Parser* parser)
 	}
 
 	//fmt::print("Line: {}, Char: {} || Block Comment || {}\n", lineCount, charCount, data);
+	PPC::Stage1::Token t;
+	t.type = PPC::Stage1::TokenType::BlockComment;
+	t.data = data;
+	t.lineCount = parser->lineCount;
+	t.charCount = parser->charCount;
+	return t;
 }
 
 //processes the string literal
-static inline void Subpass1_GenerateToken_StringLiteral(Parser* parser)
+static inline PPC::Stage1::Token Subpass1_GenerateToken_StringLiteral(Parser* parser)
 {
 	std::string data = "";
 
@@ -120,13 +139,26 @@ static inline void Subpass1_GenerateToken_StringLiteral(Parser* parser)
 	}
 
 	fmt::print("Line: {}, Char: {} || String Literal || {}\n", parser->lineCount, parser->charCount, data);
+	PPC::Stage1::Token t;
+	t.type = PPC::Stage1::TokenType::Literal_String;
+	t.data = data;
+	t.lineCount = parser->lineCount;
+	t.charCount = parser->charCount;
+	return t;
 }
 
 //makes a word
-static inline void Subpass1_GenerateTokenFromWord(std::string& word, Parser* parser)
+static inline PPC::Stage1::Token Subpass1_GenerateTokenFromWord(std::string& word, Parser* parser)
 {
 	fmt::print("Line: {}, Char: {} || {}\n", parser->lineCount, parser->charCount, word);
 	word = "";
+
+	PPC::Stage1::Token t;
+	t.type = PPC::Stage1::TokenType::Genaric;
+	t.data = word;
+	t.lineCount = parser->lineCount;
+	t.charCount = parser->charCount;
+	return t;
 }
 
 //parses raw code into Genaric Tokens for Subpass 1
@@ -146,40 +178,40 @@ static inline std::vector<PPC::Stage1::Token> Subpass1_GenerateGeneralTokens(con
 		//if new line
 		if (c == '\n')
 		{
-			Subpass1_GenerateTokenFromWord(word, &parser);
+			subpass1_Tokens.emplace_back(Subpass1_GenerateTokenFromWord(word, &parser));
 			parser.lineCount++;
 		}
 
 		//if space or tab or new line
 		else if (c == ' ' || c == '\t' || c == '\n')
-			Subpass1_GenerateTokenFromWord(word, &parser);
+			subpass1_Tokens.emplace_back(Subpass1_GenerateTokenFromWord(word, &parser));
 
 		//if string literal
 		else if (c == '"')
 		{
-			Subpass1_GenerateTokenFromWord(word, &parser);
-			Subpass1_GenerateToken_StringLiteral(&parser);
+			subpass1_Tokens.emplace_back(Subpass1_GenerateTokenFromWord(word, &parser));
+			subpass1_Tokens.emplace_back(Subpass1_GenerateToken_StringLiteral(&parser));
 		}
 
 		//if operator
 		else if (Subpass1_IsOperator(c))
 		{
-			Subpass1_GenerateTokenFromWord(word, &parser);
-			Subpass1_GenerateToken_Operator(c, &parser);
+			subpass1_Tokens.emplace_back(Subpass1_GenerateTokenFromWord(word, &parser));
+			subpass1_Tokens.emplace_back(Subpass1_GenerateToken_Operator(c, &parser));
 		}
 
 		//if # comment
 		else if (c == '#')
 		{
-			Subpass1_GenerateTokenFromWord(word, &parser);
-			Subpass1_GenerateToken_PoundSingleLineComment(&parser);
+			subpass1_Tokens.emplace_back(Subpass1_GenerateTokenFromWord(word, &parser));
+			subpass1_Tokens.emplace_back(Subpass1_GenerateToken_PoundSingleLineComment(&parser));
 		}
 
 		//if block comment
 		else if (c == '/' && parser.Parser_PeekNextChar() == '*')
 		{
-			Subpass1_GenerateTokenFromWord(word, &parser);
-			Subpass1_GenerateToken_BlockLineComment(&parser);
+			subpass1_Tokens.emplace_back(Subpass1_GenerateTokenFromWord(word, &parser));
+			subpass1_Tokens.emplace_back(Subpass1_GenerateToken_BlockLineComment(&parser));
 		}
 
 		//else if build the word
