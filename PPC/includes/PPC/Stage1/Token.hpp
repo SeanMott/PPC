@@ -67,6 +67,10 @@ namespace PPC::Stage1
 
 		//registers
 		Register_Int, //if it's a int register
+		Register_Float,
+		Register_GraphicsQuantized,
+		Register_Condition,
+		Register_Special,
 
 		Count
 	};

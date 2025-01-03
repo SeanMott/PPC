@@ -217,40 +217,10 @@ static inline bool Subpass2_IsKeyword_MemoryOffset_LowerBit(const char* key) { r
 //is it a memory offset keyword for ha || higher bit
 static inline bool Subpass2_IsKeyword_MemoryOffset_HigherBit(const char* key) { return (!strcmp(key, "ha") ? true : false); }
 
-//is it a section keyword
-
-//is it a scope keyword
-
-//is it a memory offset keyword
-
-////lists all the keywords
-//#define PPC_LEXER_KEYWORDS_COUNT 15
-//static const char* PPC_LEXER_KEYWORDS_TOKEN_STRINGS[PPC_LEXER_KEYWORDS_COUNT] = {
-//	".obj", ".endobj",
-//	".fn", ".endfn",
-//	"global", "local", "weak",
-//	".hidden",
-//	".include", ".file",
-//	".section", ".init", ".balign", ".rodata",
-//	".sdata2", "sda21"//, "l", "ha"
-//};
-//
-////checks if it's a keyword
-//static inline bool Subpass2_IsKeyword(const char* key)
-//{
-//	for (size_t i = 0; i < PPC_LEXER_KEYWORDS_COUNT; ++i)
-//	{
-//		if (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[i]))
-//			return true;
-//	}
-//
-//	return false;
-//}
-
 //lists the datatypes
-#define PPC_LEXER_DATATYPE_COUNT 4
+#define PPC_LEXER_DATATYPE_COUNT 6
 static const char* PPC_LEXER_DATATYPE_STRINGS[PPC_LEXER_DATATYPE_COUNT] = {
-	".skip", ".4byte", ".double", ".float"
+	".skip", ".4byte", ".byte", ".double", ".float", ".string"
 };
 
 //checks if it's a datatype
@@ -265,7 +235,7 @@ static inline bool Subpass2_IsDatatype(const char* key)
 	return false;
 }
 
-//lists the registers
+//lists the integer registers
 #define PPC_LEXER_INTEGER_REGISTER_COUNT 32
 static const char* PPC_LEXER_INTEGER_REGISTER_STRINGS[PPC_LEXER_INTEGER_REGISTER_COUNT] = {
 	"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19",
@@ -278,6 +248,43 @@ static inline bool Subpass2_IsIntegerRegister(const char* key)
 	for (size_t i = 0; i < PPC_LEXER_INTEGER_REGISTER_COUNT; ++i)
 	{
 		if (!strcmp(key, PPC_LEXER_INTEGER_REGISTER_STRINGS[i]))
+			return true;
+	}
+
+	return false;
+}
+
+//lists the floating registers
+#define PPC_LEXER_FLOATING_REGISTER_COUNT 32
+static const char* PPC_LEXER_FLOATING_REGISTER_STRINGS[PPC_LEXER_FLOATING_REGISTER_COUNT] = {
+	"f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12", "f13", "f14", "f15", "f16", "f17", "f18", "f19",
+	"f20", "f21", "f22", "f23", "f24", "f25", "f26", "f27", "f28", "f29", "f30", "f31"
+};
+
+//checks if it's a floating register
+static inline bool Subpass2_IsFloatingRegister(const char* key)
+{
+	for (size_t i = 0; i < PPC_LEXER_FLOATING_REGISTER_COUNT; ++i)
+	{
+		if (!strcmp(key, PPC_LEXER_FLOATING_REGISTER_STRINGS[i]))
+			return true;
+	}
+
+	return false;
+}
+
+//lists the graphics quantized registers
+#define PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_COUNT 8
+static const char* PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_STRINGS[PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_COUNT] = {
+	"qr0", "qr1", "qr2", "qr3", "qr4", "qr5", "qr6", "qr7"
+};
+
+//checks if it's a graphics quantized register
+static inline bool Subpass2_IsGraphicsQuantizedRegister(const char* key)
+{
+	for (size_t i = 0; i < PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_COUNT; ++i)
+	{
+		if (!strcmp(key, PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_STRINGS[i]))
 			return true;
 	}
 
@@ -464,6 +471,20 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 			{
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Int;
+			}
+
+			//if it's a floating register
+			else if (Subpass2_IsFloatingRegister(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Float;
+			}
+
+			//if it's a graphics quantized register
+			else if (Subpass2_IsGraphicsQuantizedRegister(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_GraphicsQuantized;
 			}
 
 			//if it's a digit literal
