@@ -401,13 +401,33 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Global;
 			}
 
-			//if it's a weak scope keyword
-
 			//if it's a local scope keyword
+			else if (Subpass2_IsKeyword_Scope_Local(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Local;
+			}
+
+			//if it's a weak scope keyword
+			else if (Subpass2_IsKeyword_Scope_Weak(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Weak;
+			}
 
 			//if it's a hidden scope keyword
+			else if (Subpass2_IsKeyword_Scope_Hidden(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Hidden;
+			}
 
 			//if it's a sys scope keyword
+			else if (Subpass2_IsKeyword_Scope_Sys(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sys;
+			}
 
 			//if it's a datatype
 			else if (Subpass2_IsDatatype(subpass1Tokens[i].data.c_str()))
