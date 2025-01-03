@@ -186,43 +186,59 @@ static inline bool Subpass1_IsOperator(const char op)
 	return false;
 }
 
-//lists all the keywords
-#define PPC_LEXER_KEYWORDS_COUNT 15
-static const char* PPC_LEXER_KEYWORDS_TOKEN_STRINGS[PPC_LEXER_KEYWORDS_COUNT] = {
-	".obj", ".endobj",
-	".fn", ".endfn",
-	"global", "local", "weak",
-	".hidden",
-	".include", ".file",
-	".section", ".init", ".balign",
-	".sdata2", "sda21"//, "l", "ha"
-};
+//is it the start of a function
+static inline bool Subpass2_IsKeyword_ObjectDef_Start(const char* key) { return (!strcmp(key, ".obj") ? true : false); }
+//is it the end of a function
+static inline bool Subpass2_IsKeyword_ObjectDef_End(const char* key) { return (!strcmp(key, ".endobj") ? true : false); }
 
-//checks if it's a keyword
-static inline bool Subpass2_IsKeyword(const char* key)
-{
-	for (size_t i = 0; i < PPC_LEXER_KEYWORDS_COUNT; ++i)
-	{
-		if (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[i]))
-			return true;
-	}
+//is it the start of a object
+static inline bool Subpass2_IsKeyword_FunctionDef_Start(const char* key) { return (!strcmp(key, ".fn") ? true : false); }
+//is it the end of a object
+static inline bool Subpass2_IsKeyword_FunctionDef_End(const char* key) { return (!strcmp(key, ".endfn") ? true : false); }
 
-	return false;
-}
+//is it a alignment keyword
+static inline bool Subpass2_IsKeyword_Alignment(const char* key) { return (!strcmp(key, ".balign") ? true : false); }
 
-//is it the start of a function def
-//static inline bool Subpass2_IsStartOfFuncDef(const char* key) { return (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[2]) ? true : false); }
+//is it a scope for global
+static inline bool Subpass2_IsKeyword_Scope_Global(const char* key) { return (!strcmp(key, "global") ? true : false); }
+//is it a scope for local
+static inline bool Subpass2_IsKeyword_Scope_Local(const char* key) { return (!strcmp(key, "local") ? true : false); }
+//is it a scope for weak
+static inline bool Subpass2_IsKeyword_Scope_Weak(const char* key) { return (!strcmp(key, "weak") ? true : false); }
+//is it a scope for hidden
+static inline bool Subpass2_IsKeyword_Scope_Hidden(const char* key) { return (!strcmp(key, ".hidden") ? true : false); }
+//is it a scope for sys
+static inline bool Subpass2_IsKeyword_Scope_Sys(const char* key) { return (!strcmp(key, ".sys") ? true : false); }
 
-//is it the end of a function def
-//static inline bool Subpass2_IsEndOfFuncDef(const char* key) { return (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[3]) ? true : false); }
+//is it a section keyword
 
-//is it the start of a object def
-//static inline bool Subpass2_IsStartOfObjectDef(const char* key) { return (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[0]) ? true : false); }
+//is it a scope keyword
 
-//is it the end of a object def
-//static inline bool Subpass2_IsEndOfObjectDef(const char* key) { return (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[1]) ? true : false); }
+//is it a memory offset keyword
 
-//is it the scope modifier
+////lists all the keywords
+//#define PPC_LEXER_KEYWORDS_COUNT 15
+//static const char* PPC_LEXER_KEYWORDS_TOKEN_STRINGS[PPC_LEXER_KEYWORDS_COUNT] = {
+//	".obj", ".endobj",
+//	".fn", ".endfn",
+//	"global", "local", "weak",
+//	".hidden",
+//	".include", ".file",
+//	".section", ".init", ".balign", ".rodata",
+//	".sdata2", "sda21"//, "l", "ha"
+//};
+//
+////checks if it's a keyword
+//static inline bool Subpass2_IsKeyword(const char* key)
+//{
+//	for (size_t i = 0; i < PPC_LEXER_KEYWORDS_COUNT; ++i)
+//	{
+//		if (!strcmp(key, PPC_LEXER_KEYWORDS_TOKEN_STRINGS[i]))
+//			return true;
+//	}
+//
+//	return false;
+//}
 
 //lists the datatypes
 #define PPC_LEXER_DATATYPE_COUNT 4
@@ -339,13 +355,59 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 		//if it's genaric we parse it for furthur data
 		if (subpass1Tokens[i].type == PPC::Stage1::TokenType::Genaric)
 		{
-			//if it's a keyword
-			if (Subpass2_IsKeyword(subpass1Tokens[i].data.c_str()))
+			//if it's a general keyword we ignore in the compiler
+
+			//if it's a section keyword
+
+			//if it's a aligment keyword
+			if (Subpass2_IsKeyword_Alignment(subpass1Tokens[i].data.c_str()))
 			{
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-
-				//specifies the type of keyword
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Alignment;
 			}
+
+			//if it's a start of a function keyword
+			else if (Subpass2_IsKeyword_FunctionDef_Start(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncStart;
+			}
+
+			//if it's the end of a function keyword
+			else if (Subpass2_IsKeyword_FunctionDef_End(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncEnd;
+			}
+
+			//if it's a start of a object keyword
+			else if (Subpass2_IsKeyword_ObjectDef_Start(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjStart;
+			}
+
+			//if it's the end of a object keyword
+			else if (Subpass2_IsKeyword_ObjectDef_End(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjEnd;
+			}
+
+			//if it's a global scope keyword
+			else if (Subpass2_IsKeyword_Scope_Global(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Global;
+			}
+
+			//if it's a weak scope keyword
+
+			//if it's a local scope keyword
+
+			//if it's a hidden scope keyword
+
+			//if it's a sys scope keyword
 
 			//if it's a datatype
 			else if (Subpass2_IsDatatype(subpass1Tokens[i].data.c_str()))

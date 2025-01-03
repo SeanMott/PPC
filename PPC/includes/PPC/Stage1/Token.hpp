@@ -42,16 +42,25 @@ namespace PPC::Stage1
 	//defines a specific token type
 	enum class SpecificTokenType
 	{
-		//defines a func start definition token
-		//defines a func end definition token
-		//defines a func name token
+		//func
+		Keyword_FuncStart = 0, //defines a func start definition token
+		Keyword_FuncEnd, //defines a func end definition token
 
-		//defines a object start definition token
-		//defines a object end definition token
-		//defines a object name token
+		//object
+		Keyword_ObjStart, //defines a object start definition token
+		Keyword_ObjEnd, //defines a object end definition token
 
-		//defines a scope keyword || global, local, or weak
+		//scope
+		Keyword_Scope_Global,
+		Keyword_Scope_Local,
+		Keyword_Scope_Weak,
+		Keyword_Scope_Hidden,
+		Keyword_Scope_Sys,
 
+		//mic
+		Keyword_Alignment,
+
+		//registers
 		Register_Int, //if it's a int register
 
 		Count
