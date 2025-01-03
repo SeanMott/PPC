@@ -207,8 +207,8 @@ static inline bool Subpass2_IsKeyword_Scope_Local(const char* key) { return (!st
 static inline bool Subpass2_IsKeyword_Scope_Weak(const char* key) { return (!strcmp(key, "weak") ? true : false); }
 //is it a scope for hidden
 static inline bool Subpass2_IsKeyword_Scope_Hidden(const char* key) { return (!strcmp(key, ".hidden") ? true : false); }
-//is it a scope for sys
-static inline bool Subpass2_IsKeyword_Scope_Sys(const char* key) { return (!strcmp(key, ".sys") ? true : false); }
+//is it a scope for sym
+static inline bool Subpass2_IsKeyword_Scope_Sym(const char* key) { return (!strcmp(key, ".sym") ? true : false); }
 
 //is it a memory offset keyword for sda21
 static inline bool Subpass2_IsKeyword_MemoryOffset_Sda21(const char* key) { return (!strcmp(key, "sda21") ? true : false); }
@@ -334,6 +334,91 @@ static inline bool Subpass2_IsConditionRegister(const char* key)
 	for (size_t i = 0; i < PPC_LEXER_CONDITION_REGISTER_COUNT; ++i)
 	{
 		if (!strcmp(key, PPC_LEXER_CONDITION_REGISTER_STRINGS[i]))
+			return true;
+	}
+
+	return false;
+}
+
+//lists the special registers
+#define PPC_LEXER_SPECIAL_REGISTER_COUNT 68
+static const char* PPC_LEXER_SPECIAL_REGISTER_STRINGS[PPC_LEXER_SPECIAL_REGISTER_COUNT] = {
+	"XER", 
+"LR",
+"CTR",
+"DSISR",
+"DAR",
+"DEC",
+"SDR1",
+"SRR0",
+"SRR1",
+"SPRG0",
+"SPRG1",
+"SPRG2",
+"SPRG3",
+"EAR",
+"PVR",
+"IBAT0U",
+"IBAT0L",
+"IBAT1U",
+"IBAT1L",
+"IBAT2U",
+"IBAT2L",
+"IBAT3U",
+"IBAT3L",
+"DBAT0U",
+"DBAT0L",
+"DBAT1U",
+"DBAT1L",
+"DBAT2U",
+"DBAT2L",
+"DBAT3U",
+"DBAT3L",
+"GQR0",
+"GQR1",
+"GQR2",
+"GQR3",
+"GQR4",
+"GQR5",
+"GQR6",
+"GQR7",
+"HID2",
+"WPAR",
+"DMA_U",
+"DMA_L",
+"UMMCR0",
+"UPMC1",
+"UPMC2",
+"USIA",
+"UMMCR1",
+"UPMC3",
+"UPMC4",
+"USDA",
+"MMCR0",
+"PMC1",
+"PMC2",
+"SIA",
+"MMCR1",
+"PMC3",
+"PMC4",
+"SDA",
+"HID0",
+"HID1",
+"IABR",
+"DABR",
+"L2CR",
+"ICTC",
+"THRM1",
+"THRM2",
+"THRM3"
+};
+
+//checks if it's a special register
+static inline bool Subpass2_IsSpecialRegister(const char* key)
+{
+	for (size_t i = 0; i < PPC_LEXER_SPECIAL_REGISTER_COUNT; ++i)
+	{
+		if (!strcmp(key, PPC_LEXER_SPECIAL_REGISTER_STRINGS[i]))
 			return true;
 	}
 
@@ -481,11 +566,11 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Hidden;
 			}
 
-			//if it's a sys scope keyword
-			else if (Subpass2_IsKeyword_Scope_Sys(subpass1Tokens[i].data.c_str()))
+			//if it's a sym scope keyword
+			else if (Subpass2_IsKeyword_Scope_Sym(subpass1Tokens[i].data.c_str()))
 			{
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sys;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sym;
 			}
 
 			//if it's a sda21 memory offset keyword
@@ -542,6 +627,13 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Condition;
 			}
+
+			//if it's a special register
+			else if (Subpass2_IsSpecialRegister(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
+				}
 
 			//if it's a digit literal
 

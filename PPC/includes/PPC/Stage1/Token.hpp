@@ -55,7 +55,7 @@ namespace PPC::Stage1
 		Keyword_Scope_Local,
 		Keyword_Scope_Weak,
 		Keyword_Scope_Hidden,
-		Keyword_Scope_Sys,
+		Keyword_Scope_Sym,
 
 		//memory offset
 		Keyword_MemoryOffset_Sda21,
@@ -109,7 +109,7 @@ namespace PPC::Stage1
 				break;
 
 			case TokenType::Identifier:
-				fmt::print("Line: {}, Char: {} || Identifier {}\n", lineCount, charCount, data);
+				fmt::print(fmt::fg(fmt::color::blue), "Line: {}, Char: {} || Identifier {}\n", lineCount, charCount, data);
 				break;
 			}
 		}
