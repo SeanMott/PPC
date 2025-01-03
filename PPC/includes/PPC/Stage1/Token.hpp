@@ -57,6 +57,11 @@ namespace PPC::Stage1
 		Keyword_Scope_Hidden,
 		Keyword_Scope_Sys,
 
+		//memory offset
+		Keyword_MemoryOffset_Sda21,
+		Keyword_MemoryOffset_LowerBit,
+		Keyword_MemoryOffset_HigherBit,
+
 		//mic
 		Keyword_Alignment,
 

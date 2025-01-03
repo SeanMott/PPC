@@ -210,6 +210,13 @@ static inline bool Subpass2_IsKeyword_Scope_Hidden(const char* key) { return (!s
 //is it a scope for sys
 static inline bool Subpass2_IsKeyword_Scope_Sys(const char* key) { return (!strcmp(key, ".sys") ? true : false); }
 
+//is it a memory offset keyword for sda21
+static inline bool Subpass2_IsKeyword_MemoryOffset_Sda21(const char* key) { return (!strcmp(key, "sda21") ? true : false); }
+//is it a memory offset keyword for l || lower bit
+static inline bool Subpass2_IsKeyword_MemoryOffset_LowerBit(const char* key) { return (!strcmp(key, "l") ? true : false); }
+//is it a memory offset keyword for ha || higher bit
+static inline bool Subpass2_IsKeyword_MemoryOffset_HigherBit(const char* key) { return (!strcmp(key, "ha") ? true : false); }
+
 //is it a section keyword
 
 //is it a scope keyword
@@ -355,10 +362,6 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 		//if it's genaric we parse it for furthur data
 		if (subpass1Tokens[i].type == PPC::Stage1::TokenType::Genaric)
 		{
-			//if it's a general keyword we ignore in the compiler
-
-			//if it's a section keyword
-
 			//if it's a aligment keyword
 			if (Subpass2_IsKeyword_Alignment(subpass1Tokens[i].data.c_str()))
 			{
@@ -427,6 +430,27 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 			{
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sys;
+			}
+
+			//if it's a sda21 memory offset keyword
+			else if (Subpass2_IsKeyword_MemoryOffset_Sda21(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_Sda21;
+			}
+
+			//if it's a lower bit memory offset keyword
+			else if (Subpass2_IsKeyword_MemoryOffset_LowerBit(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit;
+			}
+
+			//if it's a higher bit memory offset keyword
+			else if (Subpass2_IsKeyword_MemoryOffset_HigherBit(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit;
 			}
 
 			//if it's a datatype
