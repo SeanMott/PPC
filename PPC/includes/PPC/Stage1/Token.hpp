@@ -17,13 +17,13 @@ namespace PPC::Stage1
 		//this is used in earlier subpasses to handle stuff we don't want to parse yet.
 		//we parse it out at a later pass when there's less to worry about
 
-		//Identifier, //the identifier
+		Identifier, //the identifier
 
 		Keyword, //a keyword
 
 		Datatype, //a datatype
 
-		//Register, //a register
+		Register, //a register
 
 		Literal_String, //the string literal
 
@@ -49,6 +49,8 @@ namespace PPC::Stage1
 		//defines a object name token
 
 		//defines a scope keyword || global, local, or weak
+
+		Register_Int, //if it's a int register
 
 		Count
 	};
@@ -76,6 +78,14 @@ namespace PPC::Stage1
 
 			case TokenType::Datatype:
 				fmt::print("Line: {}, Char: {} || Datatype || {}\n", lineCount, charCount, data);
+				break;
+
+			case TokenType::Register:
+				fmt::print("Line: {}, Char: {} || Register || {}\n", lineCount, charCount, data);
+				break;
+
+			case TokenType::Identifier:
+				fmt::print("Line: {}, Char: {} || Identifier {}\n", lineCount, charCount, data);
 				break;
 			}
 		}

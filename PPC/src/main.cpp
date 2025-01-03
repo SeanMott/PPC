@@ -26,7 +26,9 @@ int main(int args, const char* argv[])
 	PPC::Data::TranslationUnit tu; 
 	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
 	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
-	PPC::Stage1::LexTokens(tu);
+	std::vector<PPC::Stage1::Token> tokens = PPC::Stage1::LexTokens(tu);
+
+	//output the C code
 
 	getchar();
 	return 0;

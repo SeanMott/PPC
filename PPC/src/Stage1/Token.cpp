@@ -242,8 +242,24 @@ static inline bool Subpass2_IsDatatype(const char* key)
 	return false;
 }
 
-
 //lists the registers
+#define PPC_LEXER_INTEGER_REGISTER_COUNT 32
+static const char* PPC_LEXER_INTEGER_REGISTER_STRINGS[PPC_LEXER_INTEGER_REGISTER_COUNT] = {
+	"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19",
+	"r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"
+};
+
+//checks if it's a integer register
+static inline bool Subpass2_IsIntegerRegister(const char* key)
+{
+	for (size_t i = 0; i < PPC_LEXER_INTEGER_REGISTER_COUNT; ++i)
+	{
+		if (!strcmp(key, PPC_LEXER_INTEGER_REGISTER_STRINGS[i]))
+			return true;
+	}
+
+	return false;
+}
 
 //parses raw code into Genaric Tokens for Subpass 1
 //read the Subpass 1: Genaric Token Splits in the README
@@ -327,7 +343,7 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 			if (Subpass2_IsKeyword(subpass1Tokens[i].data.c_str()))
 			{
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-			
+
 				//specifies the type of keyword
 			}
 
@@ -337,9 +353,18 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Datatype;
 			}
 
-			//else it's a Identifier
+			//if it's a int register
+			else if (Subpass2_IsIntegerRegister(subpass1Tokens[i].data.c_str()))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
+				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Int;
+			}
 
-			subpass1Tokens[i].Print();
+			//if it's a digit literal
+
+			//else it's a Identifier
+			else
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Identifier;
 		}
 
 		//skip the ignore
@@ -355,6 +380,34 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 	return tokens;
 }
 
+//processes the subpass 4
+static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vector<PPC::Stage1::Token>& subpass3Tokens)
+{
+	const size_t subpass3TokenCount = subpass3Tokens.size();
+	std::vector<PPC::Stage1::Token> tokens;
+	tokens.reserve(subpass3TokenCount);
+
+	//compress the tokens into the new tree
+	for (size_t i = 0; i < subpass3TokenCount; ++i)
+	{
+		//check for this line and the next few to be invalid structure and skip it all if so
+		if (subpass3Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass3Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
+			subpass3Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass3Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment)
+		{
+			if (subpass3Tokens[i + 3].data == " invalid ")
+			{
+				i += 4;
+				continue;
+			}
+		}
+
+		tokens.emplace_back(subpass3Tokens[i]);
+		subpass3Tokens[i].Print();
+	}
+
+	return tokens;
+}
+
 //lexes ASM into tokens
 std::vector<PPC::Stage1::Token> PPC::Stage1::LexTokens(const Data::TranslationUnit& tu)
 {
@@ -362,8 +415,15 @@ std::vector<PPC::Stage1::Token> PPC::Stage1::LexTokens(const Data::TranslationUn
 	std::vector<PPC::Stage1::Token> subpass1_Tokens = Subpass1_GenerateGeneralTokens(tu.code);
 
 	//Subpass 2:  Keywords and fine typing || read details in the README
-	std::vector<PPC::Stage1::Token> tokens = Subpass2_GenerateTokens(subpass1_Tokens);
+	std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(subpass1_Tokens);
 	subpass1_Tokens.clear(); //we don't need the old tree anymore
 
-	return tokens;
+	//Subpass 3: Jump Labels and Func/Object Names || read details in the README
+
+	//Subpass 4: Remove Invalid Instructions || read details in the README
+	std::vector<PPC::Stage1::Token> subpass4_Tokens = Subpass4_GenerateTokens(subpass2_Tokens);
+	subpass2_Tokens.clear();
+
+
+	return subpass4_Tokens;
 }
