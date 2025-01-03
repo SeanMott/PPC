@@ -21,7 +21,7 @@ namespace PPC::Stage1
 
 		Keyword, //a keyword
 
-		//Datatype, //a datatype
+		Datatype, //a datatype
 
 		//Register, //a register
 
@@ -72,6 +72,10 @@ namespace PPC::Stage1
 
 			case TokenType::Keyword:
 				fmt::print("Line: {}, Char: {} || Keyword || {}\n", lineCount, charCount, data);
+				break;
+
+			case TokenType::Datatype:
+				fmt::print("Line: {}, Char: {} || Datatype || {}\n", lineCount, charCount, data);
 				break;
 			}
 		}
