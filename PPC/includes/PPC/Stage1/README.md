@@ -103,13 +103,7 @@ After all the strings and operators are parsed out. We now mark all the keywords
 We do this now since we have weeded out the annoying types to parse if we had to deal with strings and comments. So now we apply the fine typing for each.
 This retroactivly sets the types for what were initally the Genaric tokens to their specific typing.
 
-## Subpass 3: Jump Labels and Func/Object Names
-
-Now that everything has been marked and we have all the extra metadata we need. Like with the other types.
-We can now retroactivly go through the tree and tag specific identifiers as definitions for Jump Labels and Functions.
-This is will make Stage 2 easier when we make the AST. As we will have less tokens to deal and a cleaner tree to generate C code from.
-
-## Subpass 4: Remove Invalid Instructions
+## Subpass 3: Remove Invalid Instructions
 
 DTK generates the same line anytime it runs into something invalid
 
@@ -133,4 +127,20 @@ From Tower Of Druga || auto_00_80003100_init.s
 ```
 Thanks to the earlier subpasses, we the format for this is always Block Comment, Datatype, Hex Literal, Block Comment, New Line.
 We do a final check in the tree where groups of theses Tokens are checked. Always if the second Block Comment spelles out " invalid ".
-If so, we strip it out. Leaving only the memory address Block Comment and a special Token marking it as Invalid.
+If so, we strip it out.
+
+## Subpass 4: Jump Labels
+
+Now that everything has been marked and we have all the extra metadata we need.
+We can retroactivly go back through the tree and specify jump labels.
+
+Jump Labels are simple as they are just a Identifier followed by a :
+
+From Tower Of Druga || auto_00_80003100_init.s
+```
+.L_800055D4:
+/* 800055D4 000025D4  3C 80 80 00 */	lis r4, gTRKInterruptVectorTable@ha
+```
+
+The .L_800055D4: is a Jump Label definition. .L_800055D4 is our label that will be invoked in the function. 
+While the : marks it as the start, going untill the next label, or end of function.

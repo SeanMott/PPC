@@ -27,6 +27,8 @@ int main(int args, const char* argv[])
 	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
 	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
 	std::vector<PPC::Stage1::Token> tokens = PPC::Stage1::LexTokens(tu);
+	for (size_t i = 0; i < tokens.size(); ++i)
+		tokens[i].Print();
 
 	//output the C code
 

@@ -25,6 +25,8 @@ namespace PPC::Stage1
 
 		Register, //a register
 
+		JumpLabelDefinition, //marks the definition of a jump label
+
 		Literal_String, //the string literal
 
 		Operator, //a operator in the syntax
@@ -82,6 +84,10 @@ namespace PPC::Stage1
 
 			case TokenType::Register:
 				fmt::print("Line: {}, Char: {} || Register || {}\n", lineCount, charCount, data);
+				break;
+
+			case TokenType::JumpLabelDefinition:
+				fmt::print("Line: {}, Char: {} || Jump Label || {}\n", lineCount, charCount, data);
 				break;
 
 			case TokenType::Identifier:

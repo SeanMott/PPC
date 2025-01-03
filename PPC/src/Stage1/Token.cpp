@@ -172,7 +172,7 @@ static inline PPC::Stage1::Token Subpass1_GenerateToken_NewLine(Parser* parser)
 
 //list all operator tokens
 #define PPC_LEXER_OPERATOR_COUNT 5
-static const char PPC_LEXER_OPERATOR_TOKEN_STRINGS[PPC_LEXER_OPERATOR_COUNT] = { ',', '(', ')', '@', ':' };
+static const char PPC_LEXER_OPERATOR_TOKEN_STRINGS[PPC_LEXER_OPERATOR_COUNT] = { ',', '(', ')', ':', '@'};
 
 //checks if it's a operator
 static inline bool Subpass1_IsOperator(const char op)
@@ -195,7 +195,7 @@ static const char* PPC_LEXER_KEYWORDS_TOKEN_STRINGS[PPC_LEXER_KEYWORDS_COUNT] = 
 	".hidden",
 	".include", ".file",
 	".section", ".init", ".balign",
-	".sdata2", "sda21"
+	".sdata2", "sda21"//, "l", "ha"
 };
 
 //checks if it's a keyword
@@ -380,6 +380,31 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 	return tokens;
 }
 
+//processes the subpass 3
+static inline std::vector<PPC::Stage1::Token> Subpass3_GenerateTokens(std::vector<PPC::Stage1::Token>& subpass2Tokens)
+{
+	const size_t subpass2TokenCount = subpass2Tokens.size();
+	std::vector<PPC::Stage1::Token> tokens;
+	tokens.reserve(subpass2TokenCount);
+
+	//compress the tokens into the new tree
+	for (size_t i = 0; i < subpass2TokenCount; ++i)
+	{
+		//check for this line and the next few to be invalid structure and skip it all if so
+		if (i + 3 < subpass2TokenCount && subpass2Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass2Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
+			subpass2Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
+			subpass2Tokens[i + 3].data == " invalid ")
+		{
+			i += 4; //we add the extra bit to skip the new line
+			continue;
+		}
+
+		tokens.emplace_back(subpass2Tokens[i]);
+	}
+
+	return tokens;
+}
+
 //processes the subpass 4
 static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vector<PPC::Stage1::Token>& subpass3Tokens)
 {
@@ -390,19 +415,24 @@ static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vecto
 	//compress the tokens into the new tree
 	for (size_t i = 0; i < subpass3TokenCount; ++i)
 	{
-		//check for this line and the next few to be invalid structure and skip it all if so
-		if (subpass3Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass3Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
-			subpass3Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass3Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment)
+		//if it's a identifier followed by a colon, we can remove the colon
+		//and then mark it's type as JumpLabel
+		if (i + 1 < subpass3TokenCount && subpass3Tokens[i].type == PPC::Stage1::TokenType::Identifier &&
+			subpass3Tokens[i + 1].type == PPC::Stage1::TokenType::Operator && subpass3Tokens[i + 1].data == ":")
 		{
-			if (subpass3Tokens[i + 3].data == " invalid ")
-			{
-				i += 4;
-				continue;
-			}
+			subpass3Tokens[i].type = PPC::Stage1::TokenType::JumpLabelDefinition;
+			tokens.emplace_back(subpass3Tokens[i]);
+			subpass3Tokens[i].Print();
+
+			//skip the :
+			i++;
 		}
 
-		tokens.emplace_back(subpass3Tokens[i]);
-		subpass3Tokens[i].Print();
+		else
+		{
+			tokens.emplace_back(subpass3Tokens[i]);
+			subpass3Tokens[i].Print();
+		}
 	}
 
 	return tokens;
@@ -418,12 +448,13 @@ std::vector<PPC::Stage1::Token> PPC::Stage1::LexTokens(const Data::TranslationUn
 	std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(subpass1_Tokens);
 	subpass1_Tokens.clear(); //we don't need the old tree anymore
 
-	//Subpass 3: Jump Labels and Func/Object Names || read details in the README
-
-	//Subpass 4: Remove Invalid Instructions || read details in the README
-	std::vector<PPC::Stage1::Token> subpass4_Tokens = Subpass4_GenerateTokens(subpass2_Tokens);
+	//Subpass 3: Remove Invalid Instructions || read details in the README
+	std::vector<PPC::Stage1::Token> subpass3_Tokens = Subpass3_GenerateTokens(subpass2_Tokens);
 	subpass2_Tokens.clear();
 
+	//Subpass 4: Jump Labels and Func/Object Names || read details in the README
+	std::vector<PPC::Stage1::Token> subpass4_Tokens = Subpass4_GenerateTokens(subpass3_Tokens);
+	subpass3_Tokens.clear();
 
 	return subpass4_Tokens;
 }
