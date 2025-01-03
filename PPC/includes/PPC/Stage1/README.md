@@ -95,3 +95,42 @@ From Tower of Druga || auto_04_8002DE60_rodata.s
 .endobj lbl_8002DE68
 ```
 .byte 0x1E, 0xB4, 0x0F, 0x48, 0x28, 0x0F, 0x3B, 0x1F is going to be treated as a array. We mark the commas so we parse it as such later
+
+## Subpass 2: Keywords and fine typing
+
+After all the strings and operators are parsed out. We now mark all the keywords, datatypes, registers, instructions, digit literals. Anything else is a Identifier.
+
+We do this now since we have weeded out the annoying types to parse if we had to deal with strings and comments. So now we apply the fine typing for each.
+This retroactivly sets the types for what were initally the Genaric tokens to their specific typing.
+
+## Subpass 3: Jump Labels and Func/Object Names
+
+Now that everything has been marked and we have all the extra metadata we need. Like with the other types.
+We can now retroactivly go through the tree and tag specific identifiers as definitions for Jump Labels and Functions.
+This is will make Stage 2 easier when we make the AST. As we will have less tokens to deal and a cleaner tree to generate C code from.
+
+## Subpass 4: Remove Invalid Instructions
+
+DTK generates the same line anytime it runs into something invalid
+
+From Tower Of Druga || auto_00_80003100_init.s
+```
+/* 800052A8 000022A8  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052AC 000022AC  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052B0 000022B0  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052B4 000022B4  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052B8 000022B8  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052BC 000022BC  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052C0 000022C0  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052C4 000022C4  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052C8 000022C8  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052CC 000022CC  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052D0 000022D0  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052D4 000022D4  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052D8 000022D8  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052DC 000022DC  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+/* 800052E0 000022E0  00 00 00 00 */	.4byte 0x00000000 /* invalid */
+```
+Thanks to the earlier subpasses, we the format for this is always Block Comment, Datatype, Hex Literal, Block Comment, New Line.
+We do a final check in the tree where groups of theses Tokens are checked. Always if the second Block Comment spelles out " invalid ".
+If so, we strip it out. Leaving only the memory address Block Comment and a special Token marking it as Invalid.
