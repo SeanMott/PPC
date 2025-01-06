@@ -14,11 +14,15 @@ namespace PPC::Data
 		std::string code = "";
 		size_t codeLength = 0;
 	
-		//loads the translation unit
-		inline void LoadCode(const std::filesystem::path& _filepath)
+		//sets the raw ASM this TU is associated with
+		inline void SetASM(const std::filesystem::path& _filepath)
 		{
 			filepath = _filepath;
+		}
 
+		//loads the translation unit code
+		inline void LoadASM()
+		{
 			FILE* file = fopen(filepath.string().c_str(), "r");
 			fseek(file, 0, SEEK_END);
 			codeLength = ftell(file);

@@ -166,7 +166,16 @@ From Tower Of Druga || auto_00_80003100_init.s
 The .L_800055D4: is a Jump Label definition. .L_800055D4 is our label that will be invoked in the function. 
 While the : marks it as the start, going untill the next label, or end of function.
 
-## Subpass 5: Comment Pruning (optional)
+## Subpass 5: Comment Pruning
 
-If the compiler flag is enabled, PPC will strip out the comments DTK makes for memory offset and section info.
-Theses will be parsed out initally, but then pruned from the tree after all the other subpasses.
+Now we prune any of the block and single line comments. Since they have fulfilled their usefulness. They are just tree bloat if we were to keep them.
+
+## Subpass 6: Expresstion Splitting
+
+Now that we have the metadata. We can now split every line into it's own expresstion list of tokens.
+Each line will be treated as it's own self contained expresstion later on when converting to C++.
+
+This also gets rid of the last of the bloating tokens found in newlines. All we care about is the stream of parsing.
+
+Once it's in a flat list of expresstions we can compress the trees into sub-trees. 
+Theses will contain the definitions for structs, functions, and jump labels. Each holding a list of line expresstions.

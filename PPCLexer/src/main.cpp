@@ -20,18 +20,25 @@ enum class PPCMode
 //entry point
 int main(int args, const char* argv[])
 {
-	//parse comments
+	//parse flags
+	PPC::Data::CompilerSettings settings;
+	settings.outputDebugASM = true;
 
 	//loads the code
 	PPC::Data::TranslationUnit tu;
-	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
-	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
+	tu.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
+	tu.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_05_80047290_data.s");
+	//tu.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
+	tu.LoadASM();
 
 	//lexes assembly into tokens	
-	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(tu.code);
+	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(settings, tu.code);
 	//for (size_t i = 0; i < f.wholeTokens.size(); ++i)
 	//	f.wholeTokens[i].Print();
-	f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_80003100_init.debugasm");
+	//f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_80003100_init.debugasm");
+	f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_05_80047290_data.debugasm");
+
+	//generates the IR
 
 	getchar();
 	return 0;

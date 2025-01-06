@@ -2,7 +2,7 @@
 
 //defines a Token
 
-#include <PPC/Logger.hpp>
+#include <PPC/Data/CompilerSettings.hpp>
 
 #include <vector>
 #include <fstream>
@@ -120,38 +120,52 @@ namespace PPC::Stage1
 		}
 	};
 
-	//defines a struct blob of tokens
-	struct StructTokens
+	//defines a single line expresstion
+	struct LexedSingleLineExpresstion
 	{
-		std::string name = "";
 		std::vector<Token> tokens;
 	};
 
-	//defines a function blob of tokens
-	struct FuncTokens
+	//defines a object
+	struct LexedObject
 	{
-		std::string name = "";
-		std::vector<Token> tokens;
+		std::string objectName = "";
+		std::vector<LexedSingleLineExpresstion> expresstions;
+	};
 
-		//defines each jump label and their tokens
+	//defines a jump label in a function
+	struct LexedJumpLabel
+	{
+		std::string jumpLabelName = "";
+		std::vector<LexedSingleLineExpresstion> expresstions;
+	};
+
+	//defines a function
+	struct LexedFunction
+	{
+		std::string functionName = "";
+		std::vector<LexedSingleLineExpresstion> expresstions;
+		std::vector<LexedJumpLabel> jumpLabels;
+
 	};
 
 	//defines a lexed file
 	struct LexedFile
 	{
-		std::vector<FuncTokens> funcs; //the funcs
-		std::vector<StructTokens> structs; //the structs
-	
-		std::vector<Token> wholeTokens; //all the other tokens making up the file
+		std::vector<LexedSingleLineExpresstion> singleLineExpesstions; //the entire file split into new lines
 
 		//generate a debug output file of all the tokens
 		inline void GenerateDebugOutputFileOfTokens(const std::string& filepath)
 		{
 			std::string data = "";
-			for (size_t i = 0; i < wholeTokens.size(); ++i)
+			for (size_t i = 0; i < singleLineExpesstions.size(); ++i)
 			{
-				data += wholeTokens[i].data;
-				data += ' ';
+				for (size_t t = 0; t < singleLineExpesstions[i].tokens.size(); ++t)
+				{
+					data += singleLineExpesstions[i].tokens[t].data;
+					data += ' ';
+				}
+				data += '\n';
 			}
 
 			std::fstream f(filepath, std::ios::out);
@@ -160,5 +174,5 @@ namespace PPC::Stage1
 	};
 
 	//lexes ASM into tokens
-	LexedFile LexTokens(const std::string& code);
+	LexedFile LexTokens(const Data::CompilerSettings& settings, const std::string& code);
 }

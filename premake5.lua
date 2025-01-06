@@ -11,9 +11,9 @@ configurations
 
 FMT_INCLUDE = "Venders/FMT/include"
 
----main frontend
-project "PPC"
-location "PPC"
+---lexes the existing DTK Assembly into PPC IR
+project "PPCLexer"
+location "PPCLexer"
 kind "ConsoleApp"
 language "C++"
 targetdir ("bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Game")
@@ -23,17 +23,17 @@ objdir ("bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Game")
 files 
 {
 ---base code
-"PPC/includes/**.h",
-"PPC/src/**.c",
-"PPC/includes/**.hpp",
-"PPC/src/**.cpp",
+"PPCLexer/includes/**.h",
+"PPCLexer/src/**.c",
+"PPCLexer/includes/**.hpp",
+"PPCLexer/src/**.cpp",
 
 }
 
 includedirs 
 {
 ---base code
-"PPC/includes",
+"PPCLexer/includes",
 FMT_INCLUDE
 }
 

@@ -762,32 +762,96 @@ static inline std::vector<PPC::Stage1::Token> Subpass5_StripComments(std::vector
 	return tokens;
 }
 
-#include <thread>
+//subpass 6 || splitting into expresstions
+static inline std::vector<PPC::Stage1::LexedSingleLineExpresstion> Subpass6_SplitExpresstions(const std::vector<PPC::Stage1::Token>& wholeTokens)
+{
+	//process the entire file into single line expresstions
+	const size_t tokenCount = wholeTokens.size();
+	std::vector<PPC::Stage1::LexedSingleLineExpresstion> singleLines; singleLines.reserve(50);
+	for (size_t t = 0; t < tokenCount; ++t)
+	{
+		//starts a new single line and goes till a new line
+		if (wholeTokens[t].type != PPC::Stage1::TokenType::NewLine)
+		{
+			PPC::Stage1::LexedSingleLineExpresstion* exp = &singleLines.emplace_back(PPC::Stage1::LexedSingleLineExpresstion());
+			exp->tokens.reserve(5);
+
+			while (t < tokenCount && wholeTokens[t].type != PPC::Stage1::TokenType::NewLine)
+			{
+				exp->tokens.emplace_back(wholeTokens[t]);
+				t++;
+			}
+		}
+	}
+
+	//prune the extra new lines
+	size_t singleExpressionCount = singleLines.size();
+	bool weWerePushedBelowZeroLastLoop = false;
+	for (size_t e = 0; e < singleExpressionCount; ++e)
+	{
+		//go back one if needed
+		if (weWerePushedBelowZeroLastLoop)
+		{
+			e = 0;
+			weWerePushedBelowZeroLastLoop = false;
+		}
+
+		//if it's a single line and just a new line, delete it
+		if (singleLines[e].tokens.size() < 2 && singleLines[e].tokens[0].type == PPC::Stage1::TokenType::NewLine || !singleLines[e].tokens.size())
+		{
+			if (e == 0)
+				weWerePushedBelowZeroLastLoop = true;
+
+			singleLines.erase(singleLines.begin() + e);
+			singleExpressionCount--;
+		}
+	}
+
+	//prune the identifiers after the endobj or endfunc
+	singleExpressionCount = singleLines.size();
+	for (size_t e = 0; e < singleExpressionCount; ++e)
+	{
+		if (singleLines[e].tokens.size() == 2 && singleLines[e].tokens[0].type == PPC::Stage1::TokenType::Keyword &&
+			singleLines[e].tokens[0].specificType == PPC::Stage1::SpecificTokenType::Keyword_FuncEnd
+			|| singleLines[e].tokens.size() == 2 && singleLines[e].tokens[0].type == PPC::Stage1::TokenType::Keyword &&
+			singleLines[e].tokens[0].specificType == PPC::Stage1::SpecificTokenType::Keyword_ObjEnd)
+			singleLines[e].tokens.resize(1);
+	}
+
+	return singleLines;
+	
+}
 
 //lexes ASM into tokens
-PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const std::string& code)
+PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const Data::CompilerSettings& settings, const std::string& code)
 {
 	//Subpass 1: Genaric Token Splits || read details in the README
 	LexedFile file;
-	file.wholeTokens = Subpass1_GenerateGeneralTokens(code);	
-	file.funcs.reserve(5);
-	file.structs.reserve(5);
+	std::vector<Token> wholeTokens = Subpass1_GenerateGeneralTokens(code);	
 
 	//Subpass 2:  Keywords and fine typing || read details in the README
-	file.wholeTokens = Subpass2_GenerateTokens(file.wholeTokens);
+	wholeTokens = Subpass2_GenerateTokens(wholeTokens);
 
 	//Subpass 3: Remove Invalid Instructions And Section Info || read details in the README
-	file.wholeTokens = Subpass3_GenerateTokens(file.wholeTokens);
+	wholeTokens = Subpass3_GenerateTokens(wholeTokens);
 
 	//Subpass 4: Jump Labels || read details in the README
-	file.wholeTokens = Subpass4_GenerateTokens(file.wholeTokens);
+	wholeTokens = Subpass4_GenerateTokens(wholeTokens);
 
-	//Subpass 5: Strip comments and sections
-	//this is a optional extra subpass done to the file that prunes comments
-	file.wholeTokens = Subpass5_StripComments(file.wholeTokens);
+	//Subpass 5: Strip comments
+	wholeTokens = Subpass5_StripComments(wholeTokens);
 
-	//push the tokens into either function groups or struct groups
+	file.singleLineExpesstions = Subpass6_SplitExpresstions(wholeTokens);
+	wholeTokens.clear();
 
+	//process the single line expresstions into functions and objects
+	const size_t singleExpressionCount = file.singleLineExpesstions.size();
+	for (size_t e = 0; e < singleExpressionCount; ++e)
+	{
+		//if it's a function
+
+		//if it's a 
+	}
 
 	return file;
 }
