@@ -29,20 +29,9 @@ int main(int args, const char* argv[])
 
 	//lexes assembly into tokens	
 	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(tu.code);
-	//for (size_t i = 0; i < f.funcs.size(); ++i)
-	//{
-	//	for (size_t t = 0; t < f.funcs[i].tokens.size(); ++t)
-	//		f.funcs[i].tokens[t].Print();
-	//}
-	//for (size_t i = 0; i < f.structs.size(); ++i)
-	//{
-	//	for (size_t t = 0; t < f.structs[i].tokens.size(); ++t)
-	//		f.structs[i].tokens[t].Print();
-	//}
 	for (size_t i = 0; i < f.wholeTokens.size(); ++i)
 		f.wholeTokens[i].Print();
-
-	//output the C code
+	
 
 	getchar();
 	return 0;

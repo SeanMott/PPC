@@ -1,6 +1,9 @@
 # Stage 1
 
-This is the first stage of converting a ROM into C++. Taking the assembly and breaking it down into tokens and making sense of all the text.
+After the ROM has been split out into assembly and symbol data (See Stage 0). We can begin the process of converting it to C++.
+
+Stage 1 is all about lexing the raw code into tokens we can later use to generate a accurate AST of the program.
+Each Token tells a bit about the program. Using theses we can know how to assemble the C++.
 
 The most common file DTK generates is the C++ init exception file. This file is used for initalizing exceptions in C++ on the Game Cube.
 

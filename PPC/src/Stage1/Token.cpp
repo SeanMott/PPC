@@ -1,5 +1,7 @@
 #include <PPC/Stage1/Token.hpp>
 
+#include <PPC/Data/PPCInstructions.hpp>
+
 //defines a parser
 struct Parser
 {
@@ -529,6 +531,7 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 	tokens.reserve(subpass1TokenCount);
 
 	//compress the tokens into the new tree
+	uint32_t instArrayIndex = 0; PPC::Data::ASM::EInstruction ppcInstrct;
 	for (size_t i = 0; i < subpass1TokenCount; ++i)
 	{
 		//if it's genaric we parse it for furthur data
@@ -638,6 +641,13 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
 			}
 
+			//if it's assembly instruction
+			else if (PPC::Data::ASM::IsASMInstructionStr(subpass1Tokens[i].data.c_str(), instArrayIndex, ppcInstrct))
+			{
+				subpass1Tokens[i].type = PPC::Stage1::TokenType::Instruction;
+				//subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
+			}
+
 			//if it's a digit literal
 
 			//else it's a Identifier
@@ -700,17 +710,13 @@ static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vecto
 		{
 			subpass3Tokens[i].type = PPC::Stage1::TokenType::JumpLabelDefinition;
 			tokens.emplace_back(subpass3Tokens[i]);
-			//subpass3Tokens[i].Print();
 
 			//skip the :
 			i++;
 		}
 
 		else
-		{
 			tokens.emplace_back(subpass3Tokens[i]);
-			//subpass3Tokens[i].Print();
-		}
 	}
 
 	return tokens;
@@ -727,75 +733,17 @@ PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const std::string& code)
 	file.funcs.reserve(5);
 	file.structs.reserve(5);
 
-	//splits into blocks of tokens for functions and objects
-	const size_t tokenCount = file.wholeTokens.size();
-	for (size_t t = 0; t < tokenCount; ++t)
-	{
-		//if it's a function
-		if (file.wholeTokens[t].type == PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType == PPC::Stage1::SpecificTokenType::Keyword_FuncStart)
-		{
-			FuncTokens* func = &file.funcs.emplace_back(FuncTokens());
-			func->tokens.reserve(5);
+	//Subpass 2:  Keywords and fine typing || read details in the README
+	file.wholeTokens = Subpass2_GenerateTokens(file.wholeTokens);
 
-			//goes till the end of the func
-			while (t < tokenCount && 
-				file.wholeTokens[t].type != PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType != PPC::Stage1::SpecificTokenType::Keyword_FuncEnd)
-			{
-				func->tokens.emplace_back(file.wholeTokens[t]);
-				t++;
-			}
-			func->tokens.emplace_back(file.wholeTokens[t]);
+	//Subpass 3: Remove Invalid Instructions || read details in the README
+	file.wholeTokens = Subpass3_GenerateTokens(file.wholeTokens);
 
-			//gets the second token, since that one is always the Idnetifier name
-			//func->name = func->tokens[1].data;
-		}
+	//Subpass 4: Jump Labels || read details in the README
+	file.wholeTokens = Subpass4_GenerateTokens(file.wholeTokens);
 
-		//if it's a object
-		else if (file.wholeTokens[t].type == PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType == PPC::Stage1::SpecificTokenType::Keyword_ObjStart)
-		{
-			StructTokens* s = &file.structs.emplace_back(StructTokens());
-			s->tokens.reserve(5);
+	//push the tokens into either function groups or struct groups
 
-			//goes till the end of the func
-			while (t < tokenCount &&
-				file.wholeTokens[t].type != PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType != PPC::Stage1::SpecificTokenType::Keyword_ObjEnd)
-			{
-				s->tokens.emplace_back(file.wholeTokens[t]);
-				t++;
-			}
-			s->tokens.emplace_back(file.wholeTokens[t]);
-
-			//gets the second token, since that one is always the Idnetifier name
-			//s->name = s->tokens[1].data;
-		}
-	}
-
-	//we always put functions into threads but when it comes to structs. Only if they have certain token threadhold. 
-	//Since it would be faster to go through them on the main thread. Instead of spinning up more threads.
-	for (size_t f = 0; f < file.funcs.size(); ++f)
-	{
-		//Subpass 2:  Keywords and fine typing || read details in the README
-		std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(file.funcs[f].tokens);
-
-		//Subpass 3: Remove Invalid Instructions || read details in the README
-		std::vector<PPC::Stage1::Token> subpass3_Tokens = Subpass3_GenerateTokens(subpass2_Tokens);
-		subpass2_Tokens.clear();
-
-		//Subpass 4: Jump Labels || read details in the README
-		file.funcs[f].tokens = Subpass4_GenerateTokens(subpass3_Tokens);
-		subpass3_Tokens.clear();
-	}
-
-	//The struct threads also don't process jump labels since they don't exist
-	for (size_t f = 0; f < file.structs.size(); ++f)
-	{
-		//Subpass 2:  Keywords and fine typing || read details in the README
-		std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(file.structs[f].tokens);
-
-		//Subpass 3: Remove Invalid Instructions || read details in the README
-		file.structs[f].tokens = Subpass3_GenerateTokens(subpass2_Tokens);
-		subpass2_Tokens.clear();
-	}
 
 	return file;
 }

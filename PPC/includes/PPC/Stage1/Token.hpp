@@ -23,6 +23,8 @@ namespace PPC::Stage1
 
 		Register, //a register
 
+		Instruction, //defines a instruction
+
 		JumpLabelDefinition, //marks the definition of a jump label
 
 		Literal_String, //the string literal
@@ -109,6 +111,10 @@ namespace PPC::Stage1
 			case TokenType::Identifier:
 				fmt::print(fmt::fg(fmt::color::blue), "Line: {}, Char: {} || Identifier {}\n", lineCount, charCount, data);
 				break;
+
+			case TokenType::Instruction:
+				fmt::print(fmt::fg(fmt::color::orange), "Line: {}, Char: {} || Instruction {}\n", lineCount, charCount, data);
+				break;
 			}
 		}
 	};
@@ -125,11 +131,17 @@ namespace PPC::Stage1
 	{
 		std::string name = "";
 		std::vector<Token> tokens;
+
+		//defines each jump label and their tokens
 	};
 
 	//defines a lexed file
 	struct LexedFile
 	{
+		//the ID registery associated with the identifier or string
+		//all the unique identifiers in this file
+		//all the unique string literals in this file
+
 		std::vector<FuncTokens> funcs; //the funcs
 		std::vector<StructTokens> structs; //the structs
 	
