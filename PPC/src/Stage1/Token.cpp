@@ -158,8 +158,6 @@ static inline PPC::Stage1::Token Subpass1_GenerateTokenFromWord(std::string& wor
 		return t;
 	}
 
-	//fmt::print("Line: {}, Char: {} || {}\n", parser->lineCount, parser->charCount, word);
-
 	//genaric token
 	t.type = PPC::Stage1::TokenType::Genaric;
 	t.data = std::string(word);
@@ -207,7 +205,7 @@ static inline PPC::Stage1::Token Subpass1_GenerateToken_NewLine(Parser* parser)
 
 	PPC::Stage1::Token t;
 	t.type = PPC::Stage1::TokenType::NewLine;
-	t.data = "";
+	t.data = "\n";
 	t.lineCount = parser->lineCount;
 	t.charCount = parser->charCount;
 	return t;
@@ -678,10 +676,12 @@ static inline std::vector<PPC::Stage1::Token> Subpass3_GenerateTokens(std::vecto
 	//compress the tokens into the new tree
 	for (size_t i = 0; i < subpass2TokenCount; ++i)
 	{
-		//check for this line and the next few to be invalid structure and skip it all if so
+		//check for this line and the next few to be invalid or illegal structure and skip it all if so
 		if (i + 3 < subpass2TokenCount && subpass2Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass2Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
 			subpass2Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
-			subpass2Tokens[i + 3].data == " invalid ")
+			subpass2Tokens[i + 3].data == " invalid " || i + 3 < subpass2TokenCount && subpass2Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass2Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
+			subpass2Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
+			subpass2Tokens[i + 3].data.find("illegal:"))
 		{
 			i += 4; //we add the extra bit to skip the new line
 			continue;
@@ -722,6 +722,27 @@ static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vecto
 	return tokens;
 }
 
+//processes the subpass 5
+static inline std::vector<PPC::Stage1::Token> Subpass5_StripComments(std::vector<PPC::Stage1::Token>& subpass4Tokens)
+{
+	const size_t subpass4TokenCount = subpass4Tokens.size();
+	std::vector<PPC::Stage1::Token> tokens;
+	tokens.reserve(subpass4TokenCount);
+
+	//compress the tokens into the new tree
+	for (size_t i = 0; i < subpass4TokenCount; ++i)
+	{
+		//if it's a comment, we remove it
+		if (subpass4Tokens[i].type == PPC::Stage1::TokenType::BlockComment || subpass4Tokens[i].type == PPC::Stage1::TokenType::SingleLineComment)
+			continue;
+
+		else
+			tokens.emplace_back(subpass4Tokens[i]);
+	}
+
+	return tokens;
+}
+
 #include <thread>
 
 //lexes ASM into tokens
@@ -736,11 +757,15 @@ PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const std::string& code)
 	//Subpass 2:  Keywords and fine typing || read details in the README
 	file.wholeTokens = Subpass2_GenerateTokens(file.wholeTokens);
 
-	//Subpass 3: Remove Invalid Instructions || read details in the README
+	//Subpass 3: Remove Invalid Instructions And Section Info || read details in the README
 	file.wholeTokens = Subpass3_GenerateTokens(file.wholeTokens);
 
 	//Subpass 4: Jump Labels || read details in the README
 	file.wholeTokens = Subpass4_GenerateTokens(file.wholeTokens);
+
+	//Subpass 5: Strip comments and sections
+	//this is a optional extra subpass done to the file that prunes comments
+//	file.wholeTokens = Subpass5_StripComments(file.wholeTokens);
 
 	//push the tokens into either function groups or struct groups
 

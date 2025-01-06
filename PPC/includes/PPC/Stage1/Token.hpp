@@ -5,6 +5,7 @@
 #include <PPC/Logger.hpp>
 
 #include <vector>
+#include <fstream>
 
 namespace PPC::Stage1
 {
@@ -138,14 +139,24 @@ namespace PPC::Stage1
 	//defines a lexed file
 	struct LexedFile
 	{
-		//the ID registery associated with the identifier or string
-		//all the unique identifiers in this file
-		//all the unique string literals in this file
-
 		std::vector<FuncTokens> funcs; //the funcs
 		std::vector<StructTokens> structs; //the structs
 	
 		std::vector<Token> wholeTokens; //all the other tokens making up the file
+
+		//generate a debug output file of all the tokens
+		inline void GenerateDebugOutputFileOfTokens(const std::string& filepath)
+		{
+			std::string data = "";
+			for (size_t i = 0; i < wholeTokens.size(); ++i)
+			{
+				data += wholeTokens[i].data;
+				data += ' ';
+			}
+
+			std::fstream f(filepath, std::ios::out);
+			f.write(data.c_str(), data.size());
+		}
 	};
 
 	//lexes ASM into tokens

@@ -110,7 +110,7 @@ After all the strings and operators are parsed out. We now mark all the keywords
 We do this now since we have weeded out the annoying types to parse if we had to deal with strings and comments. So now we apply the fine typing for each.
 This retroactivly sets the types for what were initally the Genaric tokens to their specific typing.
 
-## Subpass 3: Remove Invalid Instructions
+## Subpass 3: Remove Invalid Instructions And Section Info
 
 DTK generates the same line anytime it runs into something invalid
 
@@ -136,6 +136,20 @@ Thanks to the earlier subpasses, we the format for this is always Block Comment,
 We do a final check in the tree where groups of theses Tokens are checked. Always if the second Block Comment spelles out " invalid ".
 If so, we strip it out.
 
+We also strip out any of the extra section data we don't need. This is becues the compiler doesn't need to parse it from the file.
+
+From Tower Of Druga || __init_cpp_exceptions.s
+```
+.include "macros.inc"
+.file "__init_cpp_exceptions.cpp"
+
+# 0x8002DE40..0x8002DE44 | size: 0x4
+.section .dtors, "a"
+.balign 4
+```
+All theses .sections and .file parts can be removed. The comments are a optional extra subpass we can remove.
+The reason is when the DTK symbol file is processed, it provides us with all the section and size and type info we need.
+
 ## Subpass 4: Jump Labels
 
 Now that everything has been marked and we have all the extra metadata we need.
@@ -151,3 +165,8 @@ From Tower Of Druga || auto_00_80003100_init.s
 
 The .L_800055D4: is a Jump Label definition. .L_800055D4 is our label that will be invoked in the function. 
 While the : marks it as the start, going untill the next label, or end of function.
+
+## Subpass 5: Comment Pruning (optional)
+
+If the compiler flag is enabled, PPC will strip out the comments DTK makes for memory offset and section info.
+Theses will be parsed out initally, but then pruned from the tree after all the other subpasses.

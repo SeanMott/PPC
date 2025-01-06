@@ -29,9 +29,9 @@ int main(int args, const char* argv[])
 
 	//lexes assembly into tokens	
 	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(tu.code);
-	for (size_t i = 0; i < f.wholeTokens.size(); ++i)
-		f.wholeTokens[i].Print();
-	
+	//for (size_t i = 0; i < f.wholeTokens.size(); ++i)
+	//	f.wholeTokens[i].Print();
+	f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_80003100_init.debugasm");
 
 	getchar();
 	return 0;
