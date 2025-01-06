@@ -687,6 +687,14 @@ static inline std::vector<PPC::Stage1::Token> Subpass3_GenerateTokens(std::vecto
 			continue;
 		}
 
+		//if it's a .file or .include line it also gets removed
+		else if (subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".include" ||
+			subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".file")
+		{
+			i += 2;
+			continue;
+		}
+
 		tokens.emplace_back(subpass2Tokens[i]);
 	}
 
@@ -765,7 +773,7 @@ PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const std::string& code)
 
 	//Subpass 5: Strip comments and sections
 	//this is a optional extra subpass done to the file that prunes comments
-//	file.wholeTokens = Subpass5_StripComments(file.wholeTokens);
+	file.wholeTokens = Subpass5_StripComments(file.wholeTokens);
 
 	//push the tokens into either function groups or struct groups
 
