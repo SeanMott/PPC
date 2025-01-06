@@ -2,8 +2,6 @@
 
 //defines a Token
 
-#include <PPC/Data/TranslationUnit.hpp>
-
 #include <PPC/Logger.hpp>
 
 #include <vector>
@@ -115,6 +113,29 @@ namespace PPC::Stage1
 		}
 	};
 
+	//defines a struct blob of tokens
+	struct StructTokens
+	{
+		std::string name = "";
+		std::vector<Token> tokens;
+	};
+
+	//defines a function blob of tokens
+	struct FuncTokens
+	{
+		std::string name = "";
+		std::vector<Token> tokens;
+	};
+
+	//defines a lexed file
+	struct LexedFile
+	{
+		std::vector<FuncTokens> funcs; //the funcs
+		std::vector<StructTokens> structs; //the structs
+	
+		std::vector<Token> wholeTokens; //all the other tokens making up the file
+	};
+
 	//lexes ASM into tokens
-	std::vector<Token> LexTokens(const Data::TranslationUnit& tu);
+	LexedFile LexTokens(const std::string& code);
 }

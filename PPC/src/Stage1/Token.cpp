@@ -131,6 +131,16 @@ static inline PPC::Stage1::Token Subpass1_GenerateToken_StringLiteral(Parser* pa
 	return t;
 }
 
+//is it the start of a function
+static inline bool Subpass1_IsKeyword_ObjectDef_Start(const char* key) { return (!strcmp(key, ".obj") ? true : false); }
+//is it the end of a function
+static inline bool Subpass1_IsKeyword_ObjectDef_End(const char* key) { return (!strcmp(key, ".endobj") ? true : false); }
+
+//is it the start of a object
+static inline bool Subpass1_IsKeyword_FunctionDef_Start(const char* key) { return (!strcmp(key, ".fn") ? true : false); }
+//is it the end of a object
+static inline bool Subpass1_IsKeyword_FunctionDef_End(const char* key) { return (!strcmp(key, ".endfn") ? true : false); }
+
 //makes a word
 static inline PPC::Stage1::Token Subpass1_GenerateTokenFromWord(std::string& word, Parser* parser)
 {
@@ -148,10 +158,41 @@ static inline PPC::Stage1::Token Subpass1_GenerateTokenFromWord(std::string& wor
 
 	//fmt::print("Line: {}, Char: {} || {}\n", parser->lineCount, parser->charCount, word);
 
+	//genaric token
 	t.type = PPC::Stage1::TokenType::Genaric;
 	t.data = std::string(word);
 	t.lineCount = parser->lineCount;
 	t.charCount = parser->charCount;
+
+	//we check for extra token specifics so we can multithread it
+
+	//if it's a start of a function keyword
+	if (Subpass1_IsKeyword_FunctionDef_Start(t.data.c_str()))
+	{
+		t.type = PPC::Stage1::TokenType::Keyword;
+		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncStart;
+	}
+
+	//if it's the end of a function keyword
+	else if (Subpass1_IsKeyword_FunctionDef_End(t.data.c_str()))
+	{
+		t.type = PPC::Stage1::TokenType::Keyword;
+		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncEnd;
+	}
+
+	//if it's a start of a object keyword
+	else if (Subpass1_IsKeyword_ObjectDef_Start(t.data.c_str()))
+	{
+		t.type = PPC::Stage1::TokenType::Keyword;
+		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjStart;
+	}
+
+	//if it's the end of a object keyword
+	else if (Subpass1_IsKeyword_ObjectDef_End(t.data.c_str()))
+	{
+		t.type = PPC::Stage1::TokenType::Keyword;
+		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjEnd;
+	}
 
 	word = "";
 	return t;
@@ -185,16 +226,6 @@ static inline bool Subpass1_IsOperator(const char op)
 
 	return false;
 }
-
-//is it the start of a function
-static inline bool Subpass2_IsKeyword_ObjectDef_Start(const char* key) { return (!strcmp(key, ".obj") ? true : false); }
-//is it the end of a function
-static inline bool Subpass2_IsKeyword_ObjectDef_End(const char* key) { return (!strcmp(key, ".endobj") ? true : false); }
-
-//is it the start of a object
-static inline bool Subpass2_IsKeyword_FunctionDef_Start(const char* key) { return (!strcmp(key, ".fn") ? true : false); }
-//is it the end of a object
-static inline bool Subpass2_IsKeyword_FunctionDef_End(const char* key) { return (!strcmp(key, ".endfn") ? true : false); }
 
 //is it a alignment keyword
 static inline bool Subpass2_IsKeyword_Alignment(const char* key) { return (!strcmp(key, ".balign") ? true : false); }
@@ -510,34 +541,6 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Alignment;
 			}
 
-			//if it's a start of a function keyword
-			else if (Subpass2_IsKeyword_FunctionDef_Start(subpass1Tokens[i].data.c_str()))
-			{
-				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncStart;
-			}
-
-			//if it's the end of a function keyword
-			else if (Subpass2_IsKeyword_FunctionDef_End(subpass1Tokens[i].data.c_str()))
-			{
-				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncEnd;
-			}
-
-			//if it's a start of a object keyword
-			else if (Subpass2_IsKeyword_ObjectDef_Start(subpass1Tokens[i].data.c_str()))
-			{
-				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjStart;
-			}
-
-			//if it's the end of a object keyword
-			else if (Subpass2_IsKeyword_ObjectDef_End(subpass1Tokens[i].data.c_str()))
-			{
-				subpass1Tokens[i].type = PPC::Stage1::TokenType::Keyword;
-				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjEnd;
-			}
-
 			//if it's a global scope keyword
 			else if (Subpass2_IsKeyword_Scope_Global(subpass1Tokens[i].data.c_str()))
 			{
@@ -633,7 +636,7 @@ static inline std::vector<PPC::Stage1::Token> Subpass2_GenerateTokens(std::vecto
 			{
 				subpass1Tokens[i].type = PPC::Stage1::TokenType::Register;
 				subpass1Tokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
-				}
+			}
 
 			//if it's a digit literal
 
@@ -697,7 +700,7 @@ static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vecto
 		{
 			subpass3Tokens[i].type = PPC::Stage1::TokenType::JumpLabelDefinition;
 			tokens.emplace_back(subpass3Tokens[i]);
-			subpass3Tokens[i].Print();
+			//subpass3Tokens[i].Print();
 
 			//skip the :
 			i++;
@@ -706,30 +709,93 @@ static inline std::vector<PPC::Stage1::Token> Subpass4_GenerateTokens(std::vecto
 		else
 		{
 			tokens.emplace_back(subpass3Tokens[i]);
-			subpass3Tokens[i].Print();
+			//subpass3Tokens[i].Print();
 		}
 	}
 
 	return tokens;
 }
 
+#include <thread>
+
 //lexes ASM into tokens
-std::vector<PPC::Stage1::Token> PPC::Stage1::LexTokens(const Data::TranslationUnit& tu)
+PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const std::string& code)
 {
 	//Subpass 1: Genaric Token Splits || read details in the README
-	std::vector<PPC::Stage1::Token> subpass1_Tokens = Subpass1_GenerateGeneralTokens(tu.code);
+	LexedFile file;
+	file.wholeTokens = Subpass1_GenerateGeneralTokens(code);	
+	file.funcs.reserve(5);
+	file.structs.reserve(5);
 
-	//Subpass 2:  Keywords and fine typing || read details in the README
-	std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(subpass1_Tokens);
-	subpass1_Tokens.clear(); //we don't need the old tree anymore
+	//splits into blocks of tokens for functions and objects
+	const size_t tokenCount = file.wholeTokens.size();
+	for (size_t t = 0; t < tokenCount; ++t)
+	{
+		//if it's a function
+		if (file.wholeTokens[t].type == PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType == PPC::Stage1::SpecificTokenType::Keyword_FuncStart)
+		{
+			FuncTokens* func = &file.funcs.emplace_back(FuncTokens());
+			func->tokens.reserve(5);
 
-	//Subpass 3: Remove Invalid Instructions || read details in the README
-	std::vector<PPC::Stage1::Token> subpass3_Tokens = Subpass3_GenerateTokens(subpass2_Tokens);
-	subpass2_Tokens.clear();
+			//goes till the end of the func
+			while (t < tokenCount && 
+				file.wholeTokens[t].type != PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType != PPC::Stage1::SpecificTokenType::Keyword_FuncEnd)
+			{
+				func->tokens.emplace_back(file.wholeTokens[t]);
+				t++;
+			}
+			func->tokens.emplace_back(file.wholeTokens[t]);
 
-	//Subpass 4: Jump Labels and Func/Object Names || read details in the README
-	std::vector<PPC::Stage1::Token> subpass4_Tokens = Subpass4_GenerateTokens(subpass3_Tokens);
-	subpass3_Tokens.clear();
+			//gets the second token, since that one is always the Idnetifier name
+			//func->name = func->tokens[1].data;
+		}
 
-	return subpass4_Tokens;
+		//if it's a object
+		else if (file.wholeTokens[t].type == PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType == PPC::Stage1::SpecificTokenType::Keyword_ObjStart)
+		{
+			StructTokens* s = &file.structs.emplace_back(StructTokens());
+			s->tokens.reserve(5);
+
+			//goes till the end of the func
+			while (t < tokenCount &&
+				file.wholeTokens[t].type != PPC::Stage1::TokenType::Keyword && file.wholeTokens[t].specificType != PPC::Stage1::SpecificTokenType::Keyword_ObjEnd)
+			{
+				s->tokens.emplace_back(file.wholeTokens[t]);
+				t++;
+			}
+			s->tokens.emplace_back(file.wholeTokens[t]);
+
+			//gets the second token, since that one is always the Idnetifier name
+			//s->name = s->tokens[1].data;
+		}
+	}
+
+	//we always put functions into threads but when it comes to structs. Only if they have certain token threadhold. 
+	//Since it would be faster to go through them on the main thread. Instead of spinning up more threads.
+	for (size_t f = 0; f < file.funcs.size(); ++f)
+	{
+		//Subpass 2:  Keywords and fine typing || read details in the README
+		std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(file.funcs[f].tokens);
+
+		//Subpass 3: Remove Invalid Instructions || read details in the README
+		std::vector<PPC::Stage1::Token> subpass3_Tokens = Subpass3_GenerateTokens(subpass2_Tokens);
+		subpass2_Tokens.clear();
+
+		//Subpass 4: Jump Labels || read details in the README
+		file.funcs[f].tokens = Subpass4_GenerateTokens(subpass3_Tokens);
+		subpass3_Tokens.clear();
+	}
+
+	//The struct threads also don't process jump labels since they don't exist
+	for (size_t f = 0; f < file.structs.size(); ++f)
+	{
+		//Subpass 2:  Keywords and fine typing || read details in the README
+		std::vector<PPC::Stage1::Token> subpass2_Tokens = Subpass2_GenerateTokens(file.structs[f].tokens);
+
+		//Subpass 3: Remove Invalid Instructions || read details in the README
+		file.structs[f].tokens = Subpass3_GenerateTokens(subpass2_Tokens);
+		subpass2_Tokens.clear();
+	}
+
+	return file;
 }

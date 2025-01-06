@@ -5,7 +5,7 @@ Allows a Game Cube/Wii ROM to be converted to C++
 */
 
 
-
+#include <PPC/Data/TranslationUnit.hpp>
 #include <PPC/Stage1/Token.hpp>
 
 //the modes PPC can be in
@@ -22,13 +22,25 @@ int main(int args, const char* argv[])
 {
 	//parse comments
 
-	//lexes assembly into tokens
-	PPC::Data::TranslationUnit tu; 
+	//loads the code
+	PPC::Data::TranslationUnit tu;
 	//tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
 	tu.LoadCode("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
-	std::vector<PPC::Stage1::Token> tokens = PPC::Stage1::LexTokens(tu);
-	for (size_t i = 0; i < tokens.size(); ++i)
-		tokens[i].Print();
+
+	//lexes assembly into tokens	
+	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(tu.code);
+	//for (size_t i = 0; i < f.funcs.size(); ++i)
+	//{
+	//	for (size_t t = 0; t < f.funcs[i].tokens.size(); ++t)
+	//		f.funcs[i].tokens[t].Print();
+	//}
+	//for (size_t i = 0; i < f.structs.size(); ++i)
+	//{
+	//	for (size_t t = 0; t < f.structs[i].tokens.size(); ++t)
+	//		f.structs[i].tokens[t].Print();
+	//}
+	for (size_t i = 0; i < f.wholeTokens.size(); ++i)
+		f.wholeTokens[i].Print();
 
 	//output the C code
 

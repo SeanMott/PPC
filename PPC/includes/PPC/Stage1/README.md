@@ -56,13 +56,14 @@ As PPC may be a one pass transcompiler, internally, each stage breaks it down in
 
 ## Subpass 1: Genaric Token Splits
 
-The first subpass breaks the entire file into lines and breaks everything in Genaric Tokens. This skips any spaces and tabs not in comments or strings.
+The first subpass breaks the entire file into Genaric Tokens. This skips any spaces and tabs not in comments or strings.
 Theses tokens just store the raw text data and line count it was found one, and the char position value in the entire file that started the Genaric Token.
 Go to the [header]("Token.hpp") to see the Token struct. This struct is re-used for theses Genaric Tokens and the special Tokens.
 
-The total types of Tokens generated during this subpass is the Genaric Token, Single and Block Comments, Operators, New Line, and String Literal Token.
+The total types of Tokens generated during this subpass is 
+the Genaric Token, Single and Block Comments, Operators, New Line, String Literal, Func Start, Func End, Object Start, and Object End Token.
 
-We sort out String Literals and Operators, since they're the easiest to define at this stage. Since we're not concerning ourselves on keywords.
+We sort out String Literals and Operators, since they're the easiest to define at this stage. Since we're not concerning ourselves on every keywords.
 
 Single and Block Comments only hold data that would be useful to someone reading the code. So we can ignore them, the only useful one we need is the invalid comment generated.
 The comments are not discarded though, we will bring them into the sudo-C and typed ASM stages. So some of the structure can be perserved.
@@ -95,6 +96,9 @@ From Tower of Druga || auto_04_8002DE60_rodata.s
 .endobj lbl_8002DE68
 ```
 .byte 0x1E, 0xB4, 0x0F, 0x48, 0x28, 0x0F, 0x3B, 0x1F is going to be treated as a array. We mark the commas so we parse it as such later
+
+The .obj denotes the start of the object and .endobj denotes the end. We define theses now alongside the other func keywords. So we can sort the tokens into groups.
+Once grouped we can throw them into threads to speed up the trans pipeline.
 
 ## Subpass 2: Keywords and fine typing
 
