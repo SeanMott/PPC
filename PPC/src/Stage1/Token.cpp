@@ -695,6 +695,17 @@ static inline std::vector<PPC::Stage1::Token> Subpass3_GenerateTokens(std::vecto
 			continue;
 		}
 
+		//if we're .section, remove the whole line
+		else if (subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".section")
+		{
+			while (subpass2Tokens[i].type != PPC::Stage1::TokenType::NewLine && i < subpass2TokenCount)
+			{
+				i++;
+			}
+
+			continue;
+		}
+
 		tokens.emplace_back(subpass2Tokens[i]);
 	}
 
