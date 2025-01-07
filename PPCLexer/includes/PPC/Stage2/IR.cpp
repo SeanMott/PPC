@@ -176,12 +176,77 @@ static inline void Subpass2_StructVarsAndInstructions(std::vector<PPC::Stage2::N
 	}
 }
 
+//furthur define the instruction parameters, resolving memory offsets
+static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vector<PPC::Stage2::Node>& nodes)
+{
+	//furthur refine the instructions memory offset parameters
+	for (size_t i = 0; i < nodes.size(); ++i)
+	{
+		//get the instruction
+		if (nodes[i].type == PPC::Stage2::NodeType::Instruction_Expresstion)
+		{
+			//goes through the paremeters and check for a memory offset
+			for (size_t p = 0; p < nodes[i].instruction.parameters.size(); ++p)
+			{
+				PPC::Stage2::InstructionParameter* param = &nodes[i].instruction.parameters[p];
+				const size_t tokenCount = param->tokens.size();
+				if (tokenCount < 3) //if there's not enough tokens for the generation
+					continue;
+
+				//checks the tokens if there's a @l, @h, or @sda21
+				for (size_t t = 0; t < tokenCount; ++t)
+				{
+					if (param->tokens[t].type == PPC::Stage1::TokenType::Keyword &&
+						param->tokens[t].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit)
+					{
+						//swap the bit and the identifier
+						PPC::Stage1::Token bit = param->tokens[t];
+						PPC::Stage1::Token identifier = param->tokens[t - 2];
+						param->tokens[t] = identifier;
+						param->tokens[t - 2] = bit;
+
+						//we remove the @ before this so we can wrap the identifier later
+						param->tokens.erase(param->tokens.begin() + (t - 1));
+					}
+				}
+
+				//const size_t lastTokenIndex = param->tokens.size() - 1;
+
+				//if (param->tokens[lastTokenIndex].type == PPC::Stage1::TokenType::Keyword &&
+				//	param->tokens[lastTokenIndex].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit)
+				//	param->paramterType = PPC::Stage2::InstructionParameterType::MemoryOffset_HighBit;
+
+				//else if (param->tokens[lastTokenIndex].type == PPC::Stage1::TokenType::Keyword &&
+				//	param->tokens[lastTokenIndex].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit)
+				//	param->paramterType = PPC::Stage2::InstructionParameterType::MemoryOffset_LowBit;
+				//else if (param->tokens[lastTokenIndex].type == PPC::Stage1::TokenType::Keyword &&
+				//	param->tokens[lastTokenIndex].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_Sda21)
+				//	param->paramterType = PPC::Stage2::InstructionParameterType::MemoryOffset_Sda21;
+
+				////quickly remove the @ and the bit we are getting
+				//if (param->paramterType == PPC::Stage2::InstructionParameterType::MemoryOffset_HighBit ||
+				//	param->paramterType == PPC::Stage2::InstructionParameterType::MemoryOffset_LowBit ||
+				//	param->paramterType == PPC::Stage2::InstructionParameterType::MemoryOffset_Sda21)
+				//{
+				//	param->tokens.erase(param->tokens.begin() + )
+				//	param->tokens.resize(nodes[i].instruction.parameters[p].tokens.size() - 2);
+				//}
+			}
+		}
+	}
+}
+
 //parses the expresstions into Node IR
 std::vector<PPC::Stage2::Node> PPC::Stage2::ParseExpresstionsIntoNodeIR(const std::vector<Stage1::LexedSingleLineExpresstion>& lineExpresstions)
 {
+	//generate inital structs and functions
 	std::vector<PPC::Stage2::Node> nodes = Subpass1_FunctionAndStructBoundChecking(lineExpresstions);
+	
+	//generate instructions and variabes
 	Subpass2_StructVarsAndInstructions(nodes);
 	
+	//furthur define the instruction parameters, resolving memory offsets
+	Subpass3_ResolveInstructionParamHighLowMemoryOffsets(nodes);
 
 	return nodes;
 }

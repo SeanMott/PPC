@@ -60,6 +60,7 @@ namespace PPC::Stage2
 	//defines a instruction parameter type
 	enum class InstructionParameterType
 	{
+
 		Count
 	};
 
@@ -148,7 +149,22 @@ namespace PPC::Stage2
 				{
 					for (size_t d = 0; d < instruction.parameters[p].tokens.size(); ++d)
 					{
-						IR += instruction.parameters[p].tokens[d].data;
+						//if we're generating a memory offset
+						if (instruction.parameters[p].tokens[d].type == PPC::Stage1::TokenType::Keyword &&
+							instruction.parameters[p].tokens[d].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit)
+						{
+							IR += "PPC_RUNTIME_GET_MEMORY_OFFSET_HIGH_BIT(" + instruction.parameters[p].tokens[d + 1].data + ")";
+							d++;
+						}
+						//else if (instruction.parameters[p].paramterType == InstructionParameterType::MemoryOffset_LowBit)
+						///	IR += "PPC_RUNTIME_GET_MEMORY_OFFSET_LOW_BIT(" + instruction.parameters[p].tokens[0].data + ")";
+						//else if (instruction.parameters[p].paramterType == InstructionParameterType::MemoryOffset_Sda21)
+						//	IR += "PPC_RUNTIME_GET_MEMORY_OFFSET_SDA21(" + instruction.parameters[p].tokens[0].data + ")";
+
+						//if we're printing a token
+						else
+							IR += instruction.parameters[p].tokens[d].data;
+						
 						IR += ' ';
 					}
 

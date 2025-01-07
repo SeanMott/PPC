@@ -28,10 +28,10 @@ int main(int args, const char* argv[])
 
 	//loads the code
 	const std::string ASMDirectory = "C:/Decomps/TOD-Decomp/RawASM/asm/";
-	const std::string ASMFileName = "auto_00_80003100_init";
+	//const std::string ASMFileName = "auto_00_80003100_init";
 	//const std::string ASMFileName = "auto_05_80047290_data";
 	//const std::string ASMFileName = "__init_cpp_exceptions";
-	//const std::string ASMFileName = "auto_01_800056A0_text";
+	const std::string ASMFileName = "auto_01_800056A0_text";
 	PPC::Data::ASMFile ASMFile;
 	ASMFile.SetASM(ASMDirectory + ASMFileName + ".s");
 	ASMFile.LoadASM();
