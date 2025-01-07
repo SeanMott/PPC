@@ -162,8 +162,32 @@ namespace PPC::Stage1
 			{
 				for (size_t t = 0; t < singleLineExpesstions[i].tokens.size(); ++t)
 				{
-					data += singleLineExpesstions[i].tokens[t].data;
-					data += ' ';
+					//if it's the start of a function
+					if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncStart)
+						data += "func ";
+
+					else //if it's the start of a function
+						if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjStart)
+							data += "struct ";
+
+					//if it's the end of a function or object
+					else if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncEnd ||
+						singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjEnd)
+						data += "};";
+
+					//if it's a jump label
+					else if (singleLineExpesstions[i].tokens[t].type == TokenType::JumpLabelDefinition)
+					{
+						data += "Jump Label (" + singleLineExpesstions[i].tokens[t].data + "):";
+					}
+
+					//otherwise
+					else
+					{
+						data += singleLineExpesstions[i].tokens[t].data;
+
+						data += ' ';
+					}
 				}
 				data += '\n';
 			}

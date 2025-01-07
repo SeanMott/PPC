@@ -560,6 +560,8 @@ PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const Data::CompilerSettings& sett
 		//if it's a function
 
 		//if it's a object
+
+		//if it's a jump label
 	}
 
 	return file;
