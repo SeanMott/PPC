@@ -42,6 +42,7 @@
     <ClInclude Include="includes\PPC\Stage2\IR.hpp">
       <Filter>includes\PPC\Stage2</Filter>
     </ClInclude>
+    <ClInclude Include="includes\PPC\Stage1\Subpass1.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Stage1\Token.cpp">
@@ -50,5 +51,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="includes\PPC\Stage1\Subpass1.cpp" />
   </ItemGroup>
 </Project>

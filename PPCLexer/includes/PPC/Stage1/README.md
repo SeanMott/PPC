@@ -176,6 +176,3 @@ Now that we have the metadata. We can now split every line into it's own express
 Each line will be treated as it's own self contained expresstion later on when converting to C++.
 
 This also gets rid of the last of the bloating tokens found in newlines. All we care about is the stream of parsing.
-
-Once it's in a flat list of expresstions we can compress the trees into sub-trees. 
-Theses will contain the definitions for structs, functions, and jump labels. Each holding a list of line expresstions.
