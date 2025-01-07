@@ -11,8 +11,31 @@ std::vector<PPC::Stage2::Node> PPC::Stage2::ParseExpresstionsIntoNodeIR(const st
 	nodes.reserve(lineCount / 2);
 	for (size_t l = 0; l < lineCount; ++l)
 	{
+		//strips the line expresstion if it's a hidden
+		if (lineExpresstions[l].tokens[0].type == Stage1::TokenType::Keyword && lineExpresstions[l].tokens[0].specificType == Stage1::SpecificTokenType::Keyword_Scope_Hidden)
+			continue;
+
+		//if it's a .sym
+		else if (lineExpresstions[l].tokens[0].type == Stage1::TokenType::Keyword && lineExpresstions[l].tokens[0].specificType == Stage1::SpecificTokenType::Keyword_Scope_Sym)
+		{
+			Node node;
+
+			node.type = NodeType::SysAddressDef;
+
+			//gets name
+			node.symLabelDef.name = lineExpresstions[l].tokens[1].data;
+
+			//skips the comma
+
+			//gets the scope
+			//node->functionHeaderDef.scope = lineExpresstions[l].tokens[3].data;
+			node.symLabelDef.scope = Data::ScopeKeyword::Global;
+
+			nodes.emplace_back(node);
+		}
+
 		//if it's the start of a function
-		if (lineExpresstions[l].tokens[0].type == Stage1::TokenType::Keyword && lineExpresstions[l].tokens[0].specificType == Stage1::SpecificTokenType::Keyword_FuncStart)
+		else if (lineExpresstions[l].tokens[0].type == Stage1::TokenType::Keyword && lineExpresstions[l].tokens[0].specificType == Stage1::SpecificTokenType::Keyword_FuncStart)
 		{
 			Node node;
 

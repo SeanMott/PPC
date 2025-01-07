@@ -9,7 +9,7 @@ def MakeFolder(dir):
 
 print("PPC Stage 0: Gathering Data")
 
-DTK = "C:/Decomps/dtk"
+DTK = "C:/Decomps/dtk_130"
 ROM = "c:/Users/rafal/Desktop/Tower of Druaga, The (Japan)/TOD.iso"
 DTKOuputDir = "C:/Decomps/TOD-Decomp"
 MakeFolder(DTKOuputDir)

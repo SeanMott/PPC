@@ -52,6 +52,13 @@ namespace PPC::Stage2
 		std::string ownerName = ""; //what function or struct owns this label
 	};
 
+	//defines a sym jump label
+	struct SymJumpLabelDef
+	{
+		std::string name = "";
+		Data::ScopeKeyword scope = Data::ScopeKeyword::Count;
+	};
+
 	//defines a general Node
 	struct Node
 	{
@@ -62,32 +69,53 @@ namespace PPC::Stage2
 		FunctionHeaderDef functionHeaderDef;
 		StructHeaderDef structHeaderDef;
 		JumpLabelDef jumpLabelDef;
+		SymJumpLabelDef symLabelDef;
 
-		//prints the node type
-		inline void Print() const
+		//generates debug IR text
+		inline std::string GenerateDebugIR() const
 		{
+			std::string IR = "";
+
 			switch (type)
 			{
-				case NodeType::FunctionDef:
-					fmt::print("----Func || Global || {} \n", functionHeaderDef.name.c_str());
-					break;
+			case NodeType::FunctionDef:
+				IR += "static inline void " + functionHeaderDef.name + "(PPCRuntime::Context* context)\n{\n";
+				return IR;
 
-				case NodeType::FunctionDefEnd:
-					fmt::print("----Func End \n");
-					break;
+			case NodeType::FunctionDefEnd:
+				IR += "\n}\n";
+				return IR;
 
-				case NodeType::StructDef:
-					fmt::print("----Struct || Global || {} \n", structHeaderDef.name.c_str());
-					break;
+			case NodeType::StructDef:
+				IR += "struct " + structHeaderDef.name + "\n{\n";
+				return IR;
 
-				case NodeType::StructDefEnd:
-					fmt::print("----Struct End \n");
-					break;
+			case NodeType::StructDefEnd:
+				IR += "\n};\n";
+				return IR;
 
-				case NodeType::Unknown:
-					fmt::print("Unknown: \n");
-					break;
+			case NodeType::SysAddressDef:
+				IR += "Sym Address Jump || Static || " + symLabelDef.name + "\n";
+				return IR;
+
+			case NodeType::Unknown:
+				IR = "/*unable to parse the following Token Line Expresstion to IR. If it is a missing instruction make a pull on the github.";
+
+				for (size_t i = 0; i < lineExpresstion.size(); ++i)
+				{
+					IR += "\n//";
+					for (size_t t = 0; t < lineExpresstion[i].tokens.size(); ++t)
+					{
+						IR += ' ';
+						IR += (lineExpresstion[i].tokens[t].type == Stage1::TokenType::Literal_String ? "\"" + lineExpresstion[i].tokens[t].data + "\"" : lineExpresstion[i].tokens[t].data);
+					}
+				}
+				IR += "\n*/\n";
+
+				return IR;
 			}
+
+			return "";
 		}
 	};
 
