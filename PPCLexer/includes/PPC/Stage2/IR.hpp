@@ -96,7 +96,7 @@ namespace PPC::Stage2
 	struct Node
 	{
 		NodeType type = NodeType::Count;
-		std::vector<Stage1::LexedSingleLineExpresstion> lineExpresstion; //defines the general like expresstion
+		Stage1::LexedSingleLineExpresstion lineExpresstion; //defines the general like expresstion
 		std::vector<Node> nodes; //the internal nodes of this tree
 
 		//the specific bits of node data
@@ -180,16 +180,11 @@ namespace PPC::Stage2
 				return IR;
 
 			case NodeType::Unknown:
-				IR = "/*unable to parse the following Token Line Expresstion to IR. If it is a missing instruction make a pull on the github.";
-
-				for (size_t i = 0; i < lineExpresstion.size(); ++i)
+				IR = "/*unable to parse the following Token Line Expresstion to IR. If it is a missing instruction make a pull on the github.\n//";
+				for (size_t t = 0; t < lineExpresstion.tokens.size(); ++t)
 				{
-					IR += "\n//";
-					for (size_t t = 0; t < lineExpresstion[i].tokens.size(); ++t)
-					{
-						IR += ' ';
-						IR += (lineExpresstion[i].tokens[t].type == Stage1::TokenType::Literal_String ? "\"" + lineExpresstion[i].tokens[t].data + "\"" : lineExpresstion[i].tokens[t].data);
-					}
+					IR += ' ';
+					IR += (lineExpresstion.tokens[t].type == Stage1::TokenType::Literal_String ? "\"" + lineExpresstion.tokens[t].data + "\"" : lineExpresstion.tokens[t].data);
 				}
 				IR += "\n*/\n";
 

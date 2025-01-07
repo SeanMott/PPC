@@ -99,7 +99,7 @@ static inline std::vector<PPC::Stage2::Node> Subpass1_FunctionAndStructBoundChec
 		{
 			PPC::Stage2::Node n;
 			n.type = PPC::Stage2::NodeType::Unknown;
-			n.lineExpresstion.emplace_back(lineExpresstions[l]);
+			n.lineExpresstion = lineExpresstions[l];
 			nodes.emplace_back(n);
 		}
 	}
@@ -120,16 +120,16 @@ std::vector<PPC::Stage2::Node> PPC::Stage2::ParseExpresstionsIntoNodeIR(const st
 		if (nodes[i].type == NodeType::Unknown)
 		{
 			//if instruction
-			if (nodes[i].lineExpresstion[0].tokens[0].type == Stage1::TokenType::Instruction)
+			if (nodes[i].lineExpresstion.tokens[0].type == Stage1::TokenType::Instruction)
 			{
 				nodes[i].type = NodeType::Instruction_Expresstion;
 			
 				//generate the first instruction Node
-				nodes[i].instruction.instruction = nodes[i].lineExpresstion[0].tokens[0];
+				nodes[i].instruction.instruction = nodes[i].lineExpresstion.tokens[0];
 
 				//generates the paramter nodes
 				InstructionParameter* param = nullptr;
-				const size_t paramCount = nodes[i].lineExpresstion[0].tokens.size();
+				const size_t paramCount = nodes[i].lineExpresstion.tokens.size();
 					
 				if (paramCount > 0)
 				{
@@ -137,28 +137,28 @@ std::vector<PPC::Stage2::Node> PPC::Stage2::ParseExpresstionsIntoNodeIR(const st
 					for (size_t p = 1; p < paramCount; ++p)
 					{
 						//if it's a comma, this is the start of a new parameter
-						if (nodes[i].lineExpresstion[0].tokens[p].type == Stage1::TokenType::Operator && nodes[i].lineExpresstion[0].tokens[p].data == ",")
+						if (nodes[i].lineExpresstion.tokens[p].type == Stage1::TokenType::Operator && nodes[i].lineExpresstion.tokens[p].data == ",")
 							param = &nodes[i].instruction.parameters.emplace_back(InstructionParameter());
 
 						//otherwise add it to the current one
 						else
-							param->tokens.emplace_back(nodes[i].lineExpresstion[0].tokens[p]);
+							param->tokens.emplace_back(nodes[i].lineExpresstion.tokens[p]);
 					}
 				}
 			
 			}
 
 			//if datatype
-			else if (nodes[i].lineExpresstion[0].tokens[0].type == Stage1::TokenType::Datatype)
+			else if (nodes[i].lineExpresstion.tokens[0].type == Stage1::TokenType::Datatype)
 			{
 				nodes[i].type = NodeType::Datatype_Exprestion;
 
 				//generate the first datatype Node
-				nodes[i].variable.datatype = nodes[i].lineExpresstion[0].tokens[0];
+				nodes[i].variable.datatype = nodes[i].lineExpresstion.tokens[0];
 
 				//generates the value paramter nodes
 				VariableValueParameter* param = nullptr;
-				const size_t paramCount = nodes[i].lineExpresstion[0].tokens.size();
+				const size_t paramCount = nodes[i].lineExpresstion.tokens.size();
 
 				if (paramCount > 0)
 				{
@@ -166,12 +166,12 @@ std::vector<PPC::Stage2::Node> PPC::Stage2::ParseExpresstionsIntoNodeIR(const st
 					for (size_t p = 1; p < paramCount; ++p)
 					{
 						//if it's a comma, this is the start of a new parameter
-						if (nodes[i].lineExpresstion[0].tokens[p].type == Stage1::TokenType::Operator && nodes[i].lineExpresstion[0].tokens[p].data == ",")
+						if (nodes[i].lineExpresstion.tokens[p].type == Stage1::TokenType::Operator && nodes[i].lineExpresstion.tokens[p].data == ",")
 							param = &nodes[i].variable.parameters.emplace_back(VariableValueParameter());
 
 						//otherwise add it to the current one
 						else
-							param->tokens.emplace_back(nodes[i].lineExpresstion[0].tokens[p]);
+							param->tokens.emplace_back(nodes[i].lineExpresstion.tokens[p]);
 					}
 				}
 			}
