@@ -404,7 +404,8 @@ static inline std::vector<PPC::Stage1::Token> Subpass3_GenerateTokens(std::vecto
 		else if (subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".section" ||
 			subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".include" ||
 			subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".file" ||
-			subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".data")
+			subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".data" ||
+			subpass2Tokens[i].type == PPC::Stage1::TokenType::Identifier && subpass2Tokens[i].data == ".text")
 		{
 			while (subpass2Tokens[i].type != PPC::Stage1::TokenType::NewLine && i < subpass2TokenCount)
 			{
