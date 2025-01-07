@@ -27,9 +27,9 @@ static inline bool Subpass2_IsKeyword_MemoryOffset_LowerBit(const char* key) { r
 static inline bool Subpass2_IsKeyword_MemoryOffset_HigherBit(const char* key) { return (!strcmp(key, "ha") ? true : false); }
 
 //lists the datatypes
-#define PPC_LEXER_DATATYPE_COUNT 7
+#define PPC_LEXER_DATATYPE_COUNT 8
 static const char* PPC_LEXER_DATATYPE_STRINGS[PPC_LEXER_DATATYPE_COUNT] = {
-	".skip", ".4byte", ".byte", ".double", ".float", ".string", ".rel"
+	".skip", ".4byte", "2byte", ".byte", ".double", ".float", ".string", ".rel"
 };
 
 //checks if it's a datatype
@@ -559,7 +559,7 @@ PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const Data::CompilerSettings& sett
 	{
 		//if it's a function
 
-		//if it's a 
+		//if it's a object
 	}
 
 	return file;
