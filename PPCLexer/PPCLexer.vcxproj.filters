@@ -30,7 +30,7 @@
     <ClInclude Include="includes\PPC\Data\PPCInstructions.hpp">
       <Filter>includes\PPC\Data</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPC\Data\TranslationUnit.hpp">
+    <ClInclude Include="includes\PPC\Data\ASMFile.hpp">
       <Filter>includes\PPC\Data</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPC\Logger.hpp">
@@ -43,6 +43,7 @@
       <Filter>includes\PPC\Stage2</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPC\Stage1\Subpass1.hpp" />
+    <ClInclude Include="includes\PPC\Data\Scope.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Stage1\Token.cpp">
@@ -52,5 +53,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="includes\PPC\Stage1\Subpass1.cpp" />
+    <ClCompile Include="includes\PPC\Stage2\IR.cpp" />
   </ItemGroup>
 </Project>

@@ -5,8 +5,10 @@ Allows a Game Cube/Wii ROM to be converted to C++
 */
 
 
-#include <PPC/Data/TranslationUnit.hpp>
+#include <PPC/Data/ASMFile.hpp>
+
 #include <PPC/Stage1/Token.hpp>
+#include <PPC/Stage2/IR.hpp>
 
 //the modes PPC can be in
 enum class PPCMode
@@ -25,21 +27,23 @@ int main(int args, const char* argv[])
 	settings.outputDebugASM = true;
 
 	//loads the code
-	PPC::Data::TranslationUnit tu;
-	tu.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
-	tu.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_05_80047290_data.s");
-	//tu.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
-	tu.LoadASM();
+	PPC::Data::ASMFile ASMFile;
+	ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
+	//ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_05_80047290_data.s");
+	//ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
+	ASMFile.LoadASM();
 
 	//lexes assembly into tokens	
-	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(settings, tu.code);
+	PPC::Stage1::LexedFile f = PPC::Stage1::LexTokens(settings, ASMFile.code);
 	//for (size_t i = 0; i < f.wholeTokens.size(); ++i)
 	//	f.wholeTokens[i].Print();
 	//f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_80003100_init.debugasm");
 	//f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_05_80047290_data.debugasm");
 
 	//generates the IR as a translation unit
-	//PPC::Stage2::TranslationUnit TU = PPC::Stage2::GenerateIR(settings, f);
+	std::vector<PPC::Stage2::Node> nodes = PPC::Stage2::ParseExpresstionsIntoNodeIR(f.singleLineExpesstions);
+	for (size_t i = 0; i < nodes.size(); ++i)
+		nodes[i].Print();
 
 	getchar();
 	return 0;

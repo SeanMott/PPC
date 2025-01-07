@@ -553,16 +553,5 @@ PPC::Stage1::LexedFile PPC::Stage1::LexTokens(const Data::CompilerSettings& sett
 	file.singleLineExpesstions = Subpass6_SplitExpresstions(wholeTokens);
 	wholeTokens.clear();
 
-	//process the single line expresstions into functions and objects
-	const size_t singleExpressionCount = file.singleLineExpesstions.size();
-	for (size_t e = 0; e < singleExpressionCount; ++e)
-	{
-		//if it's a function
-
-		//if it's a object
-
-		//if it's a jump label
-	}
-
 	return file;
 }

@@ -126,29 +126,6 @@ namespace PPC::Stage1
 		std::vector<Token> tokens;
 	};
 
-	//defines a object
-	struct LexedObject
-	{
-		std::string objectName = "";
-		std::vector<LexedSingleLineExpresstion> expresstions;
-	};
-
-	//defines a jump label in a function
-	struct LexedJumpLabel
-	{
-		std::string jumpLabelName = "";
-		std::vector<LexedSingleLineExpresstion> expresstions;
-	};
-
-	//defines a function
-	struct LexedFunction
-	{
-		std::string functionName = "";
-		std::vector<LexedSingleLineExpresstion> expresstions;
-		std::vector<LexedJumpLabel> jumpLabels;
-
-	};
-
 	//defines a lexed file
 	struct LexedFile
 	{
