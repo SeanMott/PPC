@@ -57,18 +57,58 @@ namespace PPC::Stage2
 		Data::ScopeKeyword scope = Data::ScopeKeyword::Count;
 	};
 
-	//defines a instruction parameter type
-	enum class InstructionParameterType
+	//defines a memory offset ()
+	struct NodeParam_MemoryOffset
+	{
+		Stage1::Token token;
+	};
+
+	//defines a SDA21
+	struct NodeParam_Sda21Invoke
 	{
 
+	};
+
+	//defines a high or low bit
+	struct NodeParam_LowOrHighBit
+	{
+		bool isHigh = false;
+	};
+
+	//defines a @ for getting a memory offset
+	struct NodeParam_GetMemoryOffset
+	{
+
+	};
+
+	//defines the state of the option
+	enum class NodeOrTokenOptionState
+	{
+		Token = 0,
+		MemoryOffset,
+		Sda21,
+		LowOrHighBit,
+		GetMemoryOffset,
+
 		Count
+	};
+
+	//define a duel struct that either contain a Token or a Node
+	struct NodeOrTokenOption
+	{
+		NodeOrTokenOptionState state = NodeOrTokenOptionState::Token;
+		Stage1::Token token;
+		NodeParam_MemoryOffset memoryOffset;
+		NodeParam_Sda21Invoke Sda21;
+		NodeParam_LowOrHighBit lowOrHighBit;
+		NodeParam_GetMemoryOffset getMemoryOffset;
 	};
 
 	//defines a instruction parameter node
 	struct InstructionParameter
 	{
-		InstructionParameterType paramterType = InstructionParameterType::Count;
-		std::vector<Stage1::Token> tokens;
+		//general nodes
+		std::vector<NodeOrTokenOption> options;
 	};
 
 	//defines a instruction node
@@ -81,8 +121,7 @@ namespace PPC::Stage2
 	//defines a variable value parameter node
 	struct VariableValueParameter
 	{
-		InstructionParameterType paramterType = InstructionParameterType::Count;
-		std::vector<Stage1::Token> tokens;
+		std::vector<NodeOrTokenOption> options;
 	};
 
 	//defines a variable node
@@ -147,7 +186,7 @@ namespace PPC::Stage2
 				paramCount = instruction.parameters.size();
 				for (size_t p = 0; p < paramCount; ++p)
 				{
-					for (size_t d = 0; d < instruction.parameters[p].tokens.size(); ++d)
+					for (size_t d = 0; d < instruction.parameters[p].options.size(); ++d)
 					{
 						////if we're generating a memory offset
 						//if (instruction.parameters[p].tokens[d].type == PPC::Stage1::TokenType::Keyword &&
@@ -165,7 +204,7 @@ namespace PPC::Stage2
 
 						//if we're printing a token
 						//else
-						IR += instruction.parameters[p].tokens[d].data;
+						IR += instruction.parameters[p].options[d].token.data;
 						
 						IR += ' ';
 					}
@@ -184,9 +223,11 @@ namespace PPC::Stage2
 				paramCount = variable.parameters.size();
 				for (size_t p = 0; p < paramCount; ++p)
 				{
-					for (size_t d = 0; d < variable.parameters[p].tokens.size(); ++d)
+					for (size_t d = 0; d < variable.parameters[p].options.size(); ++d)
 					{
-						IR += variable.parameters[p].tokens[d].data;
+						//if it's anything
+						IR += variable.parameters[p].options[d].token.data;
+						
 						IR += ' ';
 					}
 

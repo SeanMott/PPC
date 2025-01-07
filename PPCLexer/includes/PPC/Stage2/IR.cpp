@@ -139,7 +139,7 @@ static inline void Subpass2_StructVarsAndInstructions(std::vector<PPC::Stage2::N
 
 						//otherwise add it to the current one
 						else
-							param->tokens.emplace_back(nodes[i].lineExpresstion.tokens[p]);
+							param->options.emplace_back(PPC::Stage2::NodeOrTokenOption()).token = nodes[i].lineExpresstion.tokens[p];
 					}
 				}
 
@@ -168,7 +168,7 @@ static inline void Subpass2_StructVarsAndInstructions(std::vector<PPC::Stage2::N
 
 						//otherwise add it to the current one
 						else
-							param->tokens.emplace_back(nodes[i].lineExpresstion.tokens[p]);
+							param->options.emplace_back(PPC::Stage2::NodeOrTokenOption()).token = nodes[i].lineExpresstion.tokens[p];
 					}
 				}
 			}
@@ -189,9 +189,19 @@ static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vec
 			for (size_t p = 0; p < nodes[i].instruction.parameters.size(); ++p)
 			{
 				PPC::Stage2::InstructionParameter* param = &nodes[i].instruction.parameters[p];
-				const size_t tokenCount = param->tokens.size();
+				const size_t tokenCount = param->options.size();
 				if (tokenCount < 3) //if there's not enough tokens for the generation
 					continue;
+
+				//if we have a @ this is a memory offset
+
+				//if we have a sda21
+
+				//if we have a low bit
+
+				//if we have a high bit
+
+				//compress the () offsets
 			}
 		}
 	}
