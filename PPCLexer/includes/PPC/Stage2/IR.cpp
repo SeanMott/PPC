@@ -149,6 +149,32 @@ std::vector<PPC::Stage2::Node> PPC::Stage2::ParseExpresstionsIntoNodeIR(const st
 			}
 
 			//if datatype
+			else if (nodes[i].lineExpresstion[0].tokens[0].type == Stage1::TokenType::Datatype)
+			{
+				nodes[i].type = NodeType::Datatype_Exprestion;
+
+				//generate the first datatype Node
+				nodes[i].variable.datatype = nodes[i].lineExpresstion[0].tokens[0];
+
+				//generates the value paramter nodes
+				VariableValueParameter* param = nullptr;
+				const size_t paramCount = nodes[i].lineExpresstion[0].tokens.size();
+
+				if (paramCount > 0)
+				{
+					param = &nodes[i].variable.parameters.emplace_back(VariableValueParameter());
+					for (size_t p = 1; p < paramCount; ++p)
+					{
+						//if it's a comma, this is the start of a new parameter
+						if (nodes[i].lineExpresstion[0].tokens[p].type == Stage1::TokenType::Operator && nodes[i].lineExpresstion[0].tokens[p].data == ",")
+							param = &nodes[i].variable.parameters.emplace_back(VariableValueParameter());
+
+						//otherwise add it to the current one
+						else
+							param->tokens.emplace_back(nodes[i].lineExpresstion[0].tokens[p]);
+					}
+				}
+			}
 		}
 	}
 

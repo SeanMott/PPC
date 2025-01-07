@@ -29,7 +29,7 @@ static inline bool Subpass2_IsKeyword_MemoryOffset_HigherBit(const char* key) { 
 //lists the datatypes
 #define PPC_LEXER_DATATYPE_COUNT 8
 static const char* PPC_LEXER_DATATYPE_STRINGS[PPC_LEXER_DATATYPE_COUNT] = {
-	".skip", ".4byte", "2byte", ".byte", ".double", ".float", ".string", ".rel"
+	".skip", ".4byte", ".2byte", ".byte", ".double", ".float", ".string", ".rel"
 };
 
 //checks if it's a datatype

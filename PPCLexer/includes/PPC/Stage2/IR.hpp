@@ -22,6 +22,7 @@ namespace PPC::Stage2
 		SysAddressDef, //defines a sym address
 
 		Instruction_Expresstion, //defines a instruction expresstion
+		Datatype_Exprestion, //defines a variable definition expresstion
 
 		Unknown, //we don't know what this expresstion is, this means it needs debuging.
 		//as all unknown sysmbols should have been purged already
@@ -76,6 +77,21 @@ namespace PPC::Stage2
 		std::vector<InstructionParameter> parameters;
 	};
 
+	//defines a variable value parameter node
+	struct VariableValueParameter
+	{
+		InstructionParameterType paramterType = InstructionParameterType::Count;
+		std::vector<Stage1::Token> tokens;
+	};
+
+	//defines a variable node
+	struct VariableDefinition
+	{
+		Stage1::Token datatype;
+		std::vector<VariableValueParameter> parameters;
+	};
+
+
 	//defines a general Node
 	struct Node
 	{
@@ -89,6 +105,7 @@ namespace PPC::Stage2
 		JumpLabelDef jumpLabelDef;
 		SymJumpLabelDef symLabelDef;
 		Instruction instruction;
+		VariableDefinition variable;
 
 		//generates debug IR text
 		inline std::string GenerateDebugIR() const
@@ -126,7 +143,6 @@ namespace PPC::Stage2
 				IR += "PPC::Runtime::Instructions::" + instruction.instruction.data + "(/* ";
 
 				//adds the parameters
-
 				paramCount = instruction.parameters.size();
 				for (size_t p = 0; p < paramCount; ++p)
 				{
@@ -140,6 +156,26 @@ namespace PPC::Stage2
 						IR += ", ";
 				}
 				IR += "*/);\n";
+
+				return IR;
+
+			case NodeType::Datatype_Exprestion:
+				IR += variable.datatype.data + " <unqiueStructVariableIdentifierNameHere> = ";
+
+				//adds the parameters
+				paramCount = variable.parameters.size();
+				for (size_t p = 0; p < paramCount; ++p)
+				{
+					for (size_t d = 0; d < variable.parameters[p].tokens.size(); ++d)
+					{
+						IR += variable.parameters[p].tokens[d].data;
+						IR += ' ';
+					}
+
+					if (p + 1 < paramCount)
+						IR += ", ";
+				}
+				IR += ";\n";
 
 				return IR;
 
