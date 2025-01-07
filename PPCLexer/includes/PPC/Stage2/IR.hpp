@@ -188,23 +188,17 @@ namespace PPC::Stage2
 				{
 					for (size_t d = 0; d < instruction.parameters[p].options.size(); ++d)
 					{
-						////if we're generating a memory offset
-						//if (instruction.parameters[p].tokens[d].type == PPC::Stage1::TokenType::Keyword &&
-						//	instruction.parameters[p].tokens[d].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit)
-						//{
-						//	IR += "PPC_RUNTIME_GET_MEMORY_OFFSET_HIGH_BIT(" + instruction.parameters[p].tokens[d + 1].data + ")";
-						//	d++;
-						//}
-						//else if (instruction.parameters[p].tokens[d].type == PPC::Stage1::TokenType::Keyword &&
-						//	instruction.parameters[p].tokens[d].specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit)
-						//{
-						//	IR += "PPC_RUNTIME_GET_MEMORY_OFFSET_LOWER_BIT(" + instruction.parameters[p].tokens[d + 1].data + ")";
-						//	d++;
-						//}
+						if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::GetMemoryOffset)
+							IR += "PPC_RUNTIME_GET_MEMORY_OFFSET";
+						else if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::LowOrHighBit)
+							IR += (instruction.parameters[p].options[d].lowOrHighBit.isHigh == true ? "PPC_RUNTIME_GET_HIGH_BIT" : "PPC_RUNTIME_GET_LOW_BIT");
+
+						else if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::Sda21)
+							IR += "PPC_RUNTIME_SDA21";
 
 						//if we're printing a token
-						//else
-						IR += instruction.parameters[p].options[d].token.data;
+						else
+							IR += instruction.parameters[p].options[d].token.data;
 						
 						IR += ' ';
 					}
