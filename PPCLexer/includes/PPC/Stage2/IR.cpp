@@ -195,40 +195,50 @@ static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vec
 
 				for (size_t i = 0; i < tokenCount; ++i)
 				{
-					//if we have a @ this is a memory offset
-					if (param->options[i].state == PPC::Stage2::NodeOrTokenOptionState::Token &&
-						param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == "@")
+					if (param->options[i].state == PPC::Stage2::NodeOrTokenOptionState::Token)
 					{
-						param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::GetMemoryOffset;
-					}
 
-					//if we have a sda21
-					else if (param->options[i].state == PPC::Stage2::NodeOrTokenOptionState::Token &&
-						param->options[i].token.type == PPC::Stage1::TokenType::Keyword && 
-						param->options[i].token.specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_Sda21)
-					{
-						param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::Sda21;
-					}
+						//if we have a @ this is a memory offset
+						if (param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == "@")
+						{
+							param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::GetMemoryOffset;
+						}
 
-					//if we have a low bit
-					else if (param->options[i].state == PPC::Stage2::NodeOrTokenOptionState::Token &&
-						param->options[i].token.type == PPC::Stage1::TokenType::Keyword &&
-						param->options[i].token.specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit)
-					{
-						param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::LowOrHighBit;
-						param->options[i].lowOrHighBit.isHigh = true;
-					}
+						//if we have a sda21
+						else if (param->options[i].token.type == PPC::Stage1::TokenType::Keyword &&
+							param->options[i].token.specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_Sda21)
+						{
+							param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::Sda21;
+						}
 
-					//if we have a high bit
-					else if (param->options[i].state == PPC::Stage2::NodeOrTokenOptionState::Token &&
-						param->options[i].token.type == PPC::Stage1::TokenType::Keyword &&
-						param->options[i].token.specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit)
-					{
-						param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::LowOrHighBit;
-						param->options[i].lowOrHighBit.isHigh = false;
-					}
+						//if we have a low bit
+						else if (param->options[i].token.type == PPC::Stage1::TokenType::Keyword &&
+							param->options[i].token.specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit)
+						{
+							param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::LowOrHighBit;
+							param->options[i].lowOrHighBit.isHigh = true;
+						}
 
-					//compress the () offsets
+						//if we have a high bit
+						else if (param->options[i].token.type == PPC::Stage1::TokenType::Keyword &&
+							param->options[i].token.specificType == PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit)
+						{
+							param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::LowOrHighBit;
+							param->options[i].lowOrHighBit.isHigh = false;
+						}
+
+						//compress the () offsets
+						else if (param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == "(")
+						{
+							param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::MemoryOffset;
+
+							//compress the tokens
+							i++; //skip the (
+							param->options[i].memoryOffset.tokens.reserve(2);
+							while (i < tokenCount && param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data != "(")
+								param->options[i].memoryOffset.tokens.emplace_back(param->options[i].token);
+						}
+					}
 				}
 			}
 		}
