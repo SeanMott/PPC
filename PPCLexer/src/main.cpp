@@ -29,9 +29,9 @@ int main(int args, const char* argv[])
 	//loads the code
 	PPC::Data::ASMFile ASMFile;
 	//ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_00_80003100_init.s");
-	//ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_05_80047290_data.s");
+	ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_05_80047290_data.s");
 	//ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/__init_cpp_exceptions.s");
-	ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_01_800056A0_text.s");
+	//ASMFile.SetASM("C:/Decomps/TOD-Decomp/RawASM/asm/auto_01_800056A0_text.s");
 	ASMFile.LoadASM();
 
 	//lexes assembly into tokens	
@@ -49,10 +49,10 @@ int main(int args, const char* argv[])
 
 	//spits out a debug IR file
 	//std::fstream debugIRFile("C:/Decomps/TOD-Decomp/RawASM/asm/00_80003100_init.sir", std::ios::out);
-	//std::fstream debugIRFile("C:/Decomps/TOD-Decomp/RawASM/asm/05_80047290_data.sir", std::ios::out);
-	std::fstream debugIRFile("C:/Decomps/TOD-Decomp/RawASM/asm/auto_01_800056A0_text.sir", std::ios::out);
+	std::fstream debugIRFile("C:/Decomps/TOD-Decomp/RawASM/asm/05_80047290_data.sir", std::ios::out);
+	//std::fstream debugIRFile("C:/Decomps/TOD-Decomp/RawASM/asm/auto_01_800056A0_text.sir", std::ios::out);
 	debugIRFile.write(debugIR.c_str(), debugIR.size());
 
-	getchar();
+	//getchar();
 	return 0;
 }

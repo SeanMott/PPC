@@ -21,9 +21,7 @@ namespace PPC::Stage2
 		
 		SysAddressDef, //defines a sym address
 
-		Datatype, //defines a datatype expresstion we define inside a struct
-
-		Instruction, //defines a instruction expresstion in a function
+		Instruction_Expresstion, //defines a instruction expresstion
 
 		Unknown, //we don't know what this expresstion is, this means it needs debuging.
 		//as all unknown sysmbols should have been purged already
@@ -48,8 +46,7 @@ namespace PPC::Stage2
 	//defines a jump label defintion
 	struct JumpLabelDef
 	{
-		std::string labelName = ""; //the name of this label
-		std::string ownerName = ""; //what function or struct owns this label
+		std::string name = ""; //the name of this label
 	};
 
 	//defines a sym jump label
@@ -59,22 +56,45 @@ namespace PPC::Stage2
 		Data::ScopeKeyword scope = Data::ScopeKeyword::Count;
 	};
 
+	//defines a instruction parameter type
+	enum class InstructionParameterType
+	{
+		Count
+	};
+
+	//defines a instruction parameter node
+	struct InstructionParameter
+	{
+		InstructionParameterType paramterType = InstructionParameterType::Count;
+		std::vector<Stage1::Token> tokens;
+	};
+
+	//defines a instruction node
+	struct Instruction
+	{
+		Stage1::Token instruction;
+		std::vector<InstructionParameter> parameters;
+	};
+
 	//defines a general Node
 	struct Node
 	{
 		NodeType type = NodeType::Count;
 		std::vector<Stage1::LexedSingleLineExpresstion> lineExpresstion; //defines the general like expresstion
+		std::vector<Node> nodes; //the internal nodes of this tree
 
 		//the specific bits of node data
 		FunctionHeaderDef functionHeaderDef;
 		StructHeaderDef structHeaderDef;
 		JumpLabelDef jumpLabelDef;
 		SymJumpLabelDef symLabelDef;
+		Instruction instruction;
 
 		//generates debug IR text
 		inline std::string GenerateDebugIR() const
 		{
 			std::string IR = "";
+			size_t paramCount = 0;
 
 			switch (type)
 			{
@@ -98,6 +118,31 @@ namespace PPC::Stage2
 				IR += "Sym Address Jump || Static || " + symLabelDef.name + "\n";
 				return IR;
 
+			case NodeType::JumpLabelDef:
+				IR += "Jump Label || " + jumpLabelDef.name + ":\n";
+				return IR;
+
+			case NodeType::Instruction_Expresstion:
+				IR += "PPC::Runtime::Instructions::" + instruction.instruction.data + "(/* ";
+
+				//adds the parameters
+
+				paramCount = instruction.parameters.size();
+				for (size_t p = 0; p < paramCount; ++p)
+				{
+					for (size_t d = 0; d < instruction.parameters[p].tokens.size(); ++d)
+					{
+						IR += instruction.parameters[p].tokens[d].data;
+						IR += ' ';
+					}
+
+					if(p + 1 < paramCount)
+						IR += ", ";
+				}
+				IR += "*/);\n";
+
+				return IR;
+
 			case NodeType::Unknown:
 				IR = "/*unable to parse the following Token Line Expresstion to IR. If it is a missing instruction make a pull on the github.";
 
@@ -115,7 +160,7 @@ namespace PPC::Stage2
 				return IR;
 			}
 
-			return "";
+			return "HEY THIS TYPE OF IR IS NOT HANDLED YET, check that all types are being handled (Type converted to int: " + std::to_string((uint32_t)type) + "\n";
 		}
 	};
 
