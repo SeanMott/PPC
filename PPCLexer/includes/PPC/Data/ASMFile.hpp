@@ -1,13 +1,13 @@
 #pragma once
 
-//defines a translation file
+//defines a ASM File
 
 #include <filesystem>
 
 namespace PPC::Data
 {
-	//defines a translation unit
-	struct TranslationUnit
+	//defines a ASM file
+	struct ASMFile
 	{
 		std::filesystem::path filepath;
 

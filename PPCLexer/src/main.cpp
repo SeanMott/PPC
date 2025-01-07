@@ -36,9 +36,10 @@ int main(int args, const char* argv[])
 	//for (size_t i = 0; i < f.wholeTokens.size(); ++i)
 	//	f.wholeTokens[i].Print();
 	//f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_80003100_init.debugasm");
-	f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_05_80047290_data.debugasm");
+	//f.GenerateDebugOutputFileOfTokens("C:/Decomps/TOD-Decomp/RawASM/asm/TOD_DebugTokens_05_80047290_data.debugasm");
 
-	//generates the IR
+	//generates the IR as a translation unit
+	//PPC::Stage2::TranslationUnit TU = PPC::Stage2::GenerateIR(settings, f);
 
 	getchar();
 	return 0;
