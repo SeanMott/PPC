@@ -204,9 +204,7 @@ namespace PPC::Stage2
 								IR += instruction.parameters[p].options[d].memoryOffset.tokens[t].data;
 								IR += (t + 1 < instruction.parameters[p].options[d].memoryOffset.tokens.size() ? " " : "");
 							}
-							IR += ")";
 						}
-
 
 						//if we're printing a token
 						else

@@ -227,7 +227,7 @@ static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vec
 							param->options[i].lowOrHighBit.isHigh = false;
 						}
 
-						////compress the () offsets
+						//compress the () offsets
 						else if (param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == "(")
 						{
 							PPC::Stage2::NodeOrTokenOption* option = &param->options[i];
