@@ -156,7 +156,7 @@ namespace PPC::Stage2
 			switch (type)
 			{
 			case NodeType::FunctionDef:
-				IR += "static inline void " + functionHeaderDef.name + "(PPCRuntime::Context* context)\n{\n";
+				IR += "static inline void " + functionHeaderDef.name + "(PPC::Runtime::Context* context)\n{\n";
 				return IR;
 
 			case NodeType::FunctionDefEnd:
@@ -180,7 +180,7 @@ namespace PPC::Stage2
 				return IR;
 
 			case NodeType::Instruction_Expresstion:
-				IR += "PPC::Runtime::Instructions::" + instruction.instruction.data + "(/* ";
+				IR += "PPC::Runtime::Instructions::" + instruction.instruction.data + "( ";
 
 				//adds the parameters
 				paramCount = instruction.parameters.size();
@@ -218,7 +218,7 @@ namespace PPC::Stage2
 					if(p + 1 < paramCount)
 						IR += ", ";
 				}
-				IR += "*/);\n";
+				IR += ");\n";
 
 				return IR;
 

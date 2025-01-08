@@ -239,12 +239,14 @@ static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vec
 							while (i < tokenCount)
 							{
 								if (param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == ")")
+								{
+									param->options.erase(param->options.begin() + i); //skip the )
 									break;
-							
+								}
+
 								option->memoryOffset.tokens.emplace_back(param->options[i].token);
 								param->options.erase(param->options.begin() + i);
 								i++;
-								//i = (i == 0 ? i : i - 1);
 								tokenCount--;
 							}
 						}
