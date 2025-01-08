@@ -46,7 +46,7 @@ int main(int args, const char* argv[])
 		debugIR += nodes[i].GenerateDebugIR();
 
 	//spits out a debug IR file
-	std::fstream debugIRFile(ASMDirectory + ASMFileName + ".sir", std::ios::out);
+	std::fstream debugIRFile(ASMDirectory + ASMFileName + ".c", std::ios::out);
 	debugIRFile.write(debugIR.c_str(), debugIR.size());
 
 	//getchar();

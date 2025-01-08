@@ -196,16 +196,16 @@ namespace PPC::Stage2
 						else if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::Sda21)
 							IR += "PPC_RUNTIME_SDA21";
 
-						//else if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::MemoryOffset)
-						//{
-						//	IR += "PPC_RUNTIME_GET_MEMORY_OFFSET(";
-						//	for (size_t t = 0; t < instruction.parameters[p].options[d].memoryOffset.tokens.size(); ++t)
-						//	{
-						//		IR += instruction.parameters[p].options[d].memoryOffset.tokens[t].data;
-						//		IR += (t + 1 < instruction.parameters[p].options[d].memoryOffset.tokens.size() ? " " : "");
-						//	}
-						//	IR += ")";
-						//}
+						else if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::MemoryOffset)
+						{
+							IR += "PPC_RUNTIME_GET_MEMORY_OFFSET(";
+							for (size_t t = 0; t < instruction.parameters[p].options[d].memoryOffset.tokens.size(); ++t)
+							{
+								IR += instruction.parameters[p].options[d].memoryOffset.tokens[t].data;
+								IR += (t + 1 < instruction.parameters[p].options[d].memoryOffset.tokens.size() ? " " : "");
+							}
+							IR += ")";
+						}
 
 
 						//if we're printing a token

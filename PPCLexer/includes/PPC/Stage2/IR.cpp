@@ -189,7 +189,7 @@ static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vec
 			for (size_t p = 0; p < nodes[i].instruction.parameters.size(); ++p)
 			{
 				PPC::Stage2::InstructionParameter* param = &nodes[i].instruction.parameters[p];
-				const size_t tokenCount = param->options.size();
+				size_t tokenCount = param->options.size();
 				if (tokenCount < 3) //if there's not enough tokens for the generation
 					continue;
 
@@ -227,16 +227,26 @@ static inline void Subpass3_ResolveInstructionParamHighLowMemoryOffsets(std::vec
 							param->options[i].lowOrHighBit.isHigh = false;
 						}
 
-						//compress the () offsets
+						////compress the () offsets
 						else if (param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == "(")
 						{
-							param->options[i].state = PPC::Stage2::NodeOrTokenOptionState::MemoryOffset;
+							PPC::Stage2::NodeOrTokenOption* option = &param->options[i];
+							option->state = PPC::Stage2::NodeOrTokenOptionState::MemoryOffset;
 
 							//compress the tokens
-							i++; //skip the (
-							param->options[i].memoryOffset.tokens.reserve(2);
-							while (i < tokenCount && param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data != "(")
-								param->options[i].memoryOffset.tokens.emplace_back(param->options[i].token);
+							option->memoryOffset.tokens.reserve(2);
+							i++;
+							while (i < tokenCount)
+							{
+								if (param->options[i].token.type == PPC::Stage1::TokenType::Operator && param->options[i].token.data == ")")
+									break;
+							
+								option->memoryOffset.tokens.emplace_back(param->options[i].token);
+								param->options.erase(param->options.begin() + i);
+								i++;
+								//i = (i == 0 ? i : i - 1);
+								tokenCount--;
+							}
 						}
 					}
 				}
