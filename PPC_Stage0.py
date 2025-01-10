@@ -1,5 +1,6 @@
 import subprocess
 import os
+import sys
 
 #defines a function for making a folder if it doesn't exist
 def MakeFolder(dir):
@@ -10,8 +11,8 @@ def MakeFolder(dir):
 print("PPC Stage 0: Gathering Data")
 
 DTK = "C:/Decomps/dtk_130"
-ROM = "c:/Users/rafal/Desktop/Tower of Druaga, The (Japan)/TOD.iso"
-DTKOuputDir = "C:/Decomps/TOD-Decomp"
+ROM = sys.argv[1]
+DTKOuputDir = sys.argv[2]
 MakeFolder(DTKOuputDir)
 
 #extracts the ROM
