@@ -30,20 +30,11 @@
     <ClInclude Include="includes\PPC\Data\CompilerSettings.hpp">
       <Filter>includes\PPC\Data</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPC\Data\PPCInstructions.hpp">
-      <Filter>includes\PPC\Data</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPC\Data\Scope.hpp">
       <Filter>includes\PPC\Data</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPC\Logger.hpp">
       <Filter>includes\PPC</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\PPC\Stage1\Subpass1.hpp">
-      <Filter>includes\PPC\Stage1</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\PPC\Stage1\Token.hpp">
-      <Filter>includes\PPC\Stage1</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPC\Stage2\IR.hpp">
       <Filter>includes\PPC\Stage2</Filter>

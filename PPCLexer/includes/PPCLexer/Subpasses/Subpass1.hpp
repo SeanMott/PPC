@@ -3,7 +3,7 @@
 //defines the first subpass for lexing
 //this takes raw ASM and converts it to a stream of tokens
 
-#include <PPC/Stage1/Token.hpp>
+#include <PPCLexer/Token.hpp>
 
 #include <string>
 #include <vector>

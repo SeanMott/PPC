@@ -2,7 +2,7 @@
 
 //defines a IR token for storing the data
 
-#include <PPC/Stage1/Token.hpp>
+//#include <PPC/Stage1/Token.hpp>
 
 #include <PPC/Data/Scope.hpp>
 
@@ -60,7 +60,7 @@ namespace PPC::Stage2
 	//defines a memory offset ()
 	struct NodeParam_MemoryOffset
 	{
-		std::vector<Stage1::Token> tokens;
+		//std::vector<Stage1::Token> tokens;
 	};
 
 	//defines a SDA21
@@ -97,7 +97,7 @@ namespace PPC::Stage2
 	struct NodeOrTokenOption
 	{
 		NodeOrTokenOptionState state = NodeOrTokenOptionState::Token;
-		Stage1::Token token;
+		//Stage1::Token token;
 		NodeParam_MemoryOffset memoryOffset;
 		NodeParam_Sda21Invoke Sda21;
 		NodeParam_LowOrHighBit lowOrHighBit;
@@ -114,7 +114,7 @@ namespace PPC::Stage2
 	//defines a instruction node
 	struct Instruction
 	{
-		Stage1::Token instruction;
+		//Stage1::Token instruction;
 		std::vector<InstructionParameter> parameters;
 	};
 
@@ -127,7 +127,7 @@ namespace PPC::Stage2
 	//defines a variable node
 	struct VariableDefinition
 	{
-		Stage1::Token datatype;
+		//Stage1::Token datatype;
 		std::vector<VariableValueParameter> parameters;
 	};
 
@@ -136,7 +136,7 @@ namespace PPC::Stage2
 	struct Node
 	{
 		NodeType type = NodeType::Count;
-		Stage1::LexedSingleLineExpresstion lineExpresstion; //defines the general like expresstion
+	//	Stage1::LexedSingleLineExpresstion lineExpresstion; //defines the general like expresstion
 		std::vector<Node> nodes; //the internal nodes of this tree
 
 		//the specific bits of node data
@@ -180,7 +180,7 @@ namespace PPC::Stage2
 				return IR;
 
 			case NodeType::Instruction_Expresstion:
-				IR += "PPC::Runtime::Instructions::" + instruction.instruction.data + "( ";
+				//IR += "PPC::Runtime::Instructions::" + instruction.instruction.data + "( ";
 
 				//adds the parameters
 				paramCount = instruction.parameters.size();
@@ -197,18 +197,18 @@ namespace PPC::Stage2
 							IR += "PPC_RUNTIME_SDA21";
 
 						else if (instruction.parameters[p].options[d].state == NodeOrTokenOptionState::MemoryOffset)
-						{
+						{/*
 							IR += "PPC_RUNTIME_GET_MEMORY_OFFSET(";
 							for (size_t t = 0; t < instruction.parameters[p].options[d].memoryOffset.tokens.size(); ++t)
 							{
 								IR += instruction.parameters[p].options[d].memoryOffset.tokens[t].data;
 								IR += (t + 1 < instruction.parameters[p].options[d].memoryOffset.tokens.size() ? " " : "");
-							}
+							}*/
 						}
 
 						//if we're printing a token
-						else
-							IR += instruction.parameters[p].options[d].token.data;
+						//else
+						//	IR += instruction.parameters[p].options[d].token.data;
 						
 						IR += ' ';
 					}
@@ -221,7 +221,7 @@ namespace PPC::Stage2
 				return IR;
 
 			case NodeType::Datatype_Exprestion:
-				IR += variable.datatype.data + " <unqiueStructVariableIdentifierNameHere> = ";
+				//IR += variable.datatype.data + " <unqiueStructVariableIdentifierNameHere> = ";
 
 				//adds the parameters
 				paramCount = variable.parameters.size();
@@ -230,7 +230,7 @@ namespace PPC::Stage2
 					for (size_t d = 0; d < variable.parameters[p].options.size(); ++d)
 					{
 						//if it's anything
-						IR += variable.parameters[p].options[d].token.data;
+						//IR += variable.parameters[p].options[d].token.data;
 						
 						IR += ' ';
 					}
@@ -243,13 +243,13 @@ namespace PPC::Stage2
 				return IR;
 
 			case NodeType::Unknown:
-				IR = "/*unable to parse the following Token Line Expresstion to IR. If it is a missing instruction make a pull on the github.\n//";
+				/*IR = "/*unable to parse the following Token Line Expresstion to IR. If it is a missing instruction make a pull on the github.\n//";
 				for (size_t t = 0; t < lineExpresstion.tokens.size(); ++t)
 				{
 					IR += ' ';
 					IR += (lineExpresstion.tokens[t].type == Stage1::TokenType::Literal_String ? "\"" + lineExpresstion.tokens[t].data + "\"" : lineExpresstion.tokens[t].data);
 				}
-				IR += "\n*/\n";
+				//IR += "\n*/
 
 				return IR;
 			}
@@ -259,5 +259,5 @@ namespace PPC::Stage2
 	};
 
 	//parses the expresstions into Node IR
-	std::vector<Node> ParseExpresstionsIntoNodeIR(const std::vector<Stage1::LexedSingleLineExpresstion>& lineExpresstions);
+//	std::vector<Node> ParseExpresstionsIntoNodeIR(const std::vector<Stage1::LexedSingleLineExpresstion>& lineExpresstions);
 }

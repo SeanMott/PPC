@@ -2,7 +2,9 @@
 
 //defines a Token
 
-#include <PPC/Data/CompilerSettings.hpp>
+#define FMT_HEADER_ONLY
+#include <fmt/color.h>
+#include <fmt/core.h>
 
 #include <vector>
 #include <fstream>
@@ -113,6 +115,10 @@ namespace PPC::Stage1
 				fmt::print(fmt::fg(fmt::color::blue), "Line: {}, Char: {} || Identifier {}\n", lineCount, charCount, data);
 				break;
 
+			case TokenType::Literal_String:
+				fmt::print(fmt::fg(fmt::color::azure), "Line: {}, Char: {} || String Literal || \"{}\"\n", lineCount, charCount, data);
+				break;
+
 			case TokenType::Instruction:
 				fmt::print(fmt::fg(fmt::color::orange), "Line: {}, Char: {} || Instruction {}\n", lineCount, charCount, data);
 				break;
@@ -175,5 +181,5 @@ namespace PPC::Stage1
 	};
 
 	//lexes ASM into tokens
-	LexedFile LexTokens(const Data::CompilerSettings& settings, const std::string& code);
+	LexedFile LexTokens(const std::string& code);
 }

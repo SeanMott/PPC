@@ -1,4 +1,4 @@
-#include <PPC/Stage1/Subpass1.hpp>
+#include <PPCLexer/Subpasses/Subpass1.hpp>
 
 //processes a operator token
 static inline PPC::Stage1::Token Subpass1_GenerateToken_Operator(const char data, PPC::Stage1::Parser* parser)
@@ -40,6 +40,13 @@ static inline PPC::Stage1::Token Subpass1_GenerateToken_BlockLineComment(PPC::St
 	{
 		data += c;
 		c = parser->Parser_GetNextChar();
+
+		//if new line, increment the new line
+		if (c == '\n')
+		{
+			parser->lineCount++;
+			continue;
+		}
 
 		if (c == '*' && parser->Parser_PeekNextChar() == '/')
 		{
