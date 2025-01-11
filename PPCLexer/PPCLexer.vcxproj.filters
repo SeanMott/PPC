@@ -28,6 +28,8 @@
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLexer\Token.hpp" />
+    <ClInclude Include="includes\PPCLexer\Subpasses\Subpass2.hpp" />
+    <ClInclude Include="includes\PPCLexer\CompilerSettings.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Subpasses\Subpass1.cpp">

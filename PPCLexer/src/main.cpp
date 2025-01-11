@@ -5,6 +5,7 @@ PPC Lexer that converts DTK Raw Assembly into a stream of tokens
 #include <filesystem>
 
 #include <PPCLexer/Subpasses/Subpass1.hpp>
+#include <PPCLexer/Subpasses/Subpass2.hpp>
 
 //loads the translation unit code
 static inline void LoadASM(const std::filesystem::path& filepath, std::string& code)
@@ -43,6 +44,8 @@ int main()
 	 	std::vector<PPC::Stage1::Token> tokens = PPC::Stage1::Subpass1_GenerateGeneralTokens(code);
 
 		//runs the second pass || strips invalide and illegal tokens and optionally all comments
+		tokens = PPC::Lexer::Subpass::Subpass2_RemoveInvalidInstructions(tokens);
+		tokens = PPC::Lexer::Subpass::ExtraSubpass_StripCommentsAndSectors(tokens);
 
 		//runs the second pass || gives every token fine typing
 

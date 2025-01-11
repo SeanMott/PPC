@@ -122,6 +122,11 @@ namespace PPC::Stage1
 			case TokenType::Instruction:
 				fmt::print(fmt::fg(fmt::color::orange), "Line: {}, Char: {} || Instruction {}\n", lineCount, charCount, data);
 				break;
+
+			default:
+				fmt::print(fmt::fg(fmt::color::orange), "Line: {}, Char: {} || {}\n", lineCount, charCount, data);
+				break;
+
 			}
 		}
 	};
