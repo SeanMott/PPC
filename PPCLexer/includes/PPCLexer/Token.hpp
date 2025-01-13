@@ -2,9 +2,7 @@
 
 //defines a Token
 
-#define FMT_HEADER_ONLY
-#include <fmt/color.h>
-#include <fmt/core.h>
+#include <PPCLib/Logger.hpp>
 
 #include <vector>
 #include <fstream>
