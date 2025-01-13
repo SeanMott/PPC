@@ -28,8 +28,19 @@
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLexer\Token.hpp" />
-    <ClInclude Include="includes\PPCLexer\Subpasses\Subpass2.hpp" />
+    <ClInclude Include="includes\PPCLexer\Subpasses\SubpassExtraStripping.hpp" />
     <ClInclude Include="includes\PPCLexer\CompilerSettings.hpp" />
+    <ClInclude Include="includes\PPCLexer\TokenStream.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\SpecialRegister.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\ConditionRegister.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\GraphicsQuantizedRegisters.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\FloatingRegisters.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\IntegerRegister.hpp" />
+    <ClInclude Include="includes\PPCLexer\Subpasses\Subpass2.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\Datatypes.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\Scoping.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\MemoryOffset.hpp" />
+    <ClInclude Include="includes\PPCLexer\Data\GeneralKeywords.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Subpasses\Subpass1.cpp">

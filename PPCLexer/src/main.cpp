@@ -6,6 +6,9 @@ PPC Lexer that converts DTK Raw Assembly into a stream of tokens
 
 #include <PPCLexer/Subpasses/Subpass1.hpp>
 #include <PPCLexer/Subpasses/Subpass2.hpp>
+#include <PPCLexer/Subpasses/SubpassExtraStripping.hpp>
+
+#include <PPCLexer/TokenStream.hpp>
 
 //loads the translation unit code
 static inline void LoadASM(const std::filesystem::path& filepath, std::string& code)
@@ -39,15 +42,23 @@ int main()
 	{
 		std::string code = "";
 		LoadASM(ASMFiles[i], code);
-	
+		const std::string filename = std::filesystem::path(ASMFiles[i]).stem().string();
+
 		//runs the first pass || generates general tokens, comments, operators, and string literals
 	 	std::vector<PPC::Stage1::Token> tokens = PPC::Stage1::Subpass1_GenerateGeneralTokens(code);
 
+		//fine types the registers, instructions, memory offsets, scoping, pre-defined keywords
+		//and datatypes
+		tokens = PPC::Lexer::Subpass::Subpass2_GenerateFineTyping(tokens);
+
 		//runs the second pass || strips invalide and illegal tokens and optionally all comments
-		tokens = PPC::Lexer::Subpass::Subpass2_RemoveInvalidInstructions(tokens);
-		tokens = PPC::Lexer::Subpass::ExtraSubpass_StripCommentsAndSectors(tokens);
+		//tokens = PPC::Lexer::Subpass::Subpass2_RemoveInvalidInstructions(tokens);
+		//tokens = PPC::Lexer::Subpass::ExtraSubpass_StripCommentsAndSectors(tokens);
 
 		//runs the second pass || gives every token fine typing
+
+		//dump it all to a file
+		//PPC::Lexer::DumpTokenStream(tokens, std::filesystem::path(std::string("C:/Decomps/TOD-Decomp/DTKTokenStream/") + filename + ".ppcTokenStream"));
 
 		fmt::print("File: {}\n\n\n", ASMFiles[i]);
 		for (size_t t = 0; t < tokens.size(); ++t)

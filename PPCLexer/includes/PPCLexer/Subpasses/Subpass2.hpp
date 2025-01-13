@@ -1,73 +1,162 @@
 #pragma once
 
+//fine types the registers, instructions, memory offsets, scoping, pre-defined keywords
+//and datatypes
+
 #include <PPCLexer/Token.hpp>
 
-//defines the second subpass, this removes invalid and illegal instructions
-//optionally strips out all comments
+#include <PPCLexer/Data/ConditionRegister.hpp>
+#include <PPCLexer/Data/IntegerRegister.hpp>
+#include <PPCLexer/Data/FloatingRegisters.hpp>
+#include <PPCLexer/Data/SpecialRegister.hpp>
+#include <PPCLexer/Data/GraphicsQuantizedRegisters.hpp>
+
+#include <PPCLexer/Data/Datatypes.hpp>
+#include <PPCLexer/Data/MemoryOffset.hpp>
+#include <PPCLexer/Data/PPCInstructions.hpp>
+#include <PPCLexer/Data/Scoping.hpp>
+
+#include <PPCLexer/Data/GeneralKeywords.hpp>
 
 namespace PPC::Lexer::Subpass
 {
-
-	//process the subpass 2, removes the invalid and illegal instrucitons
-	static inline std::vector<PPC::Stage1::Token> Subpass2_RemoveInvalidInstructions(std::vector<PPC::Stage1::Token>& subpass1Tokens)
+	//defines the subpass 2 for fine typing tokens after inital typing
+	static inline std::vector<Stage1::Token> Subpass2_GenerateFineTyping(std::vector<Stage1::Token>& generalTokens)
 	{
-		const size_t subpass1TokenCount = subpass1Tokens.size();
-		std::vector<PPC::Stage1::Token> tokens;
-		tokens.reserve(subpass1TokenCount);
+		std::vector<Stage1::Token> tokens;
+		const size_t generalTokenCount = generalTokens.size();
+		tokens.reserve(generalTokenCount);
 
-		//compress the tokens into the new tree
-		for (size_t i = 0; i < subpass1TokenCount; ++i)
+		for (size_t i = 0; i < generalTokenCount; ++i)
 		{
-			//check for this line and the next few to be invalid or illegal structure and skip it all if so
-			if (i + 3 < subpass1TokenCount && subpass1Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass1Tokens[i + 1].type == PPC::Stage1::TokenType::Identifier &&
-				subpass1Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass1Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
-				subpass1Tokens[i + 3].data == " invalid " ||
-				i + 3 < subpass1TokenCount && subpass1Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass1Tokens[i + 1].type == PPC::Stage1::TokenType::Identifier &&
-				subpass1Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass1Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
-				subpass1Tokens[i + 3].data.find("illegal:"))
+			uint32_t instArrayIndex = 0;
+			PPC::Data::ASM::EInstruction ppcInstrct;
+
+			//if it's a general token
+			if (generalTokens[i].type == Stage1::TokenType::Genaric)
 			{
-				i += 4; //we add the extra bit to skip the new line
-				continue;
+				//if it's a aligment keyword
+			if (Subpass2_IsKeyword_Alignment(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Alignment;
 			}
 
-			tokens.emplace_back(subpass1Tokens[i]);
-		}
-
-		return tokens;
-	}
-
-	//option extra pass that removes ALL comments and section based tokens
-	static inline std::vector<PPC::Stage1::Token> ExtraSubpass_StripCommentsAndSectors(std::vector<PPC::Stage1::Token>& subpassTokens)
-	{
-		const size_t subpassTokenCount = subpassTokens.size();
-		std::vector<PPC::Stage1::Token> tokens;
-		tokens.reserve(subpassTokenCount);
-
-		//compress the tokens into the new tree
-		for (size_t i = 0; i < subpassTokenCount; ++i)
-		{
-			//if we're .section,.file or .include or .data remove the whole line
-			if (subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".section" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".include" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".file" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".data" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".text")
+			//if it's a global scope keyword
+			else if (Subpass2_IsKeyword_Scope_Global(generalTokens[i].data.c_str()))
 			{
-				while (subpassTokens[i].type != PPC::Stage1::TokenType::NewLine && i < subpassTokenCount)
-				{
-					i++;
-				}
-
-				continue;
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Global;
 			}
 
-			//removes comment
-			else if (subpassTokens[i].type == PPC::Stage1::TokenType::BlockComment || subpassTokens[i].type == PPC::Stage1::TokenType::SingleLineComment)
-				continue;
+			//if it's a local scope keyword
+			else if (Subpass2_IsKeyword_Scope_Local(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Local;
+			}
 
-			//adds token
-			tokens.emplace_back(subpassTokens[i]);
+			//if it's a weak scope keyword
+			else if (Subpass2_IsKeyword_Scope_Weak(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Weak;
+			}
+
+			//if it's a hidden scope keyword
+			else if (Subpass2_IsKeyword_Scope_Hidden(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Hidden;
+			}
+
+			//if it's a sym scope keyword
+			else if (Subpass2_IsKeyword_Scope_Sym(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sym;
+			}
+
+			//if it's a sda21 memory offset keyword
+			else if (Subpass2_IsKeyword_MemoryOffset_Sda21(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_Sda21;
+			}
+
+			//if it's a lower bit memory offset keyword
+			else if (Subpass2_IsKeyword_MemoryOffset_LowerBit(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit;
+			}
+
+			//if it's a higher bit memory offset keyword
+			else if (Subpass2_IsKeyword_MemoryOffset_HigherBit(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit;
+			}
+
+			//if it's a datatype
+			else if (Subpass2_IsDatatype(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Datatype;
+			}
+
+			//if it's a int register
+			else if (Subpass2_IsIntegerRegister(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Register;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Int;
+			}
+
+			//if it's a floating register
+			else if (Subpass2_IsFloatingRegister(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Register;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Float;
+			}
+
+			//if it's a graphics quantized register
+			else if (Subpass2_IsGraphicsQuantizedRegister(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Register;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_GraphicsQuantized;
+			}
+
+			//if it's a condition register
+			else if (Subpass2_IsConditionRegister(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Register;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Condition;
+			}
+
+			//if it's a special register
+			else if (Subpass2_IsSpecialRegister(generalTokens[i].data.c_str()))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Register;
+				generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
+			}
+
+			//if it's assembly instruction
+			else if (PPC::Data::ASM::IsASMInstructionStr(generalTokens[i].data.c_str(), instArrayIndex, ppcInstrct))
+			{
+				generalTokens[i].type = PPC::Stage1::TokenType::Instruction;
+				//generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
+			}
+
+			//if it's a digit literal
+
+			//else it's a Identifier
+			else
+				generalTokens[i].type = PPC::Stage1::TokenType::Identifier;
+			}
+
+			//add it to the tree
+			tokens.emplace_back(generalTokens[i]);
 		}
+
 
 		return tokens;
 	}

@@ -184,7 +184,4 @@ namespace PPC::Stage1
 			f.write(data.c_str(), data.size());
 		}
 	};
-
-	//lexes ASM into tokens
-	LexedFile LexTokens(const std::string& code);
 }
