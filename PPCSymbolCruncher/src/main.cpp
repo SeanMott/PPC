@@ -110,9 +110,19 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPCSymbol& 
 	//since for some reason DTK is dumb about that.
 	if (symbol.identifier[0] == '@')
 		symbol.identifier += "_" + splitAddressPair.value;
+
+	//process the type
+
+	//process the scope
 }
 
 //parses the arguments
+
+//-----have all symbols in one file (default function)
+
+//-----split the symbols into files based on their type: param
+
+//-----split the symbols into files based on their splits
 
 //entry
 int main(int args, const char* argv[])
