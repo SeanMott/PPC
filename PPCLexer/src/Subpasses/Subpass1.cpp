@@ -1,5 +1,7 @@
 #include <PPCLexer/Subpasses/Subpass1.hpp>
 
+#include <PPCLexer/Data/Operators.hpp>
+
 //processes a operator token
 static inline PPC::Stage1::Token Subpass1_GenerateToken_Operator(const char data, PPC::Stage1::Parser* parser)
 {
@@ -171,22 +173,6 @@ static inline PPC::Stage1::Token Subpass1_GenerateToken_NewLine(PPC::Stage1::Par
 	t.lineCount = parser->lineCount;
 	t.charCount = parser->charCount;
 	return t;
-}
-
-//list all operator tokens
-#define PPC_LEXER_OPERATOR_COUNT 6
-static const char PPC_LEXER_OPERATOR_TOKEN_STRINGS[PPC_LEXER_OPERATOR_COUNT] = { ',', '(', ')', ':', '@', '+' };
-
-//checks if it's a operator
-static inline bool Subpass1_IsOperator(const char op)
-{
-	for (size_t i = 0; i < PPC_LEXER_OPERATOR_COUNT; ++i)
-	{
-		if (op == PPC_LEXER_OPERATOR_TOKEN_STRINGS[i])
-			return true;
-	}
-
-	return false;
 }
 
 //parses raw code into Genaric Tokens for Subpass 1
