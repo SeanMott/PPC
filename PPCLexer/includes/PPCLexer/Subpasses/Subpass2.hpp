@@ -42,6 +42,8 @@ namespace PPC::Lexer::Subpass
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Alignment;
 				}
 
+				//---scoping
+
 				//if it's a global scope keyword
 				else if (Subpass2_IsKeyword_Scope_Global(generalTokens[i].data.c_str()))
 				{
@@ -77,6 +79,8 @@ namespace PPC::Lexer::Subpass
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sym;
 				}
 
+				//---memory offsets
+
 				//if it's a sda21 memory offset keyword
 				else if (Subpass2_IsKeyword_MemoryOffset_Sda21(generalTokens[i].data.c_str()))
 				{
@@ -98,12 +102,8 @@ namespace PPC::Lexer::Subpass
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit;
 				}
 
-				//if it's a datatype
-				else if (Subpass2_IsDatatype(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Datatype;
-				}
-
+				//---registers
+				
 				//if it's a int register
 				else if (Subpass2_IsIntegerRegister(generalTokens[i].data.c_str()))
 				{
@@ -137,6 +137,16 @@ namespace PPC::Lexer::Subpass
 				{
 					generalTokens[i].type = PPC::Stage1::TokenType::Register;
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Register_Special;
+				}
+
+				//--general keywords
+
+				//---other
+
+				//if it's a datatype
+				else if (Subpass2_IsDatatype(generalTokens[i].data.c_str()))
+				{
+					generalTokens[i].type = PPC::Stage1::TokenType::Datatype;
 				}
 
 				//if it's assembly instruction

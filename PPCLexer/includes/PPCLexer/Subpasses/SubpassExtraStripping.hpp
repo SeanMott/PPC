@@ -7,9 +7,25 @@
 
 namespace PPC::Lexer::Subpass
 {
+	//defines a line of tokens
+	struct TokenLine
+	{
+		std::vector<PPC::Stage1::Token> tokens;
+	};
 
-	//process the subpass 2, removes the invalid and illegal instrucitons
-	static inline std::vector<PPC::Stage1::Token> Subpass2_RemoveInvalidInstructions(std::vector<PPC::Stage1::Token>& subpass1Tokens)
+	//defines a token stream defining a function
+
+	//defines a token stream defining a struct
+
+	//defines a token stream file
+	struct TokenStreamFile
+	{
+		std::vector<PPC::Stage1::Token> wholeFileTokens; //defines the remaining total
+	};
+
+
+	//removes the invalid and illegal instrucitons
+	static inline std::vector<PPC::Stage1::Token> ExtraSubpass_RemoveInvalidInstructions(std::vector<PPC::Stage1::Token>& subpass1Tokens)
 	{
 		const size_t subpass1TokenCount = subpass1Tokens.size();
 		std::vector<PPC::Stage1::Token> tokens;
@@ -19,10 +35,10 @@ namespace PPC::Lexer::Subpass
 		for (size_t i = 0; i < subpass1TokenCount; ++i)
 		{
 			//check for this line and the next few to be invalid or illegal structure and skip it all if so
-			if (i + 3 < subpass1TokenCount && subpass1Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass1Tokens[i + 1].type == PPC::Stage1::TokenType::Identifier &&
+			if (i + 3 < subpass1TokenCount && subpass1Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass1Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
 				subpass1Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass1Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
 				subpass1Tokens[i + 3].data == " invalid " ||
-				i + 3 < subpass1TokenCount && subpass1Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass1Tokens[i + 1].type == PPC::Stage1::TokenType::Identifier &&
+				i + 3 < subpass1TokenCount && subpass1Tokens[i].type == PPC::Stage1::TokenType::BlockComment && subpass1Tokens[i + 1].type == PPC::Stage1::TokenType::Datatype &&
 				subpass1Tokens[i + 2].type == PPC::Stage1::TokenType::Identifier && subpass1Tokens[i + 3].type == PPC::Stage1::TokenType::BlockComment &&
 				subpass1Tokens[i + 3].data.find("illegal:"))
 			{

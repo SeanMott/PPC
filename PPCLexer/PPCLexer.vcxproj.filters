@@ -30,7 +30,6 @@
     <ClInclude Include="includes\PPCLexer\Token.hpp" />
     <ClInclude Include="includes\PPCLexer\Subpasses\SubpassExtraStripping.hpp" />
     <ClInclude Include="includes\PPCLexer\CompilerSettings.hpp" />
-    <ClInclude Include="includes\PPCLexer\TokenStream.hpp" />
     <ClInclude Include="includes\PPCLexer\Data\SpecialRegister.hpp" />
     <ClInclude Include="includes\PPCLexer\Data\ConditionRegister.hpp" />
     <ClInclude Include="includes\PPCLexer\Data\GraphicsQuantizedRegisters.hpp" />
@@ -42,6 +41,8 @@
     <ClInclude Include="includes\PPCLexer\Data\MemoryOffset.hpp" />
     <ClInclude Include="includes\PPCLexer\Data\GeneralKeywords.hpp" />
     <ClInclude Include="includes\PPCLexer\Data\Operators.hpp" />
+    <ClInclude Include="includes\PPCLexer\LexedFile.hpp" />
+    <ClInclude Include="includes\PPCLexer\Subpasses\Subpass3.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Subpasses\Subpass1.cpp">

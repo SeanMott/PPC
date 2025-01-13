@@ -28,8 +28,6 @@ namespace PPC::Stage1
 
 		Instruction, //defines a instruction
 
-		JumpLabelDefinition, //marks the definition of a jump label
-
 		Literal_String, //the string literal
 
 		Operator, //a operator in the syntax
@@ -92,7 +90,7 @@ namespace PPC::Stage1
 			switch (type)
 			{
 			case TokenType::Genaric:
-				fmt::print("Line: {}, Char: {} || {}\n", lineCount, charCount, data);
+				fmt::print("Line: {}, Char: {} || Genaric {}\n", lineCount, charCount, data);
 				break;
 
 			case TokenType::Keyword:
@@ -105,10 +103,6 @@ namespace PPC::Stage1
 
 			case TokenType::Register:
 				fmt::print("Line: {}, Char: {} || Register || {}\n", lineCount, charCount, data);
-				break;
-
-			case TokenType::JumpLabelDefinition:
-				fmt::print("Line: {}, Char: {} || Jump Label || {}\n", lineCount, charCount, data);
 				break;
 
 			case TokenType::Identifier:
@@ -124,7 +118,7 @@ namespace PPC::Stage1
 				break;
 
 			default:
-				fmt::print(fmt::fg(fmt::color::orange), "Line: {}, Char: {} || {}\n", lineCount, charCount, data);
+				fmt::print("Line: {}, Char: {} || {}\n", lineCount, charCount, data);
 				break;
 
 			}
@@ -163,11 +157,11 @@ namespace PPC::Stage1
 						singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjEnd)
 						data += "};";
 
-					//if it's a jump label
-					else if (singleLineExpesstions[i].tokens[t].type == TokenType::JumpLabelDefinition)
-					{
-						data += "Jump Label (" + singleLineExpesstions[i].tokens[t].data + "):";
-					}
+					////if it's a jump label
+					//else if (singleLineExpesstions[i].tokens[t].type == TokenType::JumpLabelDefinition)
+					//{
+					//	data += "Jump Label (" + singleLineExpesstions[i].tokens[t].data + "):";
+					//}
 
 					//otherwise
 					else
