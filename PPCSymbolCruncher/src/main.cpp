@@ -7,20 +7,61 @@ Parses DTK Symbols and Splits into PPC Map files
 #include <vector>
 #include <fstream>
 
+//defines a DTK Symbol value and name parameter pair
+struct DTKSymbolParameterValueNamePair
+{
+	std::string name = "", value = "";
+};
+
 //defines a PPC Symbol parsed from the DTK Symbol file
 struct PPCSymbol
 {
-	//the name of the symbol
+	std::string identifier = ""; //the name of the symbol
 	//the Symbol ID associated with the Symbol
 
 	//is it a object, function, or label
 
-	//the split section
-	//the address it starts
+	std::string split = "", //the split section
+		address = ""; //the address it starts
+
+	std::vector<DTKSymbolParameterValueNamePair> dataPairs;
+
+	//prints the symbol
+	inline void Print()
+	{
+		fmt::print(fmt::fg(fmt::color::beige), "Symbol Name: {} || ", identifier);
+		fmt::print(fmt::fg(fmt::color::crimson), "Split: {}, Address: {} || ", split, address);
+
+		for (size_t i = 0; i < dataPairs.size(); ++i)
+			fmt::print(fmt::fg(fmt::color::aqua), "{} = {} || ", dataPairs[i].name, dataPairs[i].value);
+		fmt::print("\n");
+	}
 };
 
+//takes a DTK symbol parameter and split it out by the :
+static inline DTKSymbolParameterValueNamePair GetValueAndNameOfDTKParamterPair(const std::string& nameValuePair)
+{
+	DTKSymbolParameterValueNamePair pair;
+	bool isDoneWithName = false;
+
+	for (size_t i = 0; i < nameValuePair.size(); ++i)
+	{
+		//splits the word
+		if (nameValuePair[i] == ':')
+		{
+			isDoneWithName = true;
+			continue;
+		}
+
+		//adds to either part
+		(isDoneWithName == true ? pair.value : pair.name) += nameValuePair[i];
+	}
+
+	return pair;
+}
+
 //takes a string and parses out the DTK info
-static inline void ParseDTKSymbolStringInfo(const std::string& line)
+static inline void ParseDTKSymbolStringInfo(const std::string& line, PPCSymbol& symbol)
 {
 	//split the whole line into words by spaces
 	std::vector<std::string> words; words.reserve(5);
@@ -39,32 +80,36 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line)
 	words.emplace_back(word);
 
 	//grab the first word as that is our identifier
-	const std::string identifier = words[0];
+	symbol.identifier = words[0];
 	uint8_t wordIndex = 0;
-	fmt::print(fmt::fg(fmt::color::beige), "Symbol Name: {} || ", identifier);
+	
 
 	//skip the =
 	wordIndex += 2;
 
-	//grab the next word as that's our split section and address
-	const std::string split_address = words[wordIndex];
+	//grab the next word as that's our split section and address and remove the semicolon on the end
+	std::string split_address = words[wordIndex];
+	split_address.resize(split_address.size() - 1);
 	wordIndex++;
-	fmt::print(fmt::fg(fmt::color::crimson), "Split Address: {} || ", split_address);
 
-	//split the word out into it's section and address
-
-	//chop off the ; at the end of this word
+	//then split it out into the name and value pair
+	DTKSymbolParameterValueNamePair splitAddressPair = GetValueAndNameOfDTKParamterPair(split_address);
+	symbol.split = splitAddressPair.name;
+	symbol.address = splitAddressPair.value;
 
 	//skip the // since that's unneeded data
 	wordIndex++;
 
 	//grab all the rest of the parameters and sort them by the first part
-	for (wordIndex; wordIndex < words.size(); ++wordIndex)
-		fmt::print(fmt::fg(fmt::color::aqua), " {} || ", words[wordIndex]);
-	fmt::print("\n");
+	const size_t wordCount = words.size();
+	symbol.dataPairs.reserve(wordCount - (wordIndex - 1));
+	for (wordIndex; wordIndex <wordCount; ++wordIndex)
+		symbol.dataPairs.emplace_back(GetValueAndNameOfDTKParamterPair(words[wordIndex]));
 
 	//if the start of the name is a @, merge it with a _ whatever the address is
 	//since for some reason DTK is dumb about that.
+	if (symbol.identifier[0] == '@')
+		symbol.identifier += "_" + splitAddressPair.value;
 }
 
 //parses the arguments
@@ -106,8 +151,14 @@ int main(int args, const char* argv[])
 	};
 
 	//splits it out on threads and process
-	for (size_t i = 0; i < lines.size(); ++i)
-		ParseDTKSymbolStringInfo(lines[i]);
+	const size_t lineCount = lines.size();
+	std::vector<PPCSymbol> symbols; symbols.resize(lineCount);
+	for (size_t i = 0; i < lineCount; ++i)
+		ParseDTKSymbolStringInfo(lines[i], symbols[i]);
+
+	//prints
+	for (size_t i = 0; i < lineCount; ++i)
+		symbols[i].Print();
 
 	//generate the .ppcmap file
 
