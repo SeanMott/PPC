@@ -12,7 +12,6 @@
 #include <PPCLexer/Data/GraphicsQuantizedRegisters.hpp>
 
 #include <PPCLexer/Data/Datatypes.hpp>
-#include <PPCLexer/Data/MemoryOffset.hpp>
 #include <PPCLexer/Data/PPCInstructions.hpp>
 
 #include <PPCLexer/Data/GeneralKeywords.hpp>
@@ -32,6 +31,7 @@ namespace PPC::Lexer::Subpass
 			PPC::Data::ASM::EInstruction ppcInstrct;
 
 			PPC::Data::Scope::ScopeType scopeType = PPC::Data::Scope::ScopeType::None;
+			PPC::Data::MemoryOffset::MemoryOffsetType memoryOffsetType = PPC::Data::MemoryOffset::MemoryOffsetType::None;
 
 			//if it's a general token
 			if (generalTokens[i].type == Stage1::TokenType::Genaric)
@@ -54,33 +54,10 @@ namespace PPC::Lexer::Subpass
 
 				//---memory offsets
 
-				/*
 				else if (PPC::Data::MemoryOffset::IsASMKeyword_MemoryOffset(generalTokens[i].data.c_str(), memoryOffsetType))
 				{
 					generalTokens[i].type = PPC::Stage1::TokenType::Keyword_MemoryOffset;
 					generalTokens[i].memoryOffsetType = memoryOffsetType;
-				}
-				*/
-
-				//if it's a sda21 memory offset keyword
-				else if (Subpass2_IsKeyword_MemoryOffset_Sda21(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_Sda21;
-				}
-
-				//if it's a lower bit memory offset keyword
-				else if (Subpass2_IsKeyword_MemoryOffset_LowerBit(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_LowerBit;
-				}
-
-				//if it's a higher bit memory offset keyword
-				else if (Subpass2_IsKeyword_MemoryOffset_HigherBit(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_MemoryOffset_HigherBit;
 				}
 
 				//---registers

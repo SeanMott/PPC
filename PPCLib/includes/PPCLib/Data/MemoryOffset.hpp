@@ -16,13 +16,23 @@ namespace PPC::Data::MemoryOffset
 		HigherBit
 	};
 
-	//checks if it's a memory offset keyword
-	static inline bool 
+	//converts a memory offset keyword to a memory offset type
+	static inline MemoryOffsetType ConvertDTKKeywordStringToMemoryOffsetType(const char* keyword)
+	{
+		if (!strcmp(keyword, "sda21"))
+			return MemoryOffsetType::Sda21;
+		else if (!strcmp(keyword, "l"))
+			return MemoryOffsetType::LowerBit;
+		else if (!strcmp(keyword, "ha"))
+			return MemoryOffsetType::HigherBit;
 
-	//is it a memory offset keyword for sda21
-	static inline bool Subpass2_IsKeyword_MemoryOffset_Sda21(const char* key) { return (!strcmp(key, "sda21") ? true : false); }
-	//is it a memory offset keyword for l || lower bit
-	static inline bool Subpass2_IsKeyword_MemoryOffset_LowerBit(const char* key) { return (!strcmp(key, "l") ? true : false); }
-	//is it a memory offset keyword for ha || higher bit
-	static inline bool Subpass2_IsKeyword_MemoryOffset_HigherBit(const char* key) { return (!strcmp(key, "ha") ? true : false); }
+		return MemoryOffsetType::None;
+	}
+
+	//checks if it's a memory offset keyword
+	static inline bool IsASMKeyword_MemoryOffset(const char* str, MemoryOffsetType& type)
+	{
+		type = ConvertDTKKeywordStringToMemoryOffsetType(str);
+		return (type != MemoryOffsetType::None ? true : false);
+	}
 }

@@ -6,6 +6,7 @@
 
 #include <PPCLib/Data/ObjectType.hpp>
 #include <PPCLib/Data/Scope.hpp>
+#include <PPCLib/Data/MemoryOffset.hpp>
 
 #include <vector>
 #include <fstream>
@@ -26,6 +27,8 @@ namespace PPC::Stage1
 		Keyword_Scope, //defines a scope keyword
 
 		Keyword_Object, //defines a object keyword for start and end of structs and funcs and syms/labels
+
+		Keyword_MemoryOffset, //defines a memory offset keyword
 
 		Datatype, //a datatype
 
@@ -48,11 +51,6 @@ namespace PPC::Stage1
 	//defines a specific token type
 	enum class SpecificTokenType
 	{
-		//memory offset
-		Keyword_MemoryOffset_Sda21,
-		Keyword_MemoryOffset_LowerBit,
-		Keyword_MemoryOffset_HigherBit,
-
 		//mic
 		Keyword_Alignment,
 
@@ -76,6 +74,7 @@ namespace PPC::Stage1
 		//specific type bits
 		Data::Scope::ScopeType scopeType = Data::Scope::ScopeType::None;
 		Data::ObjectType::ObjectType objType = Data::ObjectType::ObjectType::None;
+		Data::MemoryOffset::MemoryOffsetType memoryOffsetType = Data::MemoryOffset::MemoryOffsetType::None;
 
 		std::string data = "";
 
