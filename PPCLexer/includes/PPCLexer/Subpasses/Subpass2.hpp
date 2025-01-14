@@ -73,7 +73,7 @@ namespace PPC::Lexer::Subpass
 				}
 
 				//if it's a sym scope keyword
-				else if (Subpass2_IsKeyword_Scope_Sym(generalTokens[i].data.c_str()))
+				else if (Data::ObjectType::CheckForASMKeyword_Sym(generalTokens[i].data.c_str()))
 				{
 					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sym;

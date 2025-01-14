@@ -12,5 +12,3 @@ static inline bool Subpass2_IsKeyword_Scope_Local(const char* key) { return (!st
 static inline bool Subpass2_IsKeyword_Scope_Weak(const char* key) { return (!strcmp(key, "weak") ? true : false); }
 //is it a scope for hidden
 static inline bool Subpass2_IsKeyword_Scope_Hidden(const char* key) { return (!strcmp(key, ".hidden") ? true : false); }
-//is it a scope for sym
-static inline bool Subpass2_IsKeyword_Scope_Sym(const char* key) { return (!strcmp(key, ".sym") ? true : false); }

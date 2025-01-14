@@ -9,11 +9,14 @@ namespace PPC::Data::Scope
 	//defines a scope type
 	enum class ScopeType
 	{
-		None = 0,
+		None = 0, //if not found
 
+		//types used in symbols and ASM
 		Global,
 		Local,
 		Weak,
+
+		Hidden, //type used in ASM
 
 		Count
 	};
@@ -27,6 +30,8 @@ namespace PPC::Data::Scope
 			return ScopeType::Local;
 		else if (str == "weak")
 			return ScopeType::Weak;
+		else if (str == ".hidden")
+			return ScopeType::Hidden;
 
 		return ScopeType::None;
 	}

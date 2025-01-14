@@ -4,6 +4,9 @@
 
 #include <PPCLib/Logger.hpp>
 
+#include <PPCLib/Data/ObjectType.hpp>
+#include <PPCLib/Data/Scope.hpp>
+
 #include <vector>
 #include <fstream>
 

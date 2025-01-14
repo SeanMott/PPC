@@ -28,4 +28,8 @@ namespace PPC::Data::ObjectType
 
 		return ObjectType::None;
 	}
+
+	//checks for a .sym this is a called a label in the symbols....for some reason
+	static inline bool CheckForASMKeyword_Sym(const char* str) { return (!strcmp(str, ".sym") ? true : false); }
+
 }
