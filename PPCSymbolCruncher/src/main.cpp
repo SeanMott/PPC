@@ -3,7 +3,9 @@ Parses DTK Symbols and Splits into PPC Map files
 */
 
 #include <PPCLib/Logger.hpp>
+#include <PPCLibVenders/json.hpp>
 
+#include <filesystem>
 #include <vector>
 #include <fstream>
 
@@ -13,16 +15,46 @@ struct DTKSymbolParameterValueNamePair
 	std::string name = "", value = "";
 };
 
+//defines the object type
+enum class ObjectType
+{
+	None = 0,
+
+	Label,
+	Function,
+	Object,
+
+	Count
+};
+
+//defines scope
+enum class ScopeType
+{
+	None = 0,
+
+	Global,
+	Local,
+	Weak,
+
+	Count
+};
+
 //defines a PPC Symbol parsed from the DTK Symbol file
 struct PPCSymbol
 {
 	std::string identifier = ""; //the name of the symbol
 	//the Symbol ID associated with the Symbol
 
-	//is it a object, function, or label
+	ObjectType type = ObjectType::None; //is it a object, function, or label
+	ScopeType scope = ScopeType::None; //the scope type
+
 
 	std::string split = "", //the split section
 		address = ""; //the address it starts
+
+	std::string size = "NULL"; //the size
+
+	std::string datatype = "NULL"; //the datatype
 
 	std::vector<DTKSymbolParameterValueNamePair> dataPairs;
 
@@ -111,9 +143,41 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPCSymbol& 
 	if (symbol.identifier[0] == '@')
 		symbol.identifier += "_" + splitAddressPair.value;
 
-	//process the type
+	const size_t dataPairsCount = symbol.dataPairs.size();
 
-	//process the scope
+	//process the type
+	for (size_t i = 0; i < dataPairsCount; ++i)
+	{
+		//parses the type
+		if (symbol.dataPairs[i].name == "type")
+		{
+			if (symbol.dataPairs[i].value == "function")
+				symbol.type = ObjectType::Function;
+			else if (symbol.dataPairs[i].value == "object")
+				symbol.type = ObjectType::Object;
+			else if (symbol.dataPairs[i].value == "label")
+				symbol.type = ObjectType::Label;
+		}
+
+		//parses the scope
+		else if (symbol.dataPairs[i].name == "scope")
+		{
+			if (symbol.dataPairs[i].value == "global")
+				symbol.scope = ScopeType::Global;
+			else if (symbol.dataPairs[i].value == "local")
+				symbol.scope = ScopeType::Local;
+			else if (symbol.dataPairs[i].value == "weak")
+				symbol.scope = ScopeType::Weak;
+		}
+
+		//parses the size
+		else if (symbol.dataPairs[i].name == "size")
+			symbol.size = symbol.dataPairs[i].value;
+
+		//parses the data
+		else if (symbol.dataPairs[i].name == "data")
+			symbol.datatype = symbol.dataPairs[i].value;
+	}
 }
 
 //parses the arguments
@@ -128,6 +192,8 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPCSymbol& 
 int main(int args, const char* argv[])
 {
 	//loads the symbol file
+	const std::filesystem::path symbolPath = "C:/Decomps/TOD-Decomp/RawASM/DTKSymbolsNSplits/symbols.txt";
+
 	std::vector<std::string> lines = {
 		"@1249 = .data:0x80049628; // type:object size:0x84 scope:local",
 		"jumptable_800496AC = .data:0x800496AC; // type:object size:0x84 scope:local",
@@ -171,7 +237,16 @@ int main(int args, const char* argv[])
 		symbols[i].Print();
 
 	//generate the .ppcmap file
+	const std::filesystem::path ppcMap = "C:/Decomps/TOD-Decomp/PPCDTK/PureDTKSymbols.ppcmap";
 
+	//generates map
+	nlohmann::json ppcMapSymbols = nlohmann::json::array();
+	for (size_t i = 0; i < lineCount; ++i)
+		ppcMapSymbols.emplace_back(nlohmann::json{ {"symbolName", symbols[i].identifier}, {"split", symbols[i].split}, {"address", symbols[i].address},
+			{"size", symbols[i].size}, {"datatype", symbols[i].datatype}, {"scope", symbols[i].scope}});
+	std::ofstream file(ppcMap);
+	file << ppcMapSymbols.dump();
+	
 	getchar();
 	return 0;
 }

@@ -27,7 +27,7 @@
     <ClInclude Include="includes\PPCLib\Logger.hpp">
       <Filter>includes\PPCLib</Filter>
     </ClInclude>
-    <ClInclude Include="includes\Venders\json.hpp">
+    <ClInclude Include="includes\PPCLibVenders\json.hpp">
       <Filter>includes\Venders</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,10 +19,4 @@ namespace PPC::Data::Datatype
 
 		Rel, //defines a relocation
 	};
-
-	//defines the datatype for a internal datatype in PPC
-	enum class Datatype
-	{
-
-	};
 }
