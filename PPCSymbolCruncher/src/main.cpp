@@ -121,42 +121,15 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPC::Symbol
 //entry
 int main(int args, const char* argv[])
 {
-	//loads the symbol file
+	//loads the DTK symbol file
 	const std::filesystem::path symbolPath = "C:/Decomps/TOD-Decomp/RawASM/DTKSymbolsNSplits/symbols.txt";
+	std::ifstream file(symbolPath);
+	std::vector<std::string> lines;
+	std::string line;
+	while (std::getline(file, line))
+		lines.emplace_back(line);
 
-	std::vector<std::string> lines = {
-		"@1249 = .data:0x80049628; // type:object size:0x84 scope:local",
-		"jumptable_800496AC = .data:0x800496AC; // type:object size:0x84 scope:local",
-		"jumptable_80049730 = .data:0x80049730; // type:object size:0xE0 scope:local",
-		"jumptable_80049810 = .data:0x80049810; // type:object size:0x44 scope:local",
-		"lbl_80049858 = .data:0x80049858; // type:object size:0x88",
-		"jumptable_800498E0 = .data:0x800498E0; // type:object size:0x1C scope:local",
-		"jumptable_800498FC = .data:0x800498FC; // type:object size:0x1C scope:local",
-		"gTRKRestoreFlags = .data:0x80049918; // type:object size:0x9 scope:global data:byte",
-		"gTRKExceptionStatus = .data:0x80049924; // type:object size:0x10 scope:local data:4byte",
-		"lbl_80049934 = .data:0x80049934; // type:object size:0x14 data:4byte",
-		"lbl_80049948 = .data:0x80049948; // type:object size:0x40 data:4byte",
-		"gDBCommTable = .data:0x80049988; // type:object size:0x1C scope:global data:4byte",
-		"lbl_800499C0 = .bss:0x800499C0; // type:object size:0x4 data:4byte",
-		"lbl_800499C4 = .bss:0x800499C4; // type:object size:0x1C data:4byte",
-		"DriveInfo = .bss:0x800499E0; // type:object size:0x20 scope:local",
-		"__OSErrorTable = .bss:0x80049A30; // type:object size:0x44 scope:global data:4byte",
-		"lbl_80049A80 = .bss:0x80049A80; // type:object size:0x20",
-		"Scb = .bss:0x80049AA0; // type:object size:0x54 scope:local data:4byte",
-		"DBQueryData = .text:0x8002D684; // type:function size:0x9C scope:global",
-		"DBInitInterrupts = .text:0x8002D720; // type:function size:0x54 scope:global",
-		"DBInitComm = .text:0x8002D774; // type:function size:0x78 scope:global",
-		"fn_8002D7EC = .text:0x8002D7EC; // type:function size:0x40",
-		"fn_8002D82C = .text:0x8002D82C; // type:function size:0x3C",
-		"fn_8002D868 = .text:0x8002D868; // type:function size:0xAC",
-		"fn_8002D914 = .text:0x8002D914; // type:function size:0xDC",
-		"fn_8002D9F0 = .text:0x8002D9F0; // type:function size:0xDC",
-		"fn_8002DACC = .text:0x8002DACC; // type:function size:0xAC",
-		"fn_8002DB78 = .text:0x8002DB78; // type:function size:0x298",
-		"Hu_IsStub = .text:0x8002DE10; // type:function size:0x8 scope:weak"
-	};
-
-	//splits it out on threads and process
+	//process
 	const size_t lineCount = lines.size();
 	std::vector<PPC::SymbolMap::PPCSymbol> symbols; symbols.resize(lineCount);
 	for (size_t i = 0; i < lineCount; ++i)
@@ -164,10 +137,8 @@ int main(int args, const char* argv[])
 
 	//generate the .ppcmap file
 	const std::filesystem::path ppcMap = "C:/Decomps/TOD-Decomp/PPCDTK/PureDTKSymbols.ppcmap";
-
-	//generates map
 	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols);
 	
-	getchar();
+	//getchar();
 	return 0;
 }
