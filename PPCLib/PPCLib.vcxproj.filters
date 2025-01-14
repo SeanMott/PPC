@@ -33,6 +33,7 @@
     <ClInclude Include="includes\PPCLib\Data\Scope.hpp" />
     <ClInclude Include="includes\PPCLib\Data\ObjectType.hpp" />
     <ClInclude Include="includes\PPCLib\SymbolMap\PPCSymbol.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\MemoryOffset.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">

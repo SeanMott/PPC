@@ -42,9 +42,6 @@
     <ClInclude Include="includes\PPCLexer\Data\IntegerRegister.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Data\MemoryOffset.hpp">
-      <Filter>includes\PPCLexer\Data</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Data\Operators.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
