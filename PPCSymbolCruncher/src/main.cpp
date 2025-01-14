@@ -150,7 +150,7 @@ int main(int args, const char* argv[])
 		ParseDTKSymbolStringInfo(lines[i], symbols[i]);
 
 	//generate the .ppcmap file
-	const std::filesystem::path ppcMap = std::string(argv[2]) + (args >= 3 ? argv[3] : "Map.ppcmap");
+	const std::filesystem::path ppcMap = std::string(argv[2]) + "/" + std::string((args > 3 ? argv[3] : "Map.ppcmap"));
 	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols);
 	
 	//getchar();
