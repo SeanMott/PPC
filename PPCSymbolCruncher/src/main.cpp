@@ -121,8 +121,22 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPC::Symbol
 //entry
 int main(int args, const char* argv[])
 {
+	//parse the arguments
+
+	//if no arguments
+	if (args < 2)
+	{
+		fmt::print(fmt::fg(fmt::color::alice_blue), "PPC Symbol Cruncher");
+		fmt::print(fmt::fg(fmt::color::orange), " is a tool for importing symbol lists into a format the PPC Toolchain can use.\n\n");
+
+		fmt::print("----HOW TO USE----\nSymbolCruncher.exe <path to the DTK Symbol file genned in Stage 0> <folder where the PPC Map should be dumped> <optional third argument for output map name>\n");
+
+		getchar();
+		return 0;
+	}
+
 	//loads the DTK symbol file
-	const std::filesystem::path symbolPath = "C:/Decomps/TOD-Decomp/RawASM/DTKSymbolsNSplits/symbols.txt";
+	const std::filesystem::path symbolPath = argv[1]; //gets the symbol path
 	std::ifstream file(symbolPath);
 	std::vector<std::string> lines;
 	std::string line;
@@ -136,7 +150,7 @@ int main(int args, const char* argv[])
 		ParseDTKSymbolStringInfo(lines[i], symbols[i]);
 
 	//generate the .ppcmap file
-	const std::filesystem::path ppcMap = "C:/Decomps/TOD-Decomp/PPCDTK/PureDTKSymbols.ppcmap";
+	const std::filesystem::path ppcMap = std::string(argv[2]) + (args >= 3 ? argv[3] : "Map.ppcmap");
 	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols);
 	
 	//getchar();
