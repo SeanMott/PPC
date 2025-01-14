@@ -25,6 +25,8 @@ namespace PPC::Stage1
 
 		Keyword_Scope, //defines a scope keyword
 
+		Keyword_Object, //defines a object keyword for start and end of structs and funcs and syms/labels
+
 		Datatype, //a datatype
 
 		Register, //a register
@@ -46,16 +48,6 @@ namespace PPC::Stage1
 	//defines a specific token type
 	enum class SpecificTokenType
 	{
-		//func
-		Keyword_FuncStart = 0, //defines a func start definition token
-		Keyword_FuncEnd, //defines a func end definition token
-
-		//object
-		Keyword_ObjStart, //defines a object start definition token
-		Keyword_ObjEnd, //defines a object end definition token
-
-		Keyword_Sym, //defines a sym label
-
 		//memory offset
 		Keyword_MemoryOffset_Sda21,
 		Keyword_MemoryOffset_LowerBit,
@@ -83,6 +75,7 @@ namespace PPC::Stage1
 
 		//specific type bits
 		Data::Scope::ScopeType scopeType = Data::Scope::ScopeType::None;
+		Data::ObjectType::ObjectType objType = Data::ObjectType::ObjectType::None;
 
 		std::string data = "";
 
@@ -146,18 +139,18 @@ namespace PPC::Stage1
 			{
 				for (size_t t = 0; t < singleLineExpesstions[i].tokens.size(); ++t)
 				{
-					//if it's the start of a function
-					if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncStart)
-						data += "func ";
+				//	//if it's the start of a function
+				//	if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncStart)
+				//		data += "func ";
 
-					else //if it's the start of a function
-						if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjStart)
-							data += "struct ";
+				//	else //if it's the start of a function
+				//		if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjStart)
+				//			data += "struct ";
 
-					//if it's the end of a function or object
-					else if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncEnd ||
-						singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjEnd)
-						data += "};";
+				//	//if it's the end of a function or object
+				//	else if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncEnd ||
+				//		singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjEnd)
+				//		data += "};";
 
 					////if it's a jump label
 					//else if (singleLineExpesstions[i].tokens[t].type == TokenType::JumpLabelDefinition)
@@ -166,12 +159,12 @@ namespace PPC::Stage1
 					//}
 
 					//otherwise
-					else
+					/*else
 					{
 						data += singleLineExpesstions[i].tokens[t].data;
 
 						data += ' ';
-					}
+					}*/
 				}
 				data += '\n';
 			}

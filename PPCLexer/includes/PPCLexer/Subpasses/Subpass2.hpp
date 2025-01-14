@@ -43,13 +43,6 @@ namespace PPC::Lexer::Subpass
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Alignment;
 				}
 
-				//if it's a sym object type keyword
-				else if (Data::ObjectType::CheckForASMKeyword_Sym(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Sym;
-				}
-
 				//---scoping
 
 				//checks for a scoping
@@ -60,6 +53,14 @@ namespace PPC::Lexer::Subpass
 				}
 
 				//---memory offsets
+
+				/*
+				else if (PPC::Data::MemoryOffset::IsASMKeyword_MemoryOffset(generalTokens[i].data.c_str(), memoryOffsetType))
+				{
+					generalTokens[i].type = PPC::Stage1::TokenType::Keyword_MemoryOffset;
+					generalTokens[i].memoryOffsetType = memoryOffsetType;
+				}
+				*/
 
 				//if it's a sda21 memory offset keyword
 				else if (Subpass2_IsKeyword_MemoryOffset_Sda21(generalTokens[i].data.c_str()))

@@ -11,9 +11,17 @@ namespace PPC::Data::ObjectType
 	{
 		None = 0,
 
+		//for symbols
 		Label_Sym,
 		Function,
-		Object
+		Object,
+
+		//for ASM
+		Object_Start,
+		Object_End,
+
+		Func_Start,
+		Func_End
 	};
 
 	//converts a string keyword to a type
@@ -29,7 +37,38 @@ namespace PPC::Data::ObjectType
 		return ObjectType::None;
 	}
 
-	//checks for a .sym this is a called a label in the symbols....for some reason
-	static inline bool CheckForASMKeyword_Sym(const char* str) { return (!strcmp(str, ".sym") ? true : false); }
+	//check for ASM Object Keyword
+	static inline bool IsASMObjectKeyword(const char* str, ObjectType& type)
+	{
+		if (!strcmp(str, ".sym"))
+		{
+			type = ObjectType::Label_Sym;
+			return true;
+		}
 
+		else if (!strcmp(str, ".obj"))
+		{
+			type = ObjectType::Object_Start;
+			return true;
+		}
+		else if (!strcmp(str, ".endobj"))
+		{
+			type = ObjectType::Object_End;
+			return true;
+		}
+
+		else if (!strcmp(str, ".fn"))
+		{
+			type = ObjectType::Func_Start;
+			return true;
+		}
+		else if (!strcmp(str, ".endfn"))
+		{
+			type = ObjectType::Func_End;
+			return true;
+		}
+
+		type = ObjectType::None;
+		return false;
+	}
 }

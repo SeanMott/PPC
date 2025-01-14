@@ -98,15 +98,7 @@ static inline PPC::Stage1::Token Subpass1_GenerateToken_StringLiteral(PPC::Stage
 	return t;
 }
 
-//is it the start of a function
-static inline bool Subpass1_IsKeyword_ObjectDef_Start(const char* key) { return (!strcmp(key, ".obj") ? true : false); }
-//is it the end of a function
-static inline bool Subpass1_IsKeyword_ObjectDef_End(const char* key) { return (!strcmp(key, ".endobj") ? true : false); }
 
-//is it the start of a object
-static inline bool Subpass1_IsKeyword_FunctionDef_Start(const char* key) { return (!strcmp(key, ".fn") ? true : false); }
-//is it the end of a object
-static inline bool Subpass1_IsKeyword_FunctionDef_End(const char* key) { return (!strcmp(key, ".endfn") ? true : false); }
 
 //makes a word
 static inline PPC::Stage1::Token Subpass1_GenerateTokenFromWord(std::string& word, PPC::Stage1::Parser* parser)
@@ -130,34 +122,8 @@ static inline PPC::Stage1::Token Subpass1_GenerateTokenFromWord(std::string& wor
 	t.charCount = parser->charCount;
 
 	//we check for extra token specifics so we can multithread it
-
-	//if it's a start of a function keyword
-	if (Subpass1_IsKeyword_FunctionDef_Start(t.data.c_str()))
-	{
-		t.type = PPC::Stage1::TokenType::Keyword;
-		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncStart;
-	}
-
-	//if it's the end of a function keyword
-	else if (Subpass1_IsKeyword_FunctionDef_End(t.data.c_str()))
-	{
-		t.type = PPC::Stage1::TokenType::Keyword;
-		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_FuncEnd;
-	}
-
-	//if it's a start of a object keyword
-	else if (Subpass1_IsKeyword_ObjectDef_Start(t.data.c_str()))
-	{
-		t.type = PPC::Stage1::TokenType::Keyword;
-		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjStart;
-	}
-
-	//if it's the end of a object keyword
-	else if (Subpass1_IsKeyword_ObjectDef_End(t.data.c_str()))
-	{
-		t.type = PPC::Stage1::TokenType::Keyword;
-		t.specificType = PPC::Stage1::SpecificTokenType::Keyword_ObjEnd;
-	}
+	if (PPC::Data::ObjectType::IsASMObjectKeyword(t.data.c_str(), t.objType))
+		t.type = PPC::Stage1::TokenType::Keyword_Object;
 
 	word = "";
 	return t;
