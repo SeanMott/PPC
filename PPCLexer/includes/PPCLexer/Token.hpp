@@ -23,6 +23,8 @@ namespace PPC::Stage1
 
 		Keyword, //a keyword
 
+		Keyword_Scope, //defines a scope keyword
+
 		Datatype, //a datatype
 
 		Register, //a register
@@ -52,12 +54,7 @@ namespace PPC::Stage1
 		Keyword_ObjStart, //defines a object start definition token
 		Keyword_ObjEnd, //defines a object end definition token
 
-		//scope
-		Keyword_Scope_Global,
-		Keyword_Scope_Local,
-		Keyword_Scope_Weak,
-		Keyword_Scope_Hidden,
-		Keyword_Scope_Sym,
+		Keyword_Sym, //defines a sym label
 
 		//memory offset
 		Keyword_MemoryOffset_Sda21,
@@ -83,6 +80,10 @@ namespace PPC::Stage1
 		size_t lineCount = 1, charCount = 0;
 		TokenType type = TokenType::Count; //the general type
 		SpecificTokenType specificType = SpecificTokenType::Count; //the specific type
+
+		//specific type bits
+		Data::Scope::ScopeType scopeType = Data::Scope::ScopeType::None;
+
 		std::string data = "";
 
 		//prints the token

@@ -14,7 +14,6 @@
 #include <PPCLexer/Data/Datatypes.hpp>
 #include <PPCLexer/Data/MemoryOffset.hpp>
 #include <PPCLexer/Data/PPCInstructions.hpp>
-#include <PPCLexer/Data/Scoping.hpp>
 
 #include <PPCLexer/Data/GeneralKeywords.hpp>
 
@@ -32,6 +31,8 @@ namespace PPC::Lexer::Subpass
 			uint32_t instArrayIndex = 0;
 			PPC::Data::ASM::EInstruction ppcInstrct;
 
+			PPC::Data::Scope::ScopeType scopeType = PPC::Data::Scope::ScopeType::None;
+
 			//if it's a general token
 			if (generalTokens[i].type == Stage1::TokenType::Genaric)
 			{
@@ -42,41 +43,20 @@ namespace PPC::Lexer::Subpass
 					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Alignment;
 				}
 
-				//---scoping
-
-				//if it's a global scope keyword
-				else if (Subpass2_IsKeyword_Scope_Global(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Global;
-				}
-
-				//if it's a local scope keyword
-				else if (Subpass2_IsKeyword_Scope_Local(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Local;
-				}
-
-				//if it's a weak scope keyword
-				else if (Subpass2_IsKeyword_Scope_Weak(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Weak;
-				}
-
-				//if it's a hidden scope keyword
-				else if (Subpass2_IsKeyword_Scope_Hidden(generalTokens[i].data.c_str()))
-				{
-					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Hidden;
-				}
-
-				//if it's a sym scope keyword
+				//if it's a sym object type keyword
 				else if (Data::ObjectType::CheckForASMKeyword_Sym(generalTokens[i].data.c_str()))
 				{
 					generalTokens[i].type = PPC::Stage1::TokenType::Keyword;
-					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Scope_Sym;
+					generalTokens[i].specificType = PPC::Stage1::SpecificTokenType::Keyword_Sym;
+				}
+
+				//---scoping
+
+				//checks for a scoping
+				else if (PPC::Data::Scope::IsScopeKeyword(generalTokens[i].data.c_str(), scopeType))
+				{
+					generalTokens[i].type = PPC::Stage1::TokenType::Keyword_Scope;
+					generalTokens[i].scopeType = scopeType;
 				}
 
 				//---memory offsets

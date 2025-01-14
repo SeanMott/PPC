@@ -35,4 +35,11 @@ namespace PPC::Data::Scope
 
 		return ScopeType::None;
 	}
+
+	//checks if it's a scope keyword
+	static inline bool IsScopeKeyword(const std::string& str, ScopeType& type)
+	{
+		type = ConvertDTKKeywordStringToScopeType(str);
+		return (type != ScopeType::None ? true : false);
+	}
 }

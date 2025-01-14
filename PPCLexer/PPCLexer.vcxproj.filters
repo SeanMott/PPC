@@ -51,9 +51,6 @@
     <ClInclude Include="includes\PPCLexer\Data\PPCInstructions.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Data\Scoping.hpp">
-      <Filter>includes\PPCLexer\Data</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Data\SpecialRegister.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
