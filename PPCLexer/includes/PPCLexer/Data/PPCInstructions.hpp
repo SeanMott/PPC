@@ -1246,26 +1246,26 @@ namespace PPC::Data::ASM
 		// VMX instructions
 		"lvebx",
 		"lvehx",
-		"lvewx",		//+
-		"lvlx",		//+
-		"lvlxl",		//+
-		"lvrx",		//+
-		"lvrxl",		//+
+		"lvewx",	
+		"lvlx",		
+		"lvlxl",	
+		"lvrx",		
+		"lvrxl",	
 		"lvsl",
 		"lvsr",
-		"lvx",			//+
-		"lvxl",		//+
+		"lvx",		
+		"lvxl",		
 		"mfvscr",
 		"mtvscr",
 		"stvebx",
 		"stvehx",
-		"stvewx",		//+
-		"stvlx",		//+
-		"stvlxl",		//+
-		"stvrx",		//+
-		"stvrxl",		//+
-		"stvx",		//+
-		"stvxl",		//+
+		"stvewx",	
+		"stvlx",	
+		"stvlxl",	
+		"stvrx",	
+		"stvrxl",	
+		"stvx",		
+		"stvxl",	
 		"lhbrx",
 		"lwbrx",
 		"sthbrx",
@@ -1275,7 +1275,7 @@ namespace PPC::Data::ASM
 		"stswi",
 		"stswx",
 		"vaddcuw",
-		"vaddfp",		//+
+		"vaddfp",	
 		"vaddsbs",
 		"vaddshs",
 		"vaddsws",
@@ -1285,22 +1285,22 @@ namespace PPC::Data::ASM
 		"vadduhs",
 		"vadduwm",
 		"vadduws",
-		"vand",		//+
-		"vandc",		//+
+		"vand",		
+		"vandc",	
 		"vavgsb",
 		"vavgsh",
 		"vavgsw",
 		"vavgub",
 		"vavguh",
 		"vavguw",
-		"vcfpsxws",	//+
-		"vcfpuxws",	//+
-		"vcsxwfp", //+
-		"vcuxwfp", //+
-		"vctsxs",	//+
-		"vctuxs",		//+
-		"vcfsx",	//+
-		"vcfux",	//+
+		"vcfpsxws",	
+		"vcfpuxws",	
+		"vcsxwfp", 
+		"vcuxwfp", 
+		"vctsxs",	
+		"vctuxs",	
+		"vcfsx",	
+		"vcfux",	
 		"vcmpbfp",
 		"vcmpbfp.",
 		"vcmpeqfp",
@@ -1327,18 +1327,18 @@ namespace PPC::Data::ASM
 		"vcmpgtuh.",
 		"vcmpgtuw",
 		"vcmpgtuw.",
-		"vexptefp",	//+
-		"vlogefp",		//+
+		"vexptefp",	
+		"vlogefp",		
 		"vmaddcfp128",
-		"vmaddfp",		//+
-		"vmaxfp",		//+
+		"vmaddfp",		
+		"vmaxfp",		
 		"vmaxsb",
 		"vmaxsh",
 		"vmaxsw",
 		"vmaxub",
 		"vmaxuh",
 		"vmaxuw",
-		"vminfp",		//+
+		"vminfp",		
 		"vminsb",
 		"vminsh",
 		"vminsw",
@@ -1347,62 +1347,62 @@ namespace PPC::Data::ASM
 		"vminuw",
 		"vmrghb",
 		"vmrghh",
-		"vmrghw",		//+
+		"vmrghw",		
 		"vmrglb",
 		"vmrglh",
-		"vmrglw",		//+
-		"vdot3fp",		//+
-		"vdot4fp",		//+
+		"vmrglw",		
+		"vdot3fp",		
+		"vdot4fp",		
 		"vmulfp128",
-		"vnmsubfp",	//+
-		"vnor",		//+
-		"vor",			//+
-		"vperm",		//+
+		"vnmsubfp",	
+		"vnor",		
+		"vor",			
+		"vperm",		
 		"vpermwi128",
 		"vpkd3d128",
 		"vpkpx",
-		"vpkshss",		//+
-		"vpkshus",		//+
-		"vpkswss",		//+
-		"vpkswus",		//+
-		"vpkuhum",		//+
-		"vpkuhus",		//+
-		"vpkuwum",		//+
-		"vpkuwus",		//+
-		"vrefp",		//+
+		"vpkshss",		
+		"vpkshus",		
+		"vpkswss",		
+		"vpkswus",		
+		"vpkuhum",		
+		"vpkuhus",		
+		"vpkuwum",		
+		"vpkuwus",		
+		"vrefp",		
 		"rfi",
-		"vrfim",		//+
-		"vrfin",		//+
-		"vrfip",		//+
-		"vrfiz",		//+
+		"vrfim",		
+		"vrfin",		
+		"vrfip",		
+		"vrfiz",		
 		"vrlb",
 		"vrlh",
 		"vrlimi128",
-		"vrlw",		//+
-		"vrsqrtefp",	//+
-		"vsel",		//+
+		"vrlw",		
+		"vrsqrtefp",	
+		"vsel",		
 		"vsl",
 		"vslb",
-		"vsldoi",		//+
+		"vsldoi",	
 		"vslh",
-		"vslo",		//+
-		"vslw",		//+
+		"vslo",	
+		"vslw",	
 		"vspltb",
 		"vsplth",
 		"vspltisb",
 		"vspltish",
-		"vspltisw",	//+
-		"vspltw",		//+
+		"vspltisw",	
+		"vspltw",
 		"vsr",
 		"vsrab",
 		"vsrah",
-		"vsraw",		//+
+		"vsraw",
 		"vsrb",
 		"vsrh",
-		"vsro",		//+
-		"vsrw",		//+
+		"vsro",
+		"vsrw",
 		"vsubcuw",
-		"vsubfp",		//+
+		"vsubfp",
 		"vsubsbs",
 		"vsubshs",
 		"vsubsws",
@@ -1414,12 +1414,12 @@ namespace PPC::Data::ASM
 		"vsubuws",
 		"vupkd3d128",
 		"vupkhpx",
-		"vupkhsb",		//+
-		"vupkhsh",	//+
+		"vupkhsb",
+		"vupkhsh",
 		"vupklpx",
-		"vupklsb",		//+
-		"vupklsh",		//+
-		"vxor",		//+
+		"vupklsb",
+		"vupklsh",
+		"vxor",
 
 		//extra
 		"icbi",
