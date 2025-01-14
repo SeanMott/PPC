@@ -6,9 +6,7 @@ Parses DTK Symbols and Splits into PPC Map files
 
 #include <PPCLib/SymbolMap/PPCSymbol.hpp>
 
-#include <filesystem>
 #include <vector>
-#include <fstream>
 
 //defines a DTK Symbol value and name parameter pair
 struct DTKSymbolParameterValueNamePair
@@ -168,12 +166,7 @@ int main(int args, const char* argv[])
 	const std::filesystem::path ppcMap = "C:/Decomps/TOD-Decomp/PPCDTK/PureDTKSymbols.ppcmap";
 
 	//generates map
-	nlohmann::json ppcMapSymbols = nlohmann::json::array();
-	for (size_t i = 0; i < lineCount; ++i)
-		ppcMapSymbols.emplace_back(nlohmann::json{ {"symbolName", symbols[i].identifier}, {"split", symbols[i].split}, {"address", symbols[i].address},
-			{"size", symbols[i].size}, {"datatype", symbols[i].datatype}, {"scope", symbols[i].scope}});
-	std::ofstream file(ppcMap);
-	file << ppcMapSymbols.dump();
+	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols);
 	
 	getchar();
 	return 0;
