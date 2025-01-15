@@ -64,55 +64,61 @@ static inline void GeneratePureDTKTokenStream(const std::filesystem::path& ASMFi
 	}
 }
 
+//gets every assembly file in a directory
+static inline std::vector<std::filesystem::path> GetAllASMFilesInDirectory(const std::filesystem::path& dir)
+{
+	const std::string ASMDirectory = dir.string();
+	std::vector<std::filesystem::path> files; files.reserve(5);
+	for (const auto& entry : std::filesystem::directory_iterator(ASMDirectory))
+	{
+		if (entry.is_regular_file() && entry.path().extension() == ".s")
+			files.emplace_back(entry);
+	}
+	return files;
+}
+
+//parses a assembly file into a PPC Token
+static std::vector<PPC::Stage1::Token> ParseDTKAssemblyIntoTokenStream(const std::filesystem::path& file, const std::vector<PPC::SymbolMap::PPCSymbol>& symbols,
+	const std::filesystem::path& PPCTokenStreamOutputDir)
+{
+	const std::string filename = file.stem().string();
+
+	//we always generate a Pure DTK Token Stream before we start making changes that won't let us have normal files
+	std::vector<PPC::Stage1::Token> tokens;
+	GeneratePureDTKTokenStream(file, tokens, symbols);
+
+	//strips and invalid tokens
+	tokens = PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokens);
+
+	//strips sector content and comments
+	tokens = PPC::Lexer::Subpass::ExtraSubpass_StripCommentsAndSectors(tokens);
+
+	//dumps the token stream of raw DTK ASM
+	PPC::Stage1::DumpTokenStream(PPCTokenStreamOutputDir.string() + "/" + filename + ".ppctokens", tokens);
+}
+
+//gets every token stream file in a directory
+static inline std::vector<std::filesystem::path> GetAllPPCTokenFilesInDirectory(const std::filesystem::path& dir)
+{
+	const std::string ASMDirectory = dir.string();
+	std::vector<std::filesystem::path> files; files.reserve(5);
+	for (const auto& entry : std::filesystem::directory_iterator(ASMDirectory))
+	{
+		if (entry.is_regular_file() && entry.path().extension() == ".ppctokens")
+			files.emplace_back(entry);
+	}
+	return files;
+}
+
 //entry point
 int main()
 {
 	//loads the symbol files
 	std::vector<PPC::SymbolMap::PPCSymbol> symbols = PPC::SymbolMap::LoadPPCSymbolMap("C:/Decomps/TOD-Decomp/RawASM/DTKSymbolsNSplits/PureDTKSymbols.ppcmap");
 
-	//gets the ASM files
-	const std::string ASMDirectory = "C:/Decomps/TOD-Decomp/RawASM/asm/";
-	std::vector<PPC::Lexer::LexedFile> files; files.reserve(5);
-	for (const auto& entry : std::filesystem::directory_iterator(ASMDirectory))
-	{
-		if (entry.is_regular_file() && entry.path().extension() == ".s") 
-		{
-			PPC::Lexer::LexedFile f;
-			f.ASMFile = entry.path();
-			f.tokens.reserve(20);
-			files.emplace_back(f);
-		}
-	}
+	//gets the PPC Token files
+	const std::vector<std::filesystem::path> files = GetAllPPCTokenFilesInDirectory("C:/Decomps/TOD-Decomp/TypedASM/asm");
 
-	for (size_t i = 0; i < files.size(); ++i)
-	{
-		const std::string filename = files[i].ASMFile.stem().string();
-
-		//we always generate a Pure DTK Token Stream before we start making changes that won't let us have normal files
-		std::vector<PPC::Stage1::Token> tokens;
-		GeneratePureDTKTokenStream(files[i].ASMFile, tokens, symbols);
-
-		//strips and invalid tokens
-		tokens = PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokens);
-
-		//strips sector content and comments
-		tokens = PPC::Lexer::Subpass::ExtraSubpass_StripCommentsAndSectors(tokens);
-
-		//dumps the token stream of raw DTK ASM
-		PPC::Stage1::DumpTokenStream(std::string("C:/Decomps/TOD-Decomp/TypedASM/asm/") + filename + ".ppctokens", tokens);
-
-		//splits every function and object defintion into their own subtrees
-
-		//compress the tokens, generating the jump labels and alignment
-
-		//generates the lexed file and gets the aligment
-
-		//runs the second pass || gives every token fine typing
-
-		fmt::print("File: {}\n\n\n", files[i].ASMFile.string());
-		for (size_t t = 0; t < tokens.size(); ++t)
-			tokens[t].Print();
-	}
 
 	getchar();
 	return 0;
