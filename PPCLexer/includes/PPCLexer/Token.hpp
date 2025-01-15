@@ -3,6 +3,7 @@
 //defines a Token
 
 #include <PPCLib/Logger.hpp>
+#include <PPCLibVenders/json.hpp>
 
 #include <PPCLib/Data/ObjectType.hpp>
 #include <PPCLib/Data/Scope.hpp>
@@ -22,7 +23,9 @@ namespace PPC::Stage1
 		//this is used in earlier subpasses to handle stuff we don't want to parse yet.
 		//we parse it out at a later pass when there's less to worry about
 
-		Identifier, //the identifier
+		Identifier, //the general identifier
+
+		Symbol_ID, //the symbol identifier ID
 
 		Keyword, //a keyword
 
@@ -79,8 +82,18 @@ namespace PPC::Stage1
 		Data::MemoryOffset::MemoryOffsetType memoryOffsetType = Data::MemoryOffset::MemoryOffsetType::None;
 		Data::ASM::EInstruction instruction = Data::ASM::EInstruction::eInstruction_nop; //the current instruction
 		Data::Datatype::DTKDatatypeType datatype = Data::Datatype::DTKDatatypeType::None;
+		uint64_t symbolID = 0; //the symbol ID
 
 		std::string data = "";
+
+		//generates a entry in a JSON Token Stream
+		inline nlohmann::json GenerateJSONArrayEntry() const
+		{
+			return nlohmann::json{ {"type", type}, {"lineCount", lineCount}, {"charCount", charCount},
+				{"data", data}, {"specificType", specificType},
+				{"scopeType", scopeType}, {"objectType", objType}, {"memoryOffset", memoryOffsetType},
+				{"instruction", instruction}, {"datatype", datatype}, {"symbolID", symbolID} };
+		}
 
 		//prints the token
 		inline void Print() const
@@ -111,6 +124,10 @@ namespace PPC::Stage1
 				fmt::print(fmt::fg(fmt::color::azure), "Line: {}, Char: {} || String Literal || \"{}\"\n", lineCount, charCount, data);
 				break;
 
+			case TokenType::Symbol_ID:
+				fmt::print(fmt::fg(fmt::color::purple), "Line: {}, Char: {} || Symbol || \"{}\" - ID: {}\n", lineCount, charCount, data, symbolID);
+				break;
+
 			case TokenType::Instruction:
 				fmt::print(fmt::fg(fmt::color::orange), "Line: {}, Char: {} || Instruction {}\n", lineCount, charCount, data);
 				break;
@@ -122,6 +139,45 @@ namespace PPC::Stage1
 			}
 		}
 	};
+
+	//dumps a stream of tokens
+	static inline void DumpTokenStream(const std::filesystem::path& tokenStreamFP, const std::vector<Token>& tokens)
+	{
+		nlohmann::json tokenStream = nlohmann::json::array();
+		for (size_t i = 0; i < tokens.size(); ++i)
+			tokenStream.emplace_back(tokens[i].GenerateJSONArrayEntry());
+		std::ofstream file(tokenStreamFP);
+		file << tokenStream.dump();
+	}
+
+	//loads a stream of tokens from a file
+	static inline std::vector<Token> LoadTokenStream(const std::filesystem::path& tokenStreamFP)
+	{
+		//loads map
+		std::ifstream file(tokenStreamFP);
+		nlohmann::json rawTokenStream;
+		file >> rawTokenStream;
+
+		//parse into symbol array
+		std::vector<Token> tokenStream; tokenStream.reserve(15);
+		for (auto& rawToken : rawTokenStream)
+		{
+			Token* t = &tokenStream.emplace_back(Token());
+			t->type = rawToken.at("type").get<TokenType>();
+			t->lineCount = rawToken.at("lineCount").get<size_t>();
+			t->charCount = rawToken.at("charCount").get<size_t>();
+			t->data = rawToken.at("data").get<std::string>();
+			t->specificType = rawToken.at("specificType").get<SpecificTokenType>();
+			t->scopeType = rawToken.at("scopeType").get<Data::Scope::ScopeType>();
+			t->objType = rawToken.at("objectType").get<Data::ObjectType::ObjectType>();
+			t->memoryOffsetType = rawToken.at("memoryOffset").get<Data::MemoryOffset::MemoryOffsetType>();
+			t->instruction = rawToken.at("instruction").get<Data::ASM::EInstruction>();
+			t->datatype = rawToken.at("datatype").get<Data::Datatype::DTKDatatypeType>();
+			t->symbolID = rawToken.at("symbolID").get<uint64_t>();
+		}
+
+		return tokenStream;
+	}
 
 	//defines a single line expresstion
 	struct LexedSingleLineExpresstion

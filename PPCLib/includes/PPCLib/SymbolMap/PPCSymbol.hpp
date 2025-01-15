@@ -47,4 +47,26 @@ namespace PPC::SymbolMap
 	}
 
 	//loads a stream of symbols from a file
+	static inline std::vector<PPCSymbol> LoadPPCSymbolMap(const std::filesystem::path& ppcMap)
+	{
+		//loads map
+		std::ifstream file(ppcMap);
+		nlohmann::json rawSymbolData;
+		file >> rawSymbolData;
+
+		//parse into symbol array
+		std::vector<PPCSymbol> symbols; symbols.reserve(15);
+		for (auto& rawSymbol : rawSymbolData)
+		{
+			PPCSymbol* symbol = &symbols.emplace_back(PPCSymbol());
+			symbol->identifier = rawSymbol.at("symbolName").get<std::string>();
+			symbol->split = rawSymbol.at("split").get<std::string>();
+			symbol->address = rawSymbol.at("address").get<std::string>();
+			symbol->size = rawSymbol.at("size").get<std::string>();
+			symbol->datatype = rawSymbol.at("datatype").get<std::string>();
+			symbol->scope = rawSymbol.at("scope").get<PPC::Data::Scope::ScopeType>();
+		}
+
+		return symbols;
+	}
 }
