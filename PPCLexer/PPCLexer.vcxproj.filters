@@ -27,9 +27,6 @@
     <ClInclude Include="includes\PPCLexer\Data\ConditionRegister.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Data\Datatypes.hpp">
-      <Filter>includes\PPCLexer\Data</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Data\FloatingRegisters.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>

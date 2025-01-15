@@ -7,6 +7,8 @@
 #include <PPCLib/Data/ObjectType.hpp>
 #include <PPCLib/Data/Scope.hpp>
 #include <PPCLib/Data/MemoryOffset.hpp>
+#include <PPCLib/Data/Datatypes.h>
+#include <PPCLexer/Data/PPCInstructions.hpp>
 
 #include <vector>
 #include <fstream>
@@ -75,6 +77,8 @@ namespace PPC::Stage1
 		Data::Scope::ScopeType scopeType = Data::Scope::ScopeType::None;
 		Data::ObjectType::ObjectType objType = Data::ObjectType::ObjectType::None;
 		Data::MemoryOffset::MemoryOffsetType memoryOffsetType = Data::MemoryOffset::MemoryOffsetType::None;
+		Data::ASM::EInstruction instruction = Data::ASM::EInstruction::eInstruction_nop; //the current instruction
+		Data::Datatype::DTKDatatypeType datatype = Data::Datatype::DTKDatatypeType::None;
 
 		std::string data = "";
 

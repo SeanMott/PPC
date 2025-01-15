@@ -11,7 +11,6 @@
 #include <PPCLexer/Data/SpecialRegister.hpp>
 #include <PPCLexer/Data/GraphicsQuantizedRegisters.hpp>
 
-#include <PPCLexer/Data/Datatypes.hpp>
 #include <PPCLexer/Data/PPCInstructions.hpp>
 
 #include <PPCLexer/Data/GeneralKeywords.hpp>
@@ -32,6 +31,7 @@ namespace PPC::Lexer::Subpass
 
 			PPC::Data::Scope::ScopeType scopeType = PPC::Data::Scope::ScopeType::None;
 			PPC::Data::MemoryOffset::MemoryOffsetType memoryOffsetType = PPC::Data::MemoryOffset::MemoryOffsetType::None;
+			PPC::Data::Datatype::DTKDatatypeType datatype = PPC::Data::Datatype::DTKDatatypeType::None;
 
 			//if it's a general token
 			if (generalTokens[i].type == Stage1::TokenType::Genaric)
@@ -102,15 +102,17 @@ namespace PPC::Lexer::Subpass
 				//---other
 
 				//if it's a datatype
-				else if (Subpass2_IsDatatype(generalTokens[i].data.c_str()))
+				else if (Data::Datatype::IsASMKeyword_Datatype(generalTokens[i].data.c_str(), datatype))
 				{
 					generalTokens[i].type = PPC::Stage1::TokenType::Datatype;
+					generalTokens[i].datatype = datatype;
 				}
 
 				//if it's assembly instruction
 				else if (PPC::Data::ASM::IsASMInstructionStr(generalTokens[i].data.c_str(), instArrayIndex, ppcInstrct))
 				{
 					generalTokens[i].type = PPC::Stage1::TokenType::Instruction;
+					generalTokens[i].instruction = ppcInstrct;
 				}
 
 				//if it's a digit literal
