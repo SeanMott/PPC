@@ -140,9 +140,14 @@ namespace PPC::Stage1
 		}
 	};
 
+	//defines the token stream file extension
+	#define PPC_TOKEN_STREAM_FILE_EXTENSION ".ppctokens"
+
 	//dumps a stream of tokens
 	static inline void DumpTokenStream(const std::filesystem::path& tokenStreamFP, const std::vector<Token>& tokens)
 	{
+		//checks for a valid extension
+
 		nlohmann::json tokenStream = nlohmann::json::array();
 		for (size_t i = 0; i < tokens.size(); ++i)
 			tokenStream.emplace_back(tokens[i].GenerateJSONArrayEntry());
