@@ -5,15 +5,15 @@
 
 #include <PPCLexer/Token.hpp>
 
-#include <PPCLexer/Data/ConditionRegister.hpp>
-#include <PPCLexer/Data/IntegerRegister.hpp>
-#include <PPCLexer/Data/FloatingRegisters.hpp>
-#include <PPCLexer/Data/SpecialRegister.hpp>
-#include <PPCLexer/Data/GraphicsQuantizedRegisters.hpp>
+#include <PPCLib/Data/Registers/ConditionRegister.hpp>
+#include <PPCLib/Data/Registers/IntegerRegister.hpp>
+#include <PPCLib/Data/Registers/FloatingRegisters.hpp>
+#include <PPCLib/Data/Registers/SpecialRegister.hpp>
+#include <PPCLib/Data/Registers/GraphicsQuantizedRegisters.hpp>
 
 #include <PPCLib/Data/PPCInstructions.hpp>
 
-#include <PPCLexer/Data/GeneralKeywords.hpp>
+#include <PPCLib/Data/GeneralKeywords.hpp>
 
 namespace PPC::Lexer::Subpass
 {

@@ -47,6 +47,13 @@
     </ClInclude>
     <ClInclude Include="includes\PPCLib\SymbolMap\SymbolTypes.hpp" />
     <ClInclude Include="includes\PPCLib\Data\PPCInstructions.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\GeneralKeywords.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\Operators.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\Registers\ConditionRegister.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\Registers\FloatingRegisters.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\Registers\GraphicsQuantizedRegisters.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\Registers\IntegerRegister.hpp" />
+    <ClInclude Include="includes\PPCLib\Data\Registers\SpecialRegister.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">
