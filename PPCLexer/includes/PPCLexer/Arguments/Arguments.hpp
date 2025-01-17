@@ -9,8 +9,19 @@ namespace PPC::Lexer::Settings
 	//defines a flag for setting the lexer
 #define PPC_LEXER_ARGUMENT_STRING_MODE "-mode"
 
+	//defines a value for the mode flag
+#define PPC_LEXER_ARGUMENT_STRING_MODE_VALUE_PURE "Pure"
+#define PPC_LEXER_ARGUMENT_STRING_MODE_VALUE_PUREASM "PureAsm"
+#define PPC_LEXER_ARGUMENT_STRING_MODE_VALUE_RECOMP "Recomp"
+
 	//sets the input type
 #define PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE "-input"
+
+	//defines a value for the input flag
+#define PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_ASM1 "asm"
+#define PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_ASM2 "Asm"
+#define PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_TOKEN1 "token"
+#define PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_TOKEN2 "Token"
 
 	//defines a flag for loading a whole director
 #define PPC_LEXER_ARGUMENT_STRING_LOAD_DIRECTORY "-dir"
@@ -26,6 +37,8 @@ namespace PPC::Lexer::Settings
 
 	//makes the token streams pretty
 #define PPC_LEXER_ARGUMENT_STRING_PRETTY "-pretty"
+
+	//prints the help page
 
 	//parses the arguments
 	static inline ArgumentSettings ParseArguments(const int args, const char* argv[])
@@ -58,21 +71,21 @@ namespace PPC::Lexer::Settings
 				const char* m = argv[i];
 
 				//if Pure DTK
-				if (!strcmp(m, "Pure"))
+				if (!strcmp(m, PPC_LEXER_ARGUMENT_STRING_MODE_VALUE_PURE))
 				{
 					fmt::print("Mode Set: Pure\n");
 					settings.mode = Settings::LexerMode::PureDTK;
 				}
 
 				//if it's Pure and we're regening the ASM
-				else if (!strcmp(m, "PureASM"))
+				else if (!strcmp(m, PPC_LEXER_ARGUMENT_STRING_MODE_VALUE_PUREASM))
 				{
 					fmt::print("Mode Set: Pure ASM\n");
 					settings.mode = Settings::LexerMode::PureDTK_GenASM;
 				}
 
 				//if recomp
-				else if (!strcmp(m, "Recomp"))
+				else if (!strcmp(m, PPC_LEXER_ARGUMENT_STRING_MODE_VALUE_RECOMP))
 				{
 					fmt::print("Mode Set: Recomp\n");
 					settings.mode = Settings::LexerMode::Recomp;
@@ -97,14 +110,14 @@ namespace PPC::Lexer::Settings
 				const char* m = argv[i];
 
 				//if ASM
-				if (!strcmp(m, "asm") || !strcmp(m, "ASM"))
+				if (!strcmp(m, PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_ASM1) || !strcmp(m, PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_ASM2))
 				{
 					fmt::print("Input Mode Set: ASM\n");
 					settings.input.type = InputType::ASM;
 				}
 
 				//if it's token streams
-				else if (!strcmp(m, "token"))
+				else if (!strcmp(m, PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_TOKEN1) || !strcmp(m, PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE_VALUE_TOKEN2))
 				{
 					fmt::print("Input Mode Set: Token Streams\n");
 					settings.input.type = InputType::TokenStream;
