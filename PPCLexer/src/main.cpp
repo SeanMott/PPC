@@ -12,6 +12,7 @@ PPC Lexer that converts DTK Raw Assembly into a stream of tokens
 
 #include <PPCLib/SymbolMap/PPCSymbol.hpp>
 
+#include <PPCLexer/Arguments/Arguments.hpp>
 #include <PPCLexer/FileInputs/LoadInput.hpp>
 
 //generate a Pure DTK Token Stream
@@ -70,9 +71,18 @@ static std::vector<PPC::Stage1::Token> ParseDTKAssemblyIntoTokenStream(const std
 //entry point
 int main(int args, const char* argv[])
 {
-	//if no arguments pass a help screen
+	////if no arguments pass a help screen
+	//if (args < 2)
+	//{
+	//	return 1;
+	//}
 
 	//parse the arguments
+	PPC::Lexer::Settings::ArgumentSettings settings = PPC::Lexer::Settings::ParseArguments(args, argv);
+
+	//force certain settings to the compiler for testing right now
+
+	//execute the lexer
 
 	//loads the symbol files
 	//std::vector<PPC::SymbolMap::PPCSymbol> symbols = PPC::SymbolMap::LoadPPCSymbolMap("C:/Decomps/TOD-Decomp/RawASM/DTKSymbolsNSplits/PureDTKSymbols.ppcmap");
@@ -80,7 +90,5 @@ int main(int args, const char* argv[])
 	//gets the PPC Token files
 	//const std::vector<std::filesystem::path> files = GetAllPPCTokenFilesInDirectory("C:/Decomps/TOD-Decomp/TypedASM/asm");
 
-
-	getchar();
 	return 0;
 }

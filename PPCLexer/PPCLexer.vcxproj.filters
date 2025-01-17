@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="includes\PPCLexer\CompilerSettings.hpp">
-      <Filter>includes\PPCLexer</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Data\ConditionRegister.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
@@ -40,9 +37,6 @@
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLexer\Data\Operators.hpp">
-      <Filter>includes\PPCLexer\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Data\PPCInstructions.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLexer\Data\SpecialRegister.hpp">

@@ -11,7 +11,7 @@
 #include <PPCLexer/Data/SpecialRegister.hpp>
 #include <PPCLexer/Data/GraphicsQuantizedRegisters.hpp>
 
-#include <PPCLexer/Data/PPCInstructions.hpp>
+#include <PPCLib/Data/PPCInstructions.hpp>
 
 #include <PPCLexer/Data/GeneralKeywords.hpp>
 

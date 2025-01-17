@@ -24,8 +24,11 @@ namespace PPC::Lexer::Settings
 	//if no name is set, it will just use the name of the file it inputed
 
 	//parses the arguments
-	static inline void ParseArguments(ArgumentSettings& settings, const int args, const char* argv[])
+	static inline ArgumentSettings ParseArguments(const int args, const char* argv[])
 	{
-		//
+		ArgumentSettings settings;
+
+
+		return settings;
 	}
 }

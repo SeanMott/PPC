@@ -9,7 +9,7 @@
 #include <PPCLib/Data/Scope.hpp>
 #include <PPCLib/Data/MemoryOffset.hpp>
 #include <PPCLib/Data/Datatypes.h>
-#include <PPCLexer/Data/PPCInstructions.hpp>
+#include <PPCLib/Data/PPCInstructions.hpp>
 
 #include <vector>
 #include <fstream>
