@@ -73,7 +73,9 @@ int main(int args, const char* argv[])
 	if (args < 2)
 	{
 		fmt::print("PPC Lexer || Created by Sean 'Jas' Mott || Version: <put stuff here>\n");
-		fmt::print("PPC Lexer is a tool for importing DTK Assembly and exporting Token Streams used by the rest of the PPC Toolchain.\n");
+		fmt::print("PPC Lexer is a tool for importing DTK Assembly and exporting Token Streams used by the rest of the PPC Toolchain.\n\n");
+
+		PPC::Lexer::Settings::PrintArgumentHelpScreen();
 
 		return 1;
 	}
