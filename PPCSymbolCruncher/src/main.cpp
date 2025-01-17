@@ -321,6 +321,31 @@ int main(int args, const char* argv[])
 					pureByteTypes++;
 					symbols[i].identifier = "LBL_STRUCT_BYTE_" + std::to_string(pureByteTypes);
 					break;
+
+				case PPC::SymbolMap::SymbolMapType::Byte2:
+					pureByte2Types++;
+					symbols[i].identifier = "LBL_STRUCT_BYTE2_" + std::to_string(pureByte2Types);
+					break;
+
+				case PPC::SymbolMap::SymbolMapType::Byte4:
+					pureByte4Types++;
+					symbols[i].identifier = "LBL_STRUCT_BYTE4_" + std::to_string(pureByte4Types);
+					break;
+
+				case PPC::SymbolMap::SymbolMapType::String:
+					pureStrTypes++;
+					symbols[i].identifier = "LBL_STRUCT_STRING_" + std::to_string(pureStrTypes);
+					break;
+
+				case PPC::SymbolMap::SymbolMapType::Float:
+					pureFloatTypes++;
+					symbols[i].identifier = "LBL_STRUCT_FLOAT_" + std::to_string(pureFloatTypes);
+					break;
+
+				case PPC::SymbolMap::SymbolMapType::Double:
+					pureDoubleTypes++;
+					symbols[i].identifier = "LBL_STRUCT_DOUBLE_" + std::to_string(pureDoubleTypes);
+					break;
 				}
 			}
 		}
