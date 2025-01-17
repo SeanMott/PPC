@@ -42,9 +42,6 @@
     <ClInclude Include="includes\PPCLexer\Data\SpecialRegister.hpp">
       <Filter>includes\PPCLexer\Data</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\LexedFile.hpp">
-      <Filter>includes\PPCLexer</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Subpasses\Subpass1.hpp">
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
