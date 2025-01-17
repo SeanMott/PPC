@@ -80,9 +80,35 @@ int main(int args, const char* argv[])
 	//parse the arguments
 	PPC::Lexer::Settings::ArgumentSettings settings = PPC::Lexer::Settings::ParseArguments(args, argv);
 
-	//force certain settings to the compiler for testing right now
+	//checks the output and input directory exists
 
-	//execute the lexer
+	//check that the symbol map is a PPC Symbol Map, if not throw a error to the user
+
+	//load symbol map
+	const std::vector<PPC::SymbolMap::PPCSymbol> symbols = PPC::SymbolMap::LoadPPCSymbolMap(settings.input.symbolMap); //loads the PPC Symbols
+
+	//loads the files
+	std::vector<PPC::Lexer::InputLoaders::InputFile> inputFiles = PPC::Lexer::InputLoaders::GetAllFilesOfInputTypeFromDirectory(settings.input.paths[0], settings.input.type);
+
+	//if they're assembly, parse em out
+	if (settings.input.type == PPC::Lexer::Settings::InputType::ASM)
+	{
+		const size_t fileCount = inputFiles.size();
+		std::vector<std::vector<PPC::Stage1::Token>> tokenStreams; tokenStreams.resize(fileCount);
+		for (size_t i = 0; i < fileCount; ++i)
+		{
+			//generates the pure DTK Token Stream
+			GeneratePureDTKTokenStream(inputFiles[i].filepath, tokenStreams[i], symbols);
+
+			//perform the other subpasses, if we're in recomp mode
+
+			//dump the tokens
+			const std::filesystem::path dumpFP = settings.output.outputDirectory.string() + "/" + inputFiles[i].filepath.filename().stem().string() + PPC_TOKEN_STREAM_FILE_EXTENSION;
+			PPC::Stage1::DumpTokenStream(dumpFP, tokenStreams[i], settings.output.isPretty);
+		}
+	}
+
+	//if they're token streams, handle the subpasses
 
 	//loads the symbol files
 	//std::vector<PPC::SymbolMap::PPCSymbol> symbols = PPC::SymbolMap::LoadPPCSymbolMap("C:/Decomps/TOD-Decomp/RawASM/DTKSymbolsNSplits/PureDTKSymbols.ppcmap");

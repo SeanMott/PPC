@@ -144,7 +144,7 @@ namespace PPC::Stage1
 	#define PPC_TOKEN_STREAM_FILE_EXTENSION ".ppctokens"
 
 	//dumps a stream of tokens
-	static inline void DumpTokenStream(const std::filesystem::path& tokenStreamFP, const std::vector<Token>& tokens)
+	static inline void DumpTokenStream(const std::filesystem::path& tokenStreamFP, const std::vector<Token>& tokens, bool isPretty = false)
 	{
 		//checks for a valid extension
 
@@ -152,7 +152,7 @@ namespace PPC::Stage1
 		for (size_t i = 0; i < tokens.size(); ++i)
 			tokenStream.emplace_back(tokens[i].GenerateJSONArrayEntry());
 		std::ofstream file(tokenStreamFP);
-		file << tokenStream.dump();
+		file << tokenStream.dump((isPretty == true ? 4 : 1));
 	}
 
 	//loads a stream of tokens from a file

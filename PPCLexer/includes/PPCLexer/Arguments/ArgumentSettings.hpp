@@ -22,33 +22,30 @@ namespace PPC::Lexer::Settings
 		None, //is it nothing and disables this input
 	};
 
-	//defines a input directory
-	struct ArgumnentSettings_InputDirectory
+	//defines the output settings
+	struct ArgumentSettings_Output
 	{
-		InputType type = InputType::None; //is this input type disable or we doing something
-		std::filesystem::path inputDirectory = std::filesystem::path(); //the directory to use
-	};
+		bool isPretty = false; //makes the outputted token stream more human readable
 
-	//defines a input type of just singles files
-	struct ArgumentSettings_InputSingleFiles
-	{
-		InputType type = InputType::None; //is this input type disable or we doing something
-		std::vector<std::filesystem::path> filpaths;
-	};
-
-	//defines the output directory
-	struct ArgumentSettings_OutputDirectory
-	{
 		std::filesystem::path outputDirectory = std::filesystem::path(); //the directory to use as output
 	};
 
+	//defines the input settings
+	struct ArgumentSettings_Input
+	{
+		InputType type = InputType::ASM; //is it assembly or token streams
+		bool isLoadingWholeDirectories = true; //is it single files or directories
+		std::vector<std::filesystem::path> paths; //the directories or files
+
+		std::filesystem::path symbolMap = std::filesystem::path(); //the symbol map we are using
+	};
 
 	//defines the settings of all the arguments
 	struct ArgumentSettings
 	{
 		LexerMode mode = LexerMode::PureDTK; //what mode is the lexer in, this tells it if it should use extra subpasses
 		
-		ArgumentSettings_InputSingleFiles singleFileInput; //are we importing single files
-		ArgumnentSettings_InputDirectory directoryInput; //are we importing a whole directory
+		ArgumentSettings_Input input; //defines data for our inputs
+		ArgumentSettings_Output output; //defines the data for our outputs
 	};
 }
