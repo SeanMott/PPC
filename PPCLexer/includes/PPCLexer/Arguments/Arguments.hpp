@@ -6,7 +6,11 @@
 
 namespace PPC::Lexer::Settings
 {
-	//defines a flag for the lexer mode
+	//defines a flag for setting the lexer
+#define PPC_LEXER_ARGUMENT_STRING_MODE "-mode"
+
+	//sets the input type
+#define PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE "-input"
 
 	//defines a flag for loading a whole director
 #define PPC_LEXER_ARGUMENT_STRING_LOAD_DIRECTORY "-dir"
@@ -41,6 +45,77 @@ namespace PPC::Lexer::Settings
 				settings.input.paths.resize(1);
 				settings.input.isLoadingWholeDirectories = true;
 				settings.input.paths[0] = argv[i];
+			}
+
+			//sets the mode we are using
+			else if (!strcmp(argv[i], PPC_LEXER_ARGUMENT_STRING_MODE))
+			{
+				//checks if we have the next argument, if not throw a error
+
+				//sets the argument
+				i++;
+
+				const char* m = argv[i];
+
+				//if Pure DTK
+				if (!strcmp(m, "Pure"))
+				{
+					fmt::print("Mode Set: Pure\n");
+					settings.mode = Settings::LexerMode::PureDTK;
+				}
+
+				//if it's Pure and we're regening the ASM
+				else if (!strcmp(m, "PureASM"))
+				{
+					fmt::print("Mode Set: Pure ASM\n");
+					settings.mode = Settings::LexerMode::PureDTK_GenASM;
+				}
+
+				//if recomp
+				else if (!strcmp(m, "Recomp"))
+				{
+					fmt::print("Mode Set: Recomp\n");
+					settings.mode = Settings::LexerMode::Recomp;
+				}
+
+				//if unknown
+				else
+				{
+					fmt::print("Could not parse Mode flag, Mode is defaulting to DTK Pure\n");
+					settings.mode = Settings::LexerMode::PureDTK;
+				}
+			}
+
+			//sets the input type we are using
+			else if (!strcmp(argv[i], PPC_LEXER_ARGUMENT_STRING_INPUT_TYPE))
+			{
+				//checks if we have the next argument, if not throw a error
+
+				//sets the argument
+				i++;
+
+				const char* m = argv[i];
+
+				//if ASM
+				if (!strcmp(m, "asm") || !strcmp(m, "ASM"))
+				{
+					fmt::print("Input Mode Set: ASM\n");
+					settings.input.type = InputType::ASM;
+				}
+
+				//if it's token streams
+				else if (!strcmp(m, "token"))
+				{
+					fmt::print("Input Mode Set: Token Streams\n");
+					settings.input.type = InputType::TokenStream;
+				}
+
+				//if unknown
+				else
+				{
+					fmt::print("Could not parse Input Type flag, defaulting to ASM\n");
+					settings.input.type = InputType::ASM;
+				}
 			}
 
 			//sets the symbol map we are using

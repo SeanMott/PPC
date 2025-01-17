@@ -11,6 +11,8 @@
 #include <PPCLib/Data/Datatypes.h>
 #include <PPCLib/Data/PPCInstructions.hpp>
 
+#include <PPCLib/SymbolMap/PPCSymbol.hpp>
+
 #include <vector>
 #include <fstream>
 
@@ -184,57 +186,56 @@ namespace PPC::Stage1
 		return tokenStream;
 	}
 
+	//takes a stream of tokens and dumps them back as a file, works best with a Pure DTK Stream
+	static inline void DumpASMFromTokenStream(const std::filesystem::path& ASMFP, const std::vector<Token>& tokens, const std::vector<SymbolMap::PPCSymbol>& symbols)
+	{
+		//compresses tokens
+		std::string ASM = "";
+		const size_t tokenCount = tokens.size();
+		for (size_t t = 0; t < tokenCount; ++t)
+		{
+			//if it's a new line or operator
+			if (tokens[t].type == TokenType::NewLine || tokens[t].type == TokenType::Operator)
+				ASM += tokens[t].data;
+
+			//else it's got a space
+			else
+			{
+				//if it's a string
+				if (tokens[t].type == TokenType::Literal_String)
+					ASM += '"' + tokens[t].data + '"';
+
+				//if it's a single line comment
+				else if (tokens[t].type == TokenType::SingleLineComment)
+					ASM += '#' + tokens[t].data;
+
+				//if it's a block comment
+				else if (tokens[t].type == TokenType::BlockComment)
+					ASM += "/* " + tokens[t].data + " */";
+
+				//if it's a symbol, pull it from the Map
+				else if (tokens[t].type == TokenType::Symbol_ID)
+					ASM += symbols[tokens[t].symbolID].identifier;
+
+				//else if't data
+				else
+					ASM += tokens[t].data;
+
+				//only add a space if needed
+				if (t + 1 < tokenCount && tokens[t + 1].type != TokenType::NewLine && tokens[t + 1].type != TokenType::Operator &&
+					tokens[t + 1].type != TokenType::Literal_String)
+					ASM += ' ';
+			}
+		}
+
+		//dumps to file
+		std::ofstream file(ASMFP);
+		file << ASM;
+	}
+
 	//defines a single line expresstion
 	struct LexedSingleLineExpresstion
 	{
 		std::vector<Token> tokens;
-	};
-
-	//defines a lexed file
-	struct LexedFile
-	{
-		std::vector<LexedSingleLineExpresstion> singleLineExpesstions; //the entire file split into new lines
-
-		//generate a debug output file of all the tokens
-		inline void GenerateDebugOutputFileOfTokens(const std::string& filepath)
-		{
-			std::string data = "";
-			for (size_t i = 0; i < singleLineExpesstions.size(); ++i)
-			{
-				for (size_t t = 0; t < singleLineExpesstions[i].tokens.size(); ++t)
-				{
-				//	//if it's the start of a function
-				//	if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncStart)
-				//		data += "func ";
-
-				//	else //if it's the start of a function
-				//		if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjStart)
-				//			data += "struct ";
-
-				//	//if it's the end of a function or object
-				//	else if (singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_FuncEnd ||
-				//		singleLineExpesstions[i].tokens[t].type == TokenType::Keyword && singleLineExpesstions[i].tokens[t].specificType == SpecificTokenType::Keyword_ObjEnd)
-				//		data += "};";
-
-					////if it's a jump label
-					//else if (singleLineExpesstions[i].tokens[t].type == TokenType::JumpLabelDefinition)
-					//{
-					//	data += "Jump Label (" + singleLineExpesstions[i].tokens[t].data + "):";
-					//}
-
-					//otherwise
-					/*else
-					{
-						data += singleLineExpesstions[i].tokens[t].data;
-
-						data += ' ';
-					}*/
-				}
-				data += '\n';
-			}
-
-			std::fstream f(filepath, std::ios::out);
-			f.write(data.c_str(), data.size());
-		}
 	};
 }

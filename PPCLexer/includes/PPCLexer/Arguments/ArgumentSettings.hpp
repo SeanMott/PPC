@@ -11,6 +11,7 @@ namespace PPC::Lexer::Settings
 	enum class LexerMode
 	{
 		PureDTK = 0, //this will tell the lexer to not use any extra subpasses and perserve the raw DTK Assembly
+		PureDTK_GenASM, //this is just like the Pure DTK, but won't dump tokens and instead spit back out ASM
 		Recomp, //this tells the lexer to purge anything extra, we are using all theses for a recomp
 	};
 

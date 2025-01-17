@@ -90,26 +90,37 @@ int main(int args, const char* argv[])
 
 	//loads the files
 	std::vector<PPC::Lexer::InputLoaders::InputFile> inputFiles = PPC::Lexer::InputLoaders::GetAllFilesOfInputTypeFromDirectory(settings.input.paths[0], settings.input.type);
+	const size_t fileCount = inputFiles.size();
+	std::vector<std::vector<PPC::Stage1::Token>> tokenStreams; tokenStreams.resize(fileCount);
 
-	//if they're assembly, parse em out
-	if (settings.input.type == PPC::Lexer::Settings::InputType::ASM)
+	for (size_t i = 0; i < fileCount; ++i)
 	{
-		const size_t fileCount = inputFiles.size();
-		std::vector<std::vector<PPC::Stage1::Token>> tokenStreams; tokenStreams.resize(fileCount);
-		for (size_t i = 0; i < fileCount; ++i)
-		{
-			//generates the pure DTK Token Stream
+		//if they're assembly, parse em out into the pure first
+		if (inputFiles[i].type == PPC::Lexer::Settings::InputType::ASM)
 			GeneratePureDTKTokenStream(inputFiles[i].filepath, tokenStreams[i], symbols);
 
-			//perform the other subpasses, if we're in recomp mode
+		//if they're token streams, handle the subpasses
+		else if (inputFiles[i].type == PPC::Lexer::Settings::InputType::TokenStream)
+			tokenStreams[i] = PPC::Stage1::LoadTokenStream(inputFiles[i].filepath);
 
-			//dump the tokens
+		//perform the other subpasses, if we're in recomp mode
+		if (settings.mode == PPC::Lexer::Settings::LexerMode::Recomp)
+		{
+			//invoke subpasses for recomp
+		}
+
+		//dump the tokens or generate the ASM
+		if (settings.mode != PPC::Lexer::Settings::LexerMode::PureDTK_GenASM) //dumps token streams
+		{
 			const std::filesystem::path dumpFP = settings.output.outputDirectory.string() + "/" + inputFiles[i].filepath.filename().stem().string() + PPC_TOKEN_STREAM_FILE_EXTENSION;
 			PPC::Stage1::DumpTokenStream(dumpFP, tokenStreams[i], settings.output.isPretty);
 		}
+		else //dumps ASM
+		{
+			const std::filesystem::path dumpFP = settings.output.outputDirectory.string() + "/" + inputFiles[i].filepath.filename().stem().string() + ".s";
+			PPC::Stage1::DumpASMFromTokenStream(dumpFP, tokenStreams[i], symbols);
+		}
 	}
-
-	//if they're token streams, handle the subpasses
 
 	return 0;
 }
