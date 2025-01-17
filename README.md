@@ -23,7 +23,7 @@ Finally the AST is passed into the CGen to generate C++/C code that compiles wit
 
 This is not done yet, as every tool hasen't been finalized.
 
-- Step 1: Grab the latest [release]() and zip it. Then grab a Game Cube ROM you wish to decompile.
+- Step 1: Grab the latest [release]() and zip it. Then grab a Game Cube ROM you wish to decompile. Always use the version of DTK we provide. As it's what the lexer has been made to parse. And later or earlier versions might change syntax.
 
 - Step 2: in a command prompt run `python Stage0_Disassemble.py "pathToTheROM" "outputDirectory"`
 
