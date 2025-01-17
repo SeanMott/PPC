@@ -14,24 +14,12 @@ PPC Lexer that converts DTK Raw Assembly into a stream of tokens
 
 #include <PPCLexer/FileInputs/LoadInput.hpp>
 
-//loads the translation unit code
-static inline void LoadASM(const std::filesystem::path& filepath, std::string& code)
-{
-	FILE* file = fopen(filepath.string().c_str(), "r");
-	fseek(file, 0, SEEK_END);
-	const size_t codeLength = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	code.resize(codeLength);
-	fread(code.data(), sizeof(char), codeLength, file);
-	fclose(file);
-}
-
 //generate a Pure DTK Token Stream
 static inline void GeneratePureDTKTokenStream(const std::filesystem::path& ASMFile, std::vector<PPC::Stage1::Token>& tokenStream,
 	const std::vector<PPC::SymbolMap::PPCSymbol>& symbols)
 {
 	std::string code = "";
-	LoadASM(ASMFile.string(), code);
+	PPC::Lexer::InputLoaders::LoadASM(ASMFile.string(), code);
 
 	//runs the first pass || generates general tokens, comments, operators, and string literals
 	tokenStream = PPC::Stage1::Subpass1_GenerateGeneralTokens(code);

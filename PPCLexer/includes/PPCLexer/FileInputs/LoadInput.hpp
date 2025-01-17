@@ -34,4 +34,16 @@ namespace PPC::Lexer::InputLoaders
 		}
 		return files;
 	}
+
+	//loads the translation unit code
+	static inline void LoadASM(const std::filesystem::path& filepath, std::string& code)
+	{
+		FILE* file = fopen(filepath.string().c_str(), "r");
+		fseek(file, 0, SEEK_END);
+		const size_t codeLength = ftell(file);
+		fseek(file, 0, SEEK_SET);
+		code.resize(codeLength);
+		fread(code.data(), sizeof(char), codeLength, file);
+		fclose(file);
+	}
 }
