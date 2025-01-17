@@ -232,10 +232,4 @@ namespace PPC::Stage1
 		std::ofstream file(ASMFP);
 		file << ASM;
 	}
-
-	//defines a single line expresstion
-	struct LexedSingleLineExpresstion
-	{
-		std::vector<Token> tokens;
-	};
 }
