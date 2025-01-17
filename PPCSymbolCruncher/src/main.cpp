@@ -111,33 +111,133 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPC::Symbol
 }
 
 //parses the arguments
+struct ArgumentSettings
+{
+	bool isPretty = false;
 
-//-----have all symbols in one file (default function)
+	std::filesystem::path DTKSymbolFile = std::filesystem::path(), PPCMapOutputDir = std::filesystem::path(), existingPPCMapFile = std::filesystem::path();
+	std::string mapName = "Map";
+};
 
-//-----split the symbols into files based on their type: param
+//-----ARGUMENTS----//
 
-//-----split the symbols into files based on their splits
+//takes a DTK Symbol File
+#define PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_SYMBOLS "-symbols"
+
+//takes a Map file from Ghirdra or other usual decomps
+
+//takes a existing PPC Map
+#define PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_PPC_MAP "-map"
+
+//sets the output directory of the new PPC Map
+#define PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_OUTPUT_DIR "-out"
+
+//sets the name of the new PPC Map
+#define PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_MAP_NAME "-name"
+
+//sets if the PPC Map should be formated for human readability or not
+#define PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_IS_PRETTY "-pretty"
+
+//prints that there was a error with a argument
+static inline void PrintArgumentError(const std::string& argument, const std::string& desc)
+{
+	fmt::print("ARGUMENT INVALID ERROR, ABORTING OPERATION!!!!!!!!!!!!\nArgument: \"{}\" || {}\n", argument, desc);
+}
+
+//parses the arguments
+static inline ArgumentSettings ParseArguments(const int args, const char* argv[])
+{
+	ArgumentSettings settings;
+	for (size_t i = 1; i < args; ++i)
+	{
+		//symbols argument
+		if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_SYMBOLS))
+		{
+			//checks if we have the next argument, if not throw a error
+
+			//sets the argument
+			i++;
+			settings.DTKSymbolFile = argv[i];
+		}
+
+		//exisitng PPC Map argument
+		else if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_PPC_MAP))
+		{
+			//checks if we have the next argument, if not throw a error
+
+			//sets the argument
+			i++;
+			settings.existingPPCMapFile = argv[i];
+		}
+
+		//output directory
+		else if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_OUTPUT_DIR))
+		{
+			//checks if we have the next argument, if not throw a error
+
+			//sets the argument
+			i++;
+			settings.PPCMapOutputDir = argv[i];
+		}
+
+		//map name
+		else if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_MAP_NAME))
+		{
+			//checks if we have the next argument, if not throw a error
+
+			//sets the argument
+			i++;
+			settings.mapName = argv[i];
+		}
+
+		//is pretty
+		else if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_IS_PRETTY))
+			settings.isPretty = true;
+	}
+
+	return settings;
+}
 
 //entry
 int main(int args, const char* argv[])
 {
-	//parse the arguments
-
 	//if no arguments
 	if (args < 2)
 	{
 		fmt::print(fmt::fg(fmt::color::alice_blue), "PPC Symbol Cruncher");
 		fmt::print(fmt::fg(fmt::color::orange), " is a tool for importing symbol lists into a format the PPC Toolchain can use.\n\n");
 
-		fmt::print("----HOW TO USE----\nSymbolCruncher.exe <path to the DTK Symbol file genned in Stage 0> <folder where the PPC Map should be dumped> <optional third argument for output map name>\n");
+		fmt::print("----HOW TO USE----\n");
+		
+		fmt::print("Converting a DTK Symbol list to a PPC Map.\n");
+		fmt::print("SymbolCruncher.exe -symbols \"DTKSplitsNSymbols/Symbols.txt\" -out \"DTKSplitsNSymbols\"\n\n");
+
+		fmt::print("----ARGUMENT LIST----\n\n");
+		
+		fmt::print("{} <File Full Path> || Required || Full path to the symbol file.\n\n", PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_SYMBOLS);
+
+		fmt::print("{} <File Full Path> || Optional || Full path to a existing PPC Map. If symbols is also passed in. "
+			"This argument will also execute, using the current settings. So either -symbols or -map should be used to not cause conflicts.\n\n",
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_PPC_MAP);
+
+		fmt::print("{} <Directory Full Path> || Required || Full path to the directory you would like the PPC Map outputted to.\n\n",
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_OUTPUT_DIR);
+
+		fmt::print("{} <Name String> || Optional || Name of the PPC Map file outputted. Defaults to \"Map\".\n\n",
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_MAP_NAME);
+
+		fmt::print("{} || Optional || Makes the map output in a more human friendly way of reading, defaults to off.\n\n",
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_IS_PRETTY);
 
 		getchar();
 		return 0;
 	}
 
+	//parse the arguments
+	ArgumentSettings settings = ParseArguments(args, argv);
+
 	//loads the DTK symbol file
-	const std::filesystem::path symbolPath = argv[1]; //gets the symbol path
-	std::ifstream file(symbolPath);
+	std::ifstream file(settings.DTKSymbolFile);
 	std::vector<std::string> lines;
 	std::string line;
 	while (std::getline(file, line))
@@ -150,8 +250,8 @@ int main(int args, const char* argv[])
 		ParseDTKSymbolStringInfo(lines[i], symbols[i]);
 
 	//generate the .ppcmap file
-	const std::filesystem::path ppcMap = std::string(argv[2]) + "/" + std::string((args > 3 ? argv[3] : "Map.ppcmap"));
-	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols);
+	const std::filesystem::path ppcMap = std::filesystem::path(settings.PPCMapOutputDir.string() + "/" + settings.mapName + PPC_MAP_FILE_EXTENSION);
+	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols, settings.isPretty);
 	
 	//getchar();
 	return 0;

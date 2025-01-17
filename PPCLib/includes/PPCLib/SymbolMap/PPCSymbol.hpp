@@ -36,14 +36,20 @@ namespace PPC::SymbolMap
 		}
 	};
 
+	//defines the PPC Map file extension
+#define PPC_MAP_FILE_EXTENSION ".ppcmap"
+
 	//dumps a stream of symbols to the file
-	static inline void DumpPPCSymbolsToMap(const std::filesystem::path& ppcMap, const std::vector<PPCSymbol>& symbols)
+	static inline void DumpPPCSymbolsToMap(const std::filesystem::path& ppcMap, const std::vector<PPCSymbol>& symbols, bool isPretty = false)
 	{
+		//checks if it has the proper file extension
+
+		//compress symbols and dump
 		nlohmann::json ppcMapSymbols = nlohmann::json::array();
 		for (size_t i = 0; i < symbols.size(); ++i)
 			ppcMapSymbols.emplace_back(symbols[i].GenerateJSONArrayEntry());
 		std::ofstream file(ppcMap);
-		file << ppcMapSymbols.dump();
+		file << ppcMapSymbols.dump((isPretty == true ? 4 : 1));
 	}
 
 	//loads a stream of symbols from a file
