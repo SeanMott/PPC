@@ -54,6 +54,7 @@
     <ClInclude Include="includes\PPCLib\Data\Registers\GraphicsQuantizedRegisters.hpp" />
     <ClInclude Include="includes\PPCLib\Data\Registers\IntegerRegister.hpp" />
     <ClInclude Include="includes\PPCLib\Data\Registers\SpecialRegister.hpp" />
+    <ClInclude Include="includes\PPCLib\Token\Token.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">

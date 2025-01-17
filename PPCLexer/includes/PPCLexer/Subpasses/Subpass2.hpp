@@ -3,7 +3,7 @@
 //fine types the registers, instructions, memory offsets, scoping, pre-defined keywords
 //and datatypes
 
-#include <PPCLexer/Token.hpp>
+#include <PPCLib/Token/Token.hpp>
 
 #include <PPCLib/Data/Registers/ConditionRegister.hpp>
 #include <PPCLib/Data/Registers/IntegerRegister.hpp>

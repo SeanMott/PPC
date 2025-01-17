@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PPCLexer/Token.hpp>
+#include <PPCLib/Token/Token.hpp>
 
 //defines the second subpass, this removes invalid and illegal instructions
 //optionally strips out all comments

@@ -4,7 +4,7 @@
 
 #include <PPCLexer/Arguments/ArgumentSettings.hpp>
 
-#include <PPCLexer/Token.hpp>
+#include <PPCLib/Token/Token.hpp>
 
 namespace PPC::Lexer::InputLoaders
 {

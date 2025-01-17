@@ -1,6 +1,6 @@
 #include <PPCLexer/Subpasses/Subpass1.hpp>
 
-#include <PPCLexer/Data/Operators.hpp>
+#include <PPCLib/Data/Operators.hpp>
 
 //processes a operator token
 static inline PPC::Stage1::Token Subpass1_GenerateToken_Operator(const char data, PPC::Stage1::Parser* parser)

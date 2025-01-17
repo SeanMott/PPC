@@ -33,9 +33,6 @@
     <ClInclude Include="includes\PPCLexer\Subpasses\SubpassExtraStripping.hpp">
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Token.hpp">
-      <Filter>includes\PPCLexer</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Arguments\ArgumentSettings.hpp" />
     <ClInclude Include="includes\PPCLexer\Arguments\Arguments.hpp" />
     <ClInclude Include="includes\PPCLexer\FileInputs\LoadInput.hpp" />
