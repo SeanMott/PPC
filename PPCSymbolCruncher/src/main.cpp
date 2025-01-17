@@ -243,12 +243,18 @@ int main(int args, const char* argv[])
 	if (args < 2)
 	{
 		fmt::print(fmt::fg(fmt::color::alice_blue), "PPC Symbol Cruncher");
-		fmt::print(fmt::fg(fmt::color::orange), " is a tool for importing symbol lists into a format the PPC Toolchain can use.\n\n");
+		fmt::print(fmt::fg(fmt::color::orange), " is a tool for importing symbol lists into a format the PPC Toolchain can use.");
 
-		fmt::print("----HOW TO USE----\n");
+		fmt::print("\n\n----HOW TO USE----\n");
 		
 		fmt::print("Converting a DTK Symbol list to a PPC Map.\n");
-		fmt::print("SymbolCruncher.exe -symbols \"DTKSplitsNSymbols/Symbols.txt\" -out \"DTKSplitsNSymbols\"\n\n");
+		fmt::print("SymbolCruncher.exe {} \"DTKSplitsNSymbols/Symbols.txt\" {} \"DTKSplitsNSymbols\"\n\n",
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_SYMBOLS, PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_OUTPUT_DIR);
+
+		fmt::print("Generating Obj Symbol Names from Types.\n");
+		fmt::print("SymbolCruncher.exe {} \"DTKSplitsNSymbols/PureDTKSymbols.ppcmap\" {} \"DTKSplitsNSymbols\" {} \"TypedDTKSymbols\" {}\n\n",
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_PPC_MAP, PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_OUTPUT_DIR,
+			PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_MAP_NAME, PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_TYPE_OBJ_NAME);
 
 		fmt::print("----ARGUMENT LIST----\n\n");
 		

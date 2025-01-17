@@ -10,8 +10,11 @@
     <Filter Include="includes\PPCLib\Data">
       <UniqueIdentifier>{CE0232D2-BA91-BB9B-63B0-CF964F1ECC41}</UniqueIdentifier>
     </Filter>
-    <Filter Include="includes\Venders">
-      <UniqueIdentifier>{E29C78E1-CE95-9733-F7C7-7CB8E31F773F}</UniqueIdentifier>
+    <Filter Include="includes\PPCLib\SymbolMap">
+      <UniqueIdentifier>{68345375-D4F6-86FF-1DA7-158C89A85FDD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\PPCLibVenders">
+      <UniqueIdentifier>{1C05BA2E-08FF-E280-F16B-7991DD0449ED}</UniqueIdentifier>
     </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
@@ -21,19 +24,27 @@
     <ClInclude Include="includes\PPCLib\Data\Datatypes.h">
       <Filter>includes\PPCLib\Data</Filter>
     </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\MemoryOffset.hpp">
+      <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\ObjectType.hpp">
+      <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Scope.hpp">
+      <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
     <ClInclude Include="includes\PPCLib\Data\Splits.hpp">
       <Filter>includes\PPCLib\Data</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLib\Logger.hpp">
       <Filter>includes\PPCLib</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLibVenders\json.hpp">
-      <Filter>includes\Venders</Filter>
+    <ClInclude Include="includes\PPCLib\SymbolMap\PPCSymbol.hpp">
+      <Filter>includes\PPCLib\SymbolMap</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLib\Data\Scope.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\ObjectType.hpp" />
-    <ClInclude Include="includes\PPCLib\SymbolMap\PPCSymbol.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\MemoryOffset.hpp" />
+    <ClInclude Include="includes\PPCLibVenders\json.hpp">
+      <Filter>includes\PPCLibVenders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">
