@@ -5,6 +5,7 @@ Parses DTK Symbols and Splits into PPC Map files
 #include <PPCLib/Logger.hpp>
 
 #include <PPCLib/SymbolMap/PPCSymbol.hpp>
+#include <PPCLib/SymbolMap/SymbolTypes.hpp>
 
 #include <vector>
 
@@ -110,15 +111,6 @@ static inline void ParseDTKSymbolStringInfo(const std::string& line, PPC::Symbol
 	}
 }
 
-//parses the arguments
-struct ArgumentSettings
-{
-	bool isPretty = false;
-
-	std::filesystem::path DTKSymbolFile = std::filesystem::path(), PPCMapOutputDir = std::filesystem::path(), existingPPCMapFile = std::filesystem::path();
-	std::string mapName = "Map";
-};
-
 //-----ARGUMENTS----//
 
 //takes a DTK Symbol File
@@ -183,6 +175,16 @@ static inline void PrintArgumentError(const std::string& argument, const std::st
 }
 
 //parses the arguments
+struct ArgumentSettings
+{
+	bool isPretty = false;
+	bool generateTypeNames = false;
+
+	std::filesystem::path DTKSymbolFile = std::filesystem::path(), PPCMapOutputDir = std::filesystem::path(), existingPPCMapFile = std::filesystem::path();
+	std::string mapName = "Map";
+};
+
+//parses the arguments
 static inline ArgumentSettings ParseArguments(const int args, const char* argv[])
 {
 	ArgumentSettings settings;
@@ -231,6 +233,10 @@ static inline ArgumentSettings ParseArguments(const int args, const char* argv[]
 		//is pretty
 		else if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_IS_PRETTY))
 			settings.isPretty = true;
+
+		//generate type names
+		else if (!strcmp(argv[i], PPC_SYMBOL_CRUNCHER_ARGUMENT_STR_TYPE_OBJ_NAME))
+			settings.generateTypeNames = true;
 	}
 
 	return settings;
@@ -293,6 +299,33 @@ int main(int args, const char* argv[])
 
 	//if it's a Code Warror Map
 	
+	//if we're generating new type names
+	if (settings.generateTypeNames)
+	{
+		size_t pureFloatTypes = 0, pureDoubleTypes = 0, pureStrTypes = 0, pureByteTypes = 0, pureByte2Types = 0, pureByte4Types = 0;
+
+		const size_t symbolCount = symbols.size();
+		PPC::SymbolMap::SymbolMapType type = PPC::SymbolMap::SymbolMapType::Null;
+		for (size_t i = 0; i < symbolCount; ++i)
+		{
+			//skip
+			if (symbols[i].identifier.size() < 4 || symbols[i].identifier[0] != 'l' || symbols[i].identifier[1] != 'b' || symbols[i].identifier[2] != 'l' ||
+				symbols[i].identifier[3] != '_')
+				continue;
+
+			if (PPC::SymbolMap::IsSymbolMapType(symbols[i].datatype.c_str(), type))
+			{
+				switch (type)
+				{
+				case PPC::SymbolMap::SymbolMapType::Byte:
+					pureByteTypes++;
+					symbols[i].identifier = "LBL_STRUCT_BYTE_" + std::to_string(pureByteTypes);
+					break;
+				}
+			}
+		}
+	}
+
 	//generate the .ppcmap file
 	const std::filesystem::path ppcMap = std::filesystem::path(settings.PPCMapOutputDir.string() + "/" + settings.mapName + PPC_MAP_FILE_EXTENSION);
 	PPC::SymbolMap::DumpPPCSymbolsToMap(ppcMap, symbols, settings.isPretty);

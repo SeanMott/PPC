@@ -45,6 +45,7 @@
     <ClInclude Include="includes\PPCLibVenders\json.hpp">
       <Filter>includes\PPCLibVenders</Filter>
     </ClInclude>
+    <ClInclude Include="includes\PPCLib\SymbolMap\SymbolTypes.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">
