@@ -49,7 +49,7 @@ namespace PPC::SymbolMap
 		for (size_t i = 0; i < symbols.size(); ++i)
 			ppcMapSymbols.emplace_back(symbols[i].GenerateJSONArrayEntry());
 		std::ofstream file(ppcMap);
-		file << ppcMapSymbols.dump((isPretty == true ? 4 : 1));
+		file << ppcMapSymbols.dump((isPretty == true ? 4 : -1));
 	}
 
 	//loads a stream of symbols from a file

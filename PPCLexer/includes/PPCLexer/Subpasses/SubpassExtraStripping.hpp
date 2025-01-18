@@ -35,7 +35,7 @@ namespace PPC::Lexer::Subpass
 		return tokens;
 	}
 
-	//removes the file and includes and single comment lines
+	//removes the file and includes and comments
 	static inline std::vector<PPC::Stage1::Token> ExtraSubpass_RemoveFileAndIncludes(std::vector<PPC::Stage1::Token>& subpassTokens)
 	{
 		const size_t subpassTokenCount = subpassTokens.size();
@@ -48,42 +48,6 @@ namespace PPC::Lexer::Subpass
 			//if we're .section,.file or .include or .data remove the whole line
 			if (subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".include" ||
 				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".file")
-			{
-				while (subpassTokens[i].type != PPC::Stage1::TokenType::NewLine && i < subpassTokenCount)
-				{
-					i++;
-				}
-
-				continue;
-			}
-
-			//removes single line comment
-			else if (subpassTokens[i].type == PPC::Stage1::TokenType::SingleLineComment)
-				continue;
-
-			//adds token
-			tokens.emplace_back(subpassTokens[i]);
-		}
-
-		return tokens;
-	}
-
-	//option extra pass that removes ALL comments and section based tokens
-	static inline std::vector<PPC::Stage1::Token> ExtraSubpass_StripCommentsAndSectors(std::vector<PPC::Stage1::Token>& subpassTokens)
-	{
-		const size_t subpassTokenCount = subpassTokens.size();
-		std::vector<PPC::Stage1::Token> tokens;
-		tokens.reserve(subpassTokenCount);
-
-		//compress the tokens into the new tree
-		for (size_t i = 0; i < subpassTokenCount; ++i)
-		{
-			//if we're .section,.file or .include or .data remove the whole line
-			if (subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".section" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".include" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".file" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".data" ||
-				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".text")
 			{
 				while (subpassTokens[i].type != PPC::Stage1::TokenType::NewLine && i < subpassTokenCount)
 				{

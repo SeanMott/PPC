@@ -154,7 +154,7 @@ namespace PPC::Stage1
 		for (size_t i = 0; i < tokens.size(); ++i)
 			tokenStream.emplace_back(tokens[i].GenerateJSONArrayEntry());
 		std::ofstream file(tokenStreamFP);
-		file << tokenStream.dump((isPretty == true ? 4 : 1));
+		file << tokenStream.dump((isPretty == true ? 4 : -1));
 	}
 
 	//loads a stream of tokens from a file

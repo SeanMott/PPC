@@ -88,12 +88,10 @@ int main(int args, const char* argv[])
 		//perform the other subpasses, if we're in recomp mode
 		if (settings.mode == PPC::Lexer::Settings::LexerMode::Recomp)
 		{
-			//invoke subpasses for recomp
-
 			//strips invalid instructions
 			tokenStreams[i] = PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokenStreams[i]);
 			
-			//strips single line comments and file/include bits
+			//strips comments, file/include, and section data
 			tokenStreams[i] = PPC::Lexer::Subpass::ExtraSubpass_RemoveFileAndIncludes(tokenStreams[i]);
 		}
 
