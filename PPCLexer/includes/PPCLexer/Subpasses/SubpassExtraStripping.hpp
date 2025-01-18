@@ -7,23 +7,6 @@
 
 namespace PPC::Lexer::Subpass
 {
-	//defines a line of tokens
-	struct TokenLine
-	{
-		std::vector<PPC::Stage1::Token> tokens;
-	};
-
-	//defines a token stream defining a function
-
-	//defines a token stream defining a struct
-
-	//defines a token stream file
-	struct TokenStreamFile
-	{
-		std::vector<PPC::Stage1::Token> wholeFileTokens; //defines the remaining total
-	};
-
-
 	//removes the invalid and illegal instrucitons
 	static inline std::vector<PPC::Stage1::Token> ExtraSubpass_RemoveInvalidInstructions(std::vector<PPC::Stage1::Token>& subpass1Tokens)
 	{
@@ -47,6 +30,39 @@ namespace PPC::Lexer::Subpass
 			}
 
 			tokens.emplace_back(subpass1Tokens[i]);
+		}
+
+		return tokens;
+	}
+
+	//removes the file and includes and single comment lines
+	static inline std::vector<PPC::Stage1::Token> ExtraSubpass_RemoveFileAndIncludes(std::vector<PPC::Stage1::Token>& subpassTokens)
+	{
+		const size_t subpassTokenCount = subpassTokens.size();
+		std::vector<PPC::Stage1::Token> tokens;
+		tokens.reserve(subpassTokenCount);
+
+		//compress the tokens into the new tree
+		for (size_t i = 0; i < subpassTokenCount; ++i)
+		{
+			//if we're .section,.file or .include or .data remove the whole line
+			if (subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".include" ||
+				subpassTokens[i].type == PPC::Stage1::TokenType::Identifier && subpassTokens[i].data == ".file")
+			{
+				while (subpassTokens[i].type != PPC::Stage1::TokenType::NewLine && i < subpassTokenCount)
+				{
+					i++;
+				}
+
+				continue;
+			}
+
+			//removes single line comment
+			else if (subpassTokens[i].type == PPC::Stage1::TokenType::SingleLineComment)
+				continue;
+
+			//adds token
+			tokens.emplace_back(subpassTokens[i]);
 		}
 
 		return tokens;

@@ -46,26 +46,6 @@ static inline void GeneratePureDTKTokenStream(const std::filesystem::path& ASMFi
 	}
 }
 
-//parses a assembly file into a PPC Token
-static std::vector<PPC::Stage1::Token> ParseDTKAssemblyIntoTokenStream(const std::filesystem::path& file, const std::vector<PPC::SymbolMap::PPCSymbol>& symbols,
-	const std::filesystem::path& PPCTokenStreamOutputDir)
-{
-	const std::string filename = file.stem().string();
-
-	//we always generate a Pure DTK Token Stream before we start making changes that won't let us have normal files
-	std::vector<PPC::Stage1::Token> tokens;
-	GeneratePureDTKTokenStream(file, tokens, symbols);
-
-	//strips and invalid tokens
-	tokens = PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokens);
-
-	//strips sector content and comments
-	tokens = PPC::Lexer::Subpass::ExtraSubpass_StripCommentsAndSectors(tokens);
-
-	//dumps the token stream of raw DTK ASM
-	PPC::Stage1::DumpTokenStream(PPCTokenStreamOutputDir.string() + std::string("/") + filename + PPC_TOKEN_STREAM_FILE_EXTENSION, tokens);
-}
-
 //entry point
 int main(int args, const char* argv[])
 {
@@ -109,6 +89,12 @@ int main(int args, const char* argv[])
 		if (settings.mode == PPC::Lexer::Settings::LexerMode::Recomp)
 		{
 			//invoke subpasses for recomp
+
+			//strips invalid instructions
+			PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokenStreams[i]);
+			
+			//strips single line comments and file/include bits
+			PPC::Lexer::Subpass::ExtraSubpass_RemoveFileAndIncludes(tokenStreams[i]);
 		}
 
 		//dump the tokens or generate the ASM

@@ -39,9 +39,6 @@
     <ClInclude Include="includes\PPCLexer\Subpasses\Subpass2.hpp">
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Subpasses\Subpass3.hpp">
-      <Filter>includes\PPCLexer\Subpasses</Filter>
-    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Subpasses\SubpassExtraStripping.hpp">
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
