@@ -91,10 +91,10 @@ int main(int args, const char* argv[])
 			//invoke subpasses for recomp
 
 			//strips invalid instructions
-			PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokenStreams[i]);
+			tokenStreams[i] = PPC::Lexer::Subpass::ExtraSubpass_RemoveInvalidInstructions(tokenStreams[i]);
 			
 			//strips single line comments and file/include bits
-			PPC::Lexer::Subpass::ExtraSubpass_RemoveFileAndIncludes(tokenStreams[i]);
+			tokenStreams[i] = PPC::Lexer::Subpass::ExtraSubpass_RemoveFileAndIncludes(tokenStreams[i]);
 		}
 
 		//dump the tokens or generate the ASM
