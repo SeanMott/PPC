@@ -4,7 +4,6 @@
 
 #include <string>
 
-
 //lists the graphics quantized registers
 #define PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_COUNT 8
 static const char* PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_STRINGS[PPC_LEXER_GRAPHICS_QUANTIZED_REGISTER_COUNT] = {

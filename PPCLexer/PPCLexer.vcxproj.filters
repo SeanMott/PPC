@@ -7,8 +7,11 @@
     <Filter Include="includes\PPCLexer">
       <UniqueIdentifier>{0E397AD0-7A4F-7866-C3C6-03882F1C49EE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="includes\PPCLexer\Data">
-      <UniqueIdentifier>{3787E746-2381-1099-0CEE-A6A9F8867605}</UniqueIdentifier>
+    <Filter Include="includes\PPCLexer\Arguments">
+      <UniqueIdentifier>{D33CC9B8-3F4A-F79E-C830-F389343DC355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\PPCLexer\FileInputs">
+      <UniqueIdentifier>{A0531548-8C0E-05F4-35C6-7D3E21604F84}</UniqueIdentifier>
     </Filter>
     <Filter Include="includes\PPCLexer\Subpasses">
       <UniqueIdentifier>{364DF020-A25A-1E07-2B41-1AF2974DEABD}</UniqueIdentifier>
@@ -21,6 +24,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\PPCLexer\Arguments\ArgumentSettings.hpp">
+      <Filter>includes\PPCLexer\Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLexer\Arguments\Arguments.hpp">
+      <Filter>includes\PPCLexer\Arguments</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLexer\FileInputs\LoadInput.hpp">
+      <Filter>includes\PPCLexer\FileInputs</Filter>
+    </ClInclude>
     <ClInclude Include="includes\PPCLexer\Subpasses\Subpass1.hpp">
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
@@ -33,9 +45,6 @@
     <ClInclude Include="includes\PPCLexer\Subpasses\SubpassExtraStripping.hpp">
       <Filter>includes\PPCLexer\Subpasses</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLexer\Arguments\ArgumentSettings.hpp" />
-    <ClInclude Include="includes\PPCLexer\Arguments\Arguments.hpp" />
-    <ClInclude Include="includes\PPCLexer\FileInputs\LoadInput.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Subpasses\Subpass1.cpp">

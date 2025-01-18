@@ -10,8 +10,14 @@
     <Filter Include="includes\PPCLib\Data">
       <UniqueIdentifier>{CE0232D2-BA91-BB9B-63B0-CF964F1ECC41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="includes\PPCLib\Data\Registers">
+      <UniqueIdentifier>{D5A67AFC-C1CC-4463-AA12-CA2E96D7692F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="includes\PPCLib\SymbolMap">
       <UniqueIdentifier>{68345375-D4F6-86FF-1DA7-158C89A85FDD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\PPCLib\Token">
+      <UniqueIdentifier>{956C9B19-01D9-5614-CACC-EE7136F8787C}</UniqueIdentifier>
     </Filter>
     <Filter Include="includes\PPCLibVenders">
       <UniqueIdentifier>{1C05BA2E-08FF-E280-F16B-7991DD0449ED}</UniqueIdentifier>
@@ -24,11 +30,35 @@
     <ClInclude Include="includes\PPCLib\Data\Datatypes.h">
       <Filter>includes\PPCLib\Data</Filter>
     </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\GeneralKeywords.hpp">
+      <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
     <ClInclude Include="includes\PPCLib\Data\MemoryOffset.hpp">
       <Filter>includes\PPCLib\Data</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLib\Data\ObjectType.hpp">
       <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Operators.hpp">
+      <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\PPCInstructions.hpp">
+      <Filter>includes\PPCLib\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Registers\ConditionRegister.hpp">
+      <Filter>includes\PPCLib\Data\Registers</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Registers\FloatingRegisters.hpp">
+      <Filter>includes\PPCLib\Data\Registers</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Registers\GraphicsQuantizedRegisters.hpp">
+      <Filter>includes\PPCLib\Data\Registers</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Registers\IntegerRegister.hpp">
+      <Filter>includes\PPCLib\Data\Registers</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Data\Registers\SpecialRegister.hpp">
+      <Filter>includes\PPCLib\Data\Registers</Filter>
     </ClInclude>
     <ClInclude Include="includes\PPCLib\Data\Scope.hpp">
       <Filter>includes\PPCLib\Data</Filter>
@@ -42,26 +72,19 @@
     <ClInclude Include="includes\PPCLib\SymbolMap\PPCSymbol.hpp">
       <Filter>includes\PPCLib\SymbolMap</Filter>
     </ClInclude>
+    <ClInclude Include="includes\PPCLib\SymbolMap\SymbolTypes.hpp">
+      <Filter>includes\PPCLib\SymbolMap</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PPCLib\Token\Token.hpp">
+      <Filter>includes\PPCLib\Token</Filter>
+    </ClInclude>
     <ClInclude Include="includes\PPCLibVenders\json.hpp">
       <Filter>includes\PPCLibVenders</Filter>
     </ClInclude>
-    <ClInclude Include="includes\PPCLib\SymbolMap\SymbolTypes.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\PPCInstructions.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\GeneralKeywords.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\Operators.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\Registers\ConditionRegister.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\Registers\FloatingRegisters.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\Registers\GraphicsQuantizedRegisters.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\Registers\IntegerRegister.hpp" />
-    <ClInclude Include="includes\PPCLib\Data\Registers\SpecialRegister.hpp" />
-    <ClInclude Include="includes\PPCLib\Token\Token.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source.cpp">
       <Filter>src</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="includes\PPCLib\DTKParsing\README.md" />
   </ItemGroup>
 </Project>

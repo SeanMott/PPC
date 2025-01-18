@@ -326,3 +326,107 @@ flags
 {
 "LinkTimeOptimization",
 }
+
+--IRGenerator for PPC
+project "PPCIR"
+location "PPCIR"
+kind "ConsoleApp"
+language "C++"
+targetdir ("bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Game")
+objdir ("bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/Game")
+
+
+files 
+{
+---base code
+"PPCIR/includes/**.h",
+"PPCIR/src/**.c",
+"PPCIR/includes/**.hpp",
+"PPCIR/src/**.cpp",
+
+}
+
+includedirs 
+{
+---base code
+"PPCIR/includes",
+PPCLib_Include,
+FMT_INCLUDE
+}
+
+links
+{
+    PPCLib_Link
+}
+
+flags
+{
+"MultiProcessorCompile",
+"NoRuntimeChecks",
+}
+
+
+buildoptions
+{
+"/utf-8",
+}
+
+
+--platforms
+filter "system:windows"
+    cppdialect "C++20"
+    staticruntime "On"
+    systemversion "latest"
+
+
+defines
+{
+"Window_Build"
+}
+
+filter "system:linux"
+    cppdialect "C++20"
+    staticruntime "On"
+    systemversion "latest"
+
+
+defines
+{
+"Linux_Build"
+}
+
+
+    filter "system:mac"
+    cppdialect "C++20"
+    staticruntime "On"
+    systemversion "latest"
+
+
+defines
+{
+"MacOS_Build"
+}
+
+--configs
+filter "configurations:Debug"
+    defines "PPC_DEBUG"
+    symbols "On"
+
+filter "configurations:Release"
+    defines "PPC_RELEASE"
+    optimize "On"
+
+filter "configurations:Dist"
+    defines "PPC_DIST"
+    optimize "On"
+
+
+defines
+{
+"NDEBUG",
+}
+
+flags
+{
+"LinkTimeOptimization",
+}
