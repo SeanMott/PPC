@@ -10,7 +10,7 @@ def MakeFolder(dir):
 
 print("PPC Stage 0: Gathering Data")
 
-DTK = "C:/Decomps/dtk_130"
+DTK = "C:/Decomps/GameCube/Tools/DTK_141"
 ROM = sys.argv[1]
 DTKOuputDir = sys.argv[2]
 MakeFolder(DTKOuputDir)

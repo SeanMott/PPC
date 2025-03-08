@@ -16,7 +16,7 @@
 #include <vector>
 #include <fstream>
 
-namespace PPC::Stage1
+namespace PPC::Token
 {
 	//defines a general token type
 	enum class TokenType
@@ -79,12 +79,16 @@ namespace PPC::Stage1
 		SpecificTokenType specificType = SpecificTokenType::Count; //the specific type
 
 		//specific type bits
-		Data::Scope::ScopeType scopeType = Data::Scope::ScopeType::None;
-		Data::ObjectType::ObjectType objType = Data::ObjectType::ObjectType::None;
-		Data::MemoryOffset::MemoryOffsetType memoryOffsetType = Data::MemoryOffset::MemoryOffsetType::None;
-		Data::ASM::EInstruction instruction = Data::ASM::EInstruction::eInstruction_nop; //the current instruction
-		Data::Datatype::DTKDatatypeType datatype = Data::Datatype::DTKDatatypeType::None;
-		uint64_t symbolID = 0; //the symbol ID
+		union TokenSpecificFlagData
+		{
+			Data::Scope::ScopeType scopeType;
+			Data::ObjectType::ObjectType objType;
+			Data::MemoryOffset::MemoryOffsetType memoryOffsetType;
+			Data::ASM::EInstruction instruction; //the current instruction
+			Data::Datatype::DTKDatatypeType datatype;
+			uint64_t symbolID; //the symbol ID
+		};
+		TokenSpecificFlagData dataForSpecificTokenTypes;
 
 		std::string data = "";
 
@@ -93,8 +97,14 @@ namespace PPC::Stage1
 		{
 			return nlohmann::json{ {"type", type}, {"lineCount", lineCount}, {"charCount", charCount},
 				{"data", data}, {"specificType", specificType},
-				{"scopeType", scopeType}, {"objectType", objType}, {"memoryOffset", memoryOffsetType},
-				{"instruction", instruction}, {"datatype", datatype}, {"symbolID", symbolID} };
+				
+				//specific data for each token type, could be optimized
+				{"scopeType", dataForSpecificTokenTypes.scopeType},
+				{"objectType", dataForSpecificTokenTypes.objType},
+				{"memoryOffset", dataForSpecificTokenTypes.memoryOffsetType},
+				{"instruction", dataForSpecificTokenTypes.instruction},
+				{"datatype", dataForSpecificTokenTypes.datatype},
+				{"symbolID", dataForSpecificTokenTypes.symbolID} };
 		}
 
 		//prints the token
@@ -127,7 +137,7 @@ namespace PPC::Stage1
 				break;
 
 			case TokenType::Symbol_ID:
-				fmt::print(fmt::fg(fmt::color::purple), "Line: {}, Char: {} || Symbol || \"{}\" - ID: {}\n", lineCount, charCount, data, symbolID);
+				fmt::print(fmt::fg(fmt::color::purple), "Line: {}, Char: {} || Symbol || \"{}\" - ID: {}\n", lineCount, charCount, data, dataForSpecificTokenTypes.symbolID);
 				break;
 
 			case TokenType::Instruction:
@@ -175,12 +185,12 @@ namespace PPC::Stage1
 			t->charCount = rawToken.at("charCount").get<size_t>();
 			t->data = rawToken.at("data").get<std::string>();
 			t->specificType = rawToken.at("specificType").get<SpecificTokenType>();
-			t->scopeType = rawToken.at("scopeType").get<Data::Scope::ScopeType>();
-			t->objType = rawToken.at("objectType").get<Data::ObjectType::ObjectType>();
-			t->memoryOffsetType = rawToken.at("memoryOffset").get<Data::MemoryOffset::MemoryOffsetType>();
-			t->instruction = rawToken.at("instruction").get<Data::ASM::EInstruction>();
-			t->datatype = rawToken.at("datatype").get<Data::Datatype::DTKDatatypeType>();
-			t->symbolID = rawToken.at("symbolID").get<uint64_t>();
+			t->dataForSpecificTokenTypes.scopeType = rawToken.at("scopeType").get<Data::Scope::ScopeType>();
+			t->dataForSpecificTokenTypes.objType = rawToken.at("objectType").get<Data::ObjectType::ObjectType>();
+			t->dataForSpecificTokenTypes.memoryOffsetType = rawToken.at("memoryOffset").get<Data::MemoryOffset::MemoryOffsetType>();
+			t->dataForSpecificTokenTypes.instruction = rawToken.at("instruction").get<Data::ASM::EInstruction>();
+			t->dataForSpecificTokenTypes.datatype = rawToken.at("datatype").get<Data::Datatype::DTKDatatypeType>();
+			t->dataForSpecificTokenTypes.symbolID = rawToken.at("symbolID").get<uint64_t>();
 		}
 
 		return tokenStream;
@@ -215,7 +225,7 @@ namespace PPC::Stage1
 
 				//if it's a symbol, pull it from the Map
 				else if (tokens[t].type == TokenType::Symbol_ID)
-					ASM += symbols[tokens[t].symbolID].identifier;
+					ASM += symbols[tokens[t].dataForSpecificTokenTypes.symbolID].identifier;
 
 				//else if't data
 				else
