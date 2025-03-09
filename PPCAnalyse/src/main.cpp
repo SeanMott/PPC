@@ -10,30 +10,6 @@ Splits a ROM and generates the needed extra data for static recomping
 #include <PPCAnalyse/ASM/Stage1/Stage1_ExtractDefinitions.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_Subpass1_StringsAndOperators.hpp>
 
-//lexes a block of code into a series of tokens
-
-//defines a function definition
-struct FunctionDef
-{
-	//prototype
-	PPC::Data::Scope::ScopeType scope = PPC::Data::Scope::ScopeType::Count;
-	std::string name = "";
-
-	//body
-};
-
-//defines a struct definition
-struct StructDef
-{
-	//prototype
-	PPC::Data::Scope::ScopeType scope = PPC::Data::Scope::ScopeType::Count;
-	std::string name = "";
-
-	//body
-};
-
-//defines a sym definition
-
 //entry point
 int main(int args, const char* argv[])
 {
@@ -61,6 +37,7 @@ int main(int args, const char* argv[])
 	//const size_t symbolCount = symbols.size();
 	
 	//goes through the asm and perform lexing
+	size_t fileIndex = 0;
 	for (const auto& entry : std::filesystem::directory_iterator(settings.DTK_asmDir))
 	{
 		if (entry.is_regular_file() && entry.path().extension() == ".s")
@@ -74,138 +51,100 @@ int main(int args, const char* argv[])
 			fread(code.data(), sizeof(char), codeLength, file);
 			fclose(file);
 
-			//splits the inital file into strings and finds all the structs, functions, and sym definitions
-			std::vector<std::string> defStrings = PPC::Analyse::ASM::Stage1::ExtractDefinitions(code);
-
-			//parses the defs into their own token streams
-			for (size_t i = 0; i < defStrings.size(); ++i)
+			//purns everything that isn't a function, struct, or sym define
+			std::vector<std::string> funcBodyStrs, structBodyStrs, funcPrototypeStrs, structPrototypeStrs;
+			funcBodyStrs.reserve(15); structBodyStrs.reserve(15); funcPrototypeStrs.reserve(15); structPrototypeStrs.reserve(15);
+			std::vector<std::string> lines = PPC::Analyse::ASM::Stage1::SplitTextIntoLines(code);
+			const size_t lineCount = lines.size();
+			for (size_t i = 0; i < lineCount; ++i)
 			{
-				//generate the intial token stream
-				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(defStrings[i]);
+				//split into words
+				std::vector<std::string> words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(lines[i]);
 
-				//extract the prototype
-				//0 = def start keyword ".obj", ".fn", or ".sym"
-				//1 = name
-				//2 = comma
-				//3 = scope type
-				//4 = new line
-				fmt::print("{}, {}\n", tokens[1].data, tokens[3].data);
+				//gets if it's the start of something we can define
+				enum class DefType
+				{
+					None = 0,
+					Object,
+					Function,
 
-				//extract the closing statment
-				//tokens.size() - 2 = def end keyword ".endobj" or ".endfn"
-				//tokens.size() - 1 = name
+					Count
+				};
+				DefType type = DefType::None;
+
+				//if struct
+				if (words[0] == ".obj")
+					type = DefType::Object;
+
+				//if function
+				else if (words[0] == ".fn")
+					type = DefType::Function;
+				
+				//if we do a skip-y cuz it ain't the define
+				else
+					continue;
+
+				//adds the prototype
+				if (type == DefType::Object)
+					structPrototypeStrs.emplace_back(lines[i]);
+				else
+					funcPrototypeStrs.emplace_back(lines[i]);
+
+				//gets the rest of the body
+				std::string prunedCode = "";
+				while (i < lineCount)
+				{
+					i++;
+					words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(lines[i]);
+					
+					//if it's the end of the body
+					if (type == DefType::Object && words[0] == ".endobj" || type == DefType::Function && words[0] == ".endfn")
+					{
+						prunedCode += lines[i];
+						break;
+					}
+
+					//if it starts with ".hidden" skip it
+					else if (words[0] == ".hidden")
+						continue;
+
+					//otherwise add the line
+					prunedCode += lines[i] + "\n";
+				}
+
+				//adds the define string
+				if (type == DefType::Object)
+					structBodyStrs.emplace_back(prunedCode);
+				else
+					funcBodyStrs.emplace_back(prunedCode);
 			}
+
+			//lexes the file into a token stream
+			
+			//generate symbol IDs
 
 			//emits C++
-			for (size_t i = 0; i < defStrings.size(); ++i)
+			for (size_t i = 0; i < funcBodyStrs.size(); ++i)
 			{
-				const std::string code = defStrings[i];
+				//generate the prototype
+				const std::vector<std::string> words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(funcPrototypeStrs[i]);
+				std::string identifier = words[1]; identifier.resize(identifier.size() - 1);
+				const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
 
-				//writes to disc
-				std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + std::to_string(i) + ".cpp";
+				//generates the body
+				std::string body = "\n{\n" + funcBodyStrs[i] + "\n}";
+
+				//stitches it togeather
+				const std::string cppCode = prototype + body;
+
+				std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + identifier + ".cpp";
 				std::ofstream cGen(filepath);
-				cGen.write(code.c_str(), code.size());
+				cGen.write(cppCode.c_str(), cppCode.size());
 			}
+
 		}
 	}
 
-	////function and struct prototypes
-	//std::vector<FunctionDefintion> functionDefinitions; functionDefinitions.reserve(10);
-	//std::vector<StructDefinition> structDefinitions; structDefinitions.reserve(10);
-
-	////limited scope for string parsing for prototypes
-	//{
-
-	////splits code amd remove excess shit 
-	//std::vector<std::string> funcPrototypesStrs, structPrototypesStrs;
-	//std::vector<std::vector<std::string>> funcBodiesStrs, structBodiesStrs;
-	//funcPrototypesStrs.reserve(10); funcBodiesStrs.reserve(10); structPrototypesStrs.reserve(10); structBodiesStrs.reserve(10);
-	//SplitNStripASMIntoFuncsStructsAndSyms(settings.DTK_asmDir,
-	//	funcPrototypesStrs, funcBodiesStrs, structPrototypesStrs, structBodiesStrs);
-
-	////generate function and struct prototypes
-	//for (size_t i = 0; i < funcBodiesStrs.size(); ++i)
-	//{
-	//	FunctionDefintion def;
-
-	//	std::vector<std::string> words = SplitLineIntoWords(funcPrototypesStrs[i]);
-
-	//	//0 = fn start asm macro
-	//	//1 = name of the function, has a comma at the end of it at this point
-	//	//2 = is it a weak, global, or local function
-
-	//	//gets the name of the function and strips the comma after it
-	//	def.identifierName = words[1]; def.identifierName.resize(words.size() - 1);
-
-	//	//gets the scope
-	//	def.scopeType = PPC::Data::Scope::ConvertDTKKeywordStringToScopeType(words[2]);
-
-	//	//parses the body into 
-
-	//	//store rest of the body
-	//	def.bodyStrs = funcBodiesStrs[i];
-	//}
-	//for (size_t i = 0; i < structBodiesStrs.size(); ++i)
-	//{
-	//	StructDefinition def;
-
-	//	std::vector<std::string> words = SplitLineIntoWords(structPrototypesStrs[i]);
-
-	//	//0 = obj start asm macro
-	//	//1 = name of the struct, has a comma at the end of it at this point
-	//	//2 = is it a weak, global, or local structtion
-
-	//	//gets the name of the structtion and strips the comma after it
-	//	def.identifierName = words[1]; def.identifierName.resize(words.size() - 1);
-
-	//	//gets the scope
-	//	def.scopeType = PPC::Data::Scope::ConvertDTKKeywordStringToScopeType(words[2]);
-
-	//	//store rest of the body
-	//	def.bodyStrs = structBodiesStrs[i];
-	//}
-	//}
-
-	////parses each line into tokens
-
-	////autogenned C++
-	//const std::string autoGenedCpp = "//this code is auto-genned by the PPC Toolchain.\n//Github: \"https://github.com/SeanMott/PPC\"\n\n"
-	//	"//auto-included\n#include <PPCRuntime/Instructions.hpp>\n#include <PPCRuntime/GCContext.hpp>\n\n"
-	//	"//genned from this project\n#include <PPCProject/Functions.hpp>\n#include <PPCProject/Structs.hpp>\n\n";
-
-	////generate the giga function and struct headers, filled with the prototypes
-
-
-	////emit C++ of the function token stream
-	//for (size_t i = 0; i < functionDefinitions.size(); ++i)
-	//{
-	//	std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + functionDefinitions[i].identifierName + ".cpp";
-	//	std::string code = autoGenedCpp + "void " + functionDefinitions[i].identifierName + "(PPC::Runtime::GCContext* context)\n{\n";
-
-	//	//emit C++ of tokens
-	//	for (size_t t = 0; t < functionDefinitions[i].bodyStrs.size(); ++t)
-	//		code += functionDefinitions[i].bodyStrs[t] + "\n";
-	//	code += "}";
-
-	//	std::ofstream cGen(filepath);
-	//	cGen.write(code.c_str(), code.size());
-	//}
-
-	////emit C++ of the struct token stream
-	//for (size_t i = 0; i < structDefinitions.size(); ++i)
-	//{
-	//	std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + structDefinitions[i].identifierName + ".hpp";
-	//	std::string code = autoGenedCpp + "struct " + structDefinitions[i].identifierName + "\n{\n";
-	//	
-	//	//emit C++ of tokens
-	//	for (size_t t = 0; t < structDefinitions[i].bodyStrs.size(); ++t)
-	//		code += structDefinitions[i].bodyStrs[t] + "\n";
-	//	code += "};";
-
-	//	std::ofstream cGen(filepath);
-	//	cGen.write(code.c_str(), code.size());
-	//}
-
-	getchar();
+	//getchar();
 	return 0;
 }

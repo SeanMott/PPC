@@ -2,13 +2,15 @@
 
 //defines functions for extracting functions, structs, and syms from the ASM
 
+#include <PPCLib/Logger.hpp>
+
 #include <vector>
 #include <string>
 
 namespace PPC::Analyse::ASM::Stage1
 {
 	//splits words
-	static std::vector<std::string> SplitLineIntoWords(const std::string& line)
+	static inline std::vector<std::string> SplitLineIntoWords(const std::string& line)
 	{
 		std::vector<std::string> words; words.reserve(4);
 		uint32_t lineIndex = 0;
@@ -29,6 +31,30 @@ namespace PPC::Analyse::ASM::Stage1
 		}
 
 		return words;
+	}
+
+	//splits a block of code into lines
+	static inline std::vector<std::string> SplitTextIntoLines(const std::string& code)
+	{
+		//splits the code into lines
+		const size_t codeLength = code.size();
+		std::vector<std::string> lines; lines.reserve(codeLength);
+		std::string line = "";
+		for (size_t i = 0; i < codeLength; ++i)
+		{
+			//if new line
+			if (code[i] == '\n')
+			{
+				lines.emplace_back(line);
+				line = "";
+			}
+
+			//adds char
+			else
+				line += code[i];
+		}
+
+		return lines;
 	}
 
 	//extracts the chunks of code for definition any functions, structs, and syms
@@ -64,155 +90,193 @@ namespace PPC::Analyse::ASM::Stage1
 			{
 				std::vector<std::string> words = SplitLineIntoWords(lines[i]);
 
-				//if .sym def
-				if (words[0] == ".sym")
-					defs.emplace_back(lines[i]);
-
-				//if .fn def
-				else if (words[0] == ".fn")
+				//checks if it's a ".fn" or ".obj"
+				enum class DefType
 				{
-					std::string def = lines[i] + "\n";
+					None = 0,
+					Func,
+					Struct,
 
-					//fmt::print("Function Def: {}\n", words[1]);
-					i++; //skip the prototype
-
-					//goes till the end of the func
-					while (i < lineCount)
-					{
-						words = SplitLineIntoWords(lines[i]);
-
-						//if it's the end of the function
-						if (words[0] == ".endfn")
-						{
-							def += lines[i];
-							break;
-						}
-
-						//strips comments
-						const size_t lineLength = lines[i].size();
-						std::string cleanedLine = "";
-						for (size_t c = 0; c < lineLength; ++c)
-						{
-							//if we run into a "/*" go till the end of it or the line
-							if (c + 1 < lineLength && lines[i][c] == '/' && lines[i][c + 1] == '*')
-							{
-								c += 2; //goes to the start of the comment
-
-								//strip it out, leaving only the wanted stuff
-								while (c < lineLength)
-								{
-									//if we reached the end
-									if (c + 1 < lineLength && lines[i][c] == '*' && lines[i][c + 1] == '/')
-									{
-										c += 2;
-										break;
-									}
-
-									c++;
-								}
-							}
-
-							//adds the char
-							if (c < lineLength)
-								cleanedLine += lines[i][c];
-						}
-
-						//strips the extra tabs
-						while (cleanedLine[0] == '\t')
-							cleanedLine.erase(cleanedLine.begin());
-
-						//if it's hidden we skip
-						if (words[0] == ".hidden")
-						{
-							i++;
-							continue;
-						}
-
-						//if it's # comment we skip
-						if (words[0][0] == '#')
-						{
-							i++;
-							continue;
-						}
-
-						//adds the cleaned line
-						//fmt::print("{}\n", cleanedLine);
-						def += cleanedLine + "\n";
-
-						i++;
-					}
-
-					defs.emplace_back(def);
-				}
-
-				//if .obj def
+					Count
+				};
+				DefType type = DefType::None;
+				if (words[0] == ".fn")
+					type = DefType::Func;
 				else if (words[0] == ".obj")
+					type = DefType::Struct;
+				else
+					continue;
+
+				//parses the body
+				std::string def = lines[i] + "\n";
+
+				//fmt::print("{} Def: {}\n", (type == DefType::Func ? "Func" : "Struct"), words[1]);
+				i++; //skip the prototype
+
+				//gets the rest of the body
+				while (i < lineCount)
 				{
-					//fmt::print("Struct Def: {}\n", words[1]);
-					std::string def = lines[i] + "\n";
-					i++; //skip the prototype
+					words = SplitLineIntoWords(lines[i]);
 
-					//goes till the end of the struct
-
-					while (i < lineCount)
+					//if it's the end of the function/struct
+					if (type == DefType::Func && words[0] == ".endfn" || type == DefType::Struct && words[0] == ".endobj")
 					{
-						words = SplitLineIntoWords(lines[i]);
-
-						if (words[0] == ".endobj")
-						{
-							def += lines[i];
-							break;
-						}
-
-						//strips comments
-						const size_t lineLength = lines[i].size();
-						std::string cleanedLine = "";
-						for (size_t c = 0; c < lineLength; ++c)
-						{
-							//if we run into a "/*" go till the end of it or the line
-							if (c + 1 < lineLength && lines[i][c] == '/' && lines[i][c + 1] == '*')
-							{
-								c += 2; //goes to the start of the comment
-
-								//strip it out, leaving only the wanted stuff
-								while (c < lineLength)
-								{
-									//if we reached the end
-									if (c + 1 < lineLength && lines[i][c] == '*' && lines[i][c + 1] == '/')
-									{
-										c += 2;
-										break;
-									}
-
-									c++;
-								}
-							}
-
-							//adds the char
-							if (c < lineLength)
-								cleanedLine += lines[i][c];
-						}
-
-						//strips the extra tabs
-						while (cleanedLine[0] == '\t')
-							cleanedLine.erase(cleanedLine.begin());
-
-						//if it's hidden we skip
-						if (words[0] == ".hidden")
-						{
-							i++;
-							continue;
-						}
-
-						//else we add line
-						else
-							def += cleanedLine + "\n";
-
-						i++;
+						def += lines[i];
+						break;
 					}
 
-					defs.emplace_back(def);
+					def += lines[i] + "\n";
+					i++;
 				}
+
+				defs.emplace_back(def);
+
+
+				////if .fn def
+				//if (words[0] == ".fn")
+				//{
+				//	std::string def = lines[i] + "\n";
+
+				//	//fmt::print("Function Def: {}\n", words[1]);
+				//	i++; //skip the prototype
+
+				//	//goes till the end of the func
+				//	while (i < lineCount)
+				//	{
+				//		words = SplitLineIntoWords(lines[i]);
+
+				//		//if it's the end of the function
+				//		if (words[0] == ".endfn")
+				//		{
+				//			def += lines[i];
+				//			break;
+				//		}
+
+				//		//strips comments
+				//		const size_t lineLength = lines[i].size();
+				//		std::string cleanedLine = "";
+				//		for (size_t c = 0; c < lineLength; ++c)
+				//		{
+				//			//if we run into a "/*" go till the end of it or the line
+				//			if (c + 1 < lineLength && lines[i][c] == '/' && lines[i][c + 1] == '*')
+				//			{
+				//				c += 2; //goes to the start of the comment
+
+				//				//strip it out, leaving only the wanted stuff
+				//				while (c < lineLength)
+				//				{
+				//					//if we reached the end
+				//					if (c + 1 < lineLength && lines[i][c] == '*' && lines[i][c + 1] == '/')
+				//					{
+				//						c += 2;
+				//						break;
+				//					}
+
+				//					c++;
+				//				}
+				//			}
+
+				//			//adds the char
+				//			if (c < lineLength)
+				//				cleanedLine += lines[i][c];
+				//		}
+
+				//		//strips the extra tabs
+				//		while (cleanedLine[0] == '\t')
+				//			cleanedLine.erase(cleanedLine.begin());
+
+				//		//if it's hidden we skip
+				//		if (words[0] == ".hidden")
+				//		{
+				//			i++;
+				//			continue;
+				//		}
+
+				//		//if it's # comment we skip
+				//		if (words[0][0] == '#')
+				//		{
+				//			i++;
+				//			continue;
+				//		}
+
+				//		//adds the cleaned line
+				//		//fmt::print("{}\n", cleanedLine);
+				//		def += cleanedLine + "\n";
+
+				//		i++;
+				//	}
+
+				//	defs.emplace_back(def);
+				//}
+
+				////if .obj def
+				//else if (words[0] == ".obj")
+				//{
+				//	//fmt::print("Struct Def: {}\n", words[1]);
+				//	std::string def = lines[i] + "\n";
+				//	i++; //skip the prototype
+
+				//	//goes till the end of the struct
+
+				//	while (i < lineCount)
+				//	{
+				//		words = SplitLineIntoWords(lines[i]);
+
+				//		if (words[0] == ".endobj")
+				//		{
+				//			def += lines[i];
+				//			break;
+				//		}
+
+				//		//strips comments
+				//		const size_t lineLength = lines[i].size();
+				//		std::string cleanedLine = "";
+				//		for (size_t c = 0; c < lineLength; ++c)
+				//		{
+				//			//if we run into a "/*" go till the end of it or the line
+				//			if (c + 1 < lineLength && lines[i][c] == '/' && lines[i][c + 1] == '*')
+				//			{
+				//				c += 2; //goes to the start of the comment
+
+				//				//strip it out, leaving only the wanted stuff
+				//				while (c < lineLength)
+				//				{
+				//					//if we reached the end
+				//					if (c + 1 < lineLength && lines[i][c] == '*' && lines[i][c + 1] == '/')
+				//					{
+				//						c += 2;
+				//						break;
+				//					}
+
+				//					c++;
+				//				}
+				//			}
+
+				//			//adds the char
+				//			if (c < lineLength)
+				//				cleanedLine += lines[i][c];
+				//		}
+
+				//		//strips the extra tabs
+				//		while (cleanedLine[0] == '\t')
+				//			cleanedLine.erase(cleanedLine.begin());
+
+				//		//if it's hidden we skip
+				//		if (words[0] == ".hidden")
+				//		{
+				//			i++;
+				//			continue;
+				//		}
+
+				//		//else we add line
+				//		else
+				//			def += cleanedLine + "\n";
+
+				//		i++;
+				//	}
+
+				//	defs.emplace_back(def);
+				//}
 			}
 		}
 

@@ -5,11 +5,13 @@
 //makes a string literal token
 static inline PPC::Token::Token MakeToken_StringLiteral(const std::string& code, const size_t& codeLength, size_t& sourceIndex)
 {
+	PPC::Token::Token t;
+	t.type = PPC::Token::TokenType::Literal_String;
+
 	//skips the current char since it's the "
 	sourceIndex++;
 
 	//parses the string
-	std::string str = "";
 	while (sourceIndex < codeLength)
 	{
 		//if it's the end
@@ -17,53 +19,39 @@ static inline PPC::Token::Token MakeToken_StringLiteral(const std::string& code,
 			break;
 
 		//add char
-		str += code[sourceIndex];
+		t.data += code[sourceIndex];
 		sourceIndex++;
 	}
+	sourceIndex++;
 
-	return {
-		0, 0,
-		PPC::Token::TokenType::Literal_String,
-		PPC::Token::SpecificTokenType::Count,
-		{},
-		str
-	};
+	return t;
 }
 
 //makes a operator token
 static inline PPC::Token::Token MakeToken_Operator(const char& op)
 {
-	return {
-		0, 0,
-		PPC::Token::TokenType::Operator,
-		PPC::Token::SpecificTokenType::Count,
-		{},
-		std::string((&op))
-	};
+	PPC::Token::Token t;
+	t.type = PPC::Token::TokenType::Operator;
+	t.data = std::string((&op));
+	return t;
 }
 
 //makes a new line token
 static inline PPC::Token::Token MakeToken_NewLine()
 {
-	return {
-		0, 0,
-		PPC::Token::TokenType::NewLine,
-		PPC::Token::SpecificTokenType::Count,
-		{},
-		"\n"
-	};
+	PPC::Token::Token t;
+	t.type = PPC::Token::TokenType::NewLine;
+	t.data = "\n";
+	return t;
 }
 
 //makes a genaric token
 static inline PPC::Token::Token MakeToken_Genaric(const std::string& word)
 {
-	return {
-		0, 0,
-		PPC::Token::TokenType::Genaric,
-		PPC::Token::SpecificTokenType::Count,
-		{},
-		word
-	};
+	PPC::Token::Token t;
+	t.type = PPC::Token::TokenType::Genaric;
+	t.data = word;
+	return t;
 }
 
 //parses the subpass
@@ -84,7 +72,7 @@ std::vector<PPC::Token::Token> PPC::Analyse::ASM::Stage1::Subpass::PerformSubpas
 				word = "";
 			}
 			tokens.emplace_back(MakeToken_NewLine());
-			continue;
+			//continue;
 		}
 
 		//if space
@@ -95,7 +83,7 @@ std::vector<PPC::Token::Token> PPC::Analyse::ASM::Stage1::Subpass::PerformSubpas
 				tokens.emplace_back(MakeToken_Genaric(word));
 				word = "";
 			}
-			continue;
+			//continue;
 		}
 
 		//if we are starting a string literal
@@ -107,7 +95,7 @@ std::vector<PPC::Token::Token> PPC::Analyse::ASM::Stage1::Subpass::PerformSubpas
 				word = "";
 			}
 			tokens.emplace_back(MakeToken_StringLiteral(code, codeLength, c));
-			continue;
+			//continue;
 		}
 
 		//if it's a operator
@@ -119,11 +107,12 @@ std::vector<PPC::Token::Token> PPC::Analyse::ASM::Stage1::Subpass::PerformSubpas
 				word = "";
 			}
 			tokens.emplace_back(MakeToken_Operator(code[c]));
-			continue;
+			//continue;
 		}
 
 		//adds to the word
-		word += code[c];
+		else
+			word += code[c];
 	}
 
 	//stores the last bit of word data

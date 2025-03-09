@@ -71,6 +71,17 @@ namespace PPC::Token
 		Count
 	};
 
+	//specific type bits
+	union TokenSpecificFlagData
+	{
+		Data::Scope::ScopeType scopeType;
+		Data::ObjectType::ObjectType objType;
+		Data::MemoryOffset::MemoryOffsetType memoryOffsetType;
+		Data::ASM::EInstruction instruction; //the current instruction
+		Data::Datatype::DTKDatatypeType datatype;
+		uint64_t symbolID; //the symbol ID
+	};
+
 	//defines a token
 	struct Token
 	{
@@ -78,19 +89,15 @@ namespace PPC::Token
 		TokenType type = TokenType::Count; //the general type
 		SpecificTokenType specificType = SpecificTokenType::Count; //the specific type
 
-		//specific type bits
-		union TokenSpecificFlagData
-		{
-			Data::Scope::ScopeType scopeType;
-			Data::ObjectType::ObjectType objType;
-			Data::MemoryOffset::MemoryOffsetType memoryOffsetType;
-			Data::ASM::EInstruction instruction; //the current instruction
-			Data::Datatype::DTKDatatypeType datatype;
-			uint64_t symbolID; //the symbol ID
-		};
-		TokenSpecificFlagData dataForSpecificTokenTypes;
+		//specific token type
+		TokenSpecificFlagData dataForSpecificTokenTypes = {};
 
 		std::string data = "";
+
+		Token() {}
+		Token(const size_t lc, const size_t cc, const TokenType t, const SpecificTokenType st, 
+			const TokenSpecificFlagData d, const std::string& w)
+		:lineCount(lc), charCount(cc), type(t), specificType(st), dataForSpecificTokenTypes(d), data(w) {}
 
 		//generates a entry in a JSON Token Stream
 		inline nlohmann::json GenerateJSONArrayEntry() const
