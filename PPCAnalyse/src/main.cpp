@@ -100,10 +100,10 @@ int main(int args, const char* argv[])
 
 			//generate symbol IDs
 
-			for (size_t i = 0; i < funcPrototypeStrs.size(); ++i)
+			for (size_t i = 0; i < funcTokens.size(); ++i)
 			{
 				//generate the prototype
-				std::string identifier = funcTokens[i][0].data;
+				const std::string identifier = funcTokens[i][0].data;
 				const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
 
 				std::string body = "\n{\n" + funcBodyStrs[i] + "\n}";
@@ -116,11 +116,10 @@ int main(int args, const char* argv[])
 				cGen.write(cppCode.c_str(), cppCode.size());
 			}
 
-			for (size_t i = 0; i < structBodyStrs.size(); ++i)
+			for (size_t i = 0; i < structTokens.size(); ++i)
 			{
 				//generate the prototype
-				std::string identifier = structTokens[i][0].data;
-
+				const std::string identifier = structTokens[i][0].data;
 				const std::string prototype = "struct " + identifier;
 
 				//generates the body
