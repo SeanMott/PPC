@@ -2,6 +2,31 @@
 
 #include <PPCLib/Data/Operators.hpp>
 
+//makes a comment block token
+static inline PPC::Token::Token MakeToken_CommentBlock(const std::string& code, const size_t& codeLength, size_t& sourceIndex)
+{
+	PPC::Token::Token t;
+	t.type = PPC::Token::TokenType::BlockComment;
+
+	//skips the current char since it's the *
+	sourceIndex++;
+
+	//parses the string
+	while (sourceIndex < codeLength)
+	{
+		//if it's the end
+		if (sourceIndex + 1 < codeLength && code[sourceIndex] == '*' && code[sourceIndex + 1] == '/')
+			break;
+
+		//add char
+		t.data += code[sourceIndex];
+		sourceIndex++;
+	}
+	sourceIndex++;
+
+	return t;
+}
+
 //makes a string literal token
 static inline PPC::Token::Token MakeToken_StringLiteral(const std::string& code, const size_t& codeLength, size_t& sourceIndex)
 {
@@ -108,6 +133,18 @@ std::vector<PPC::Token::Token> PPC::Analyse::ASM::Stage1::Subpass::PerformSubpas
 			}
 			tokens.emplace_back(MakeToken_Operator(code[c]));
 			//continue;
+		}
+
+		//processes comment
+		else if (c + 1 < codeLength && code[c] == '/' && code[c + 1] == '*')
+		{
+			c++;
+			if (word != "")
+			{
+				tokens.emplace_back(MakeToken_Genaric(word));
+				word = "";
+			}
+			tokens.emplace_back(MakeToken_CommentBlock(code, codeLength, c));
 		}
 
 		//adds to the word

@@ -6,7 +6,6 @@ Splits a ROM and generates the needed extra data for static recomping
 
 #include <PPCAnalyse/SymbolMap/Stage_DTKSymbolsToPPCMap.hpp>
 
-#include <PPCAnalyse/ASM/Stage1/Stage1ASM.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_ExtractDefinitions.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_StripStructComments.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_Subpass1_StringsAndOperators.hpp>
@@ -62,19 +61,69 @@ int main(int args, const char* argv[])
 			PPC::Analyse::ASM::Stage1::ExtractDefinitions(code, funcPrototypeStrs, funcBodyStrs, structPrototypeStrs, structBodyStrs);
 			PPC::Analyse::ASM::Stage1::StripUnneededComments(structBodyStrs);
 
-			//lexes the file into a token stream
-			
+			//lexes the code into tokens
+			std::vector<std::vector<PPC::Token::Token>> funcTokens, structTokens;
+			funcTokens.reserve(15); structTokens.reserve(15);
+			for (size_t i = 0; i < funcBodyStrs.size(); ++i)
+			{
+				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(funcPrototypeStrs[i] + "\n" + funcBodyStrs[i]);
+
+				/*
+				0 = .fn or .obj starting word
+				1 = identifier name
+				2 = comma
+				3 = scope
+				4 = new line
+				*/
+				tokens[0] = tokens[1];
+				tokens.erase(tokens.begin() + 1, tokens.begin() + 4);
+
+				funcTokens.emplace_back(tokens);
+			}
+
 			//generate symbol IDs
 
 			//emits C++
-			for (size_t i = 0; i < funcBodyStrs.size(); ++i)
+			//for (size_t i = 0; i < funcTokens.size(); ++i)
+			//{
+			//	//----------TOKEN GENERATION-------------------//
+			//	//generate the prototype
+			//	//std::string identifier = funcTokens[i][0].data;
+			//	//const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
+
+			//	////generates the body
+			//	//std::string body = "\n{";
+			//	//const size_t tokenCount = funcTokens[i].size();
+			//	//for (size_t t = 1; t < tokenCount; ++t)
+			//	//{
+			//	//	//if it's a comment
+			//	//	if (funcTokens[i][t].type == PPC::Token::TokenType::BlockComment)
+			//	//		body += "/* " + funcTokens[i][t].data + " */";
+
+			//	//	//if it's anything else
+			//	//	else
+			//	//		body += funcTokens[i][t].data;
+
+			//	//	//adds a space if it's needed
+			//	//	if (t + 1 < tokenCount && funcTokens[i][t].type != PPC::Token::TokenType::NewLine)
+			//	//		body += ' ';
+			//	//}
+			//	//body += "\n}";
+
+			//	//stitches it togeather
+			//	const std::string cppCode = prototype + body;
+
+			//	std::string filepath = recompDir_CppCode.string() + "/" + identifier + ".cpp";
+			//	std::ofstream cGen(filepath);
+			//	cGen.write(cppCode.c_str(), cppCode.size());
+			//}
+
+			for (size_t i = 0; i < funcPrototypeStrs.size(); ++i)
 			{
 				//generate the prototype
-				const std::vector<std::string> words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(funcPrototypeStrs[i]);
-				std::string identifier = words[1]; identifier.resize(identifier.size() - 1);
+				std::string identifier = funcTokens[i][0].data;
 				const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
 
-				//generates the body
 				std::string body = "\n{\n" + funcBodyStrs[i] + "\n}";
 
 				//stitches it togeather
