@@ -11,6 +11,12 @@
 #include <PPCLib/Data/Datatypes.h>
 #include <PPCLib/Data/PPCInstructions.hpp>
 
+#include <PPCLib/Data/Registers/ConditionRegister.hpp>
+#include <PPCLib/Data/Registers/FloatingRegisters.hpp>
+#include <PPCLib/Data/Registers/GraphicsQuantizedRegisters.hpp>
+#include <PPCLib/Data/Registers/IntegerRegister.hpp>
+#include <PPCLib/Data/Registers/SpecialRegister.hpp>
+
 #include <PPCLib/SymbolMap/PPCSymbol.hpp>
 
 #include <vector>
@@ -50,6 +56,8 @@ namespace PPC::Token
 		SingleLineComment, //a single line # comment
 		BlockComment, //a block comment
 
+		JumpLabel, //defines a jump label
+
 		NewLine,
 
 		Count
@@ -79,6 +87,7 @@ namespace PPC::Token
 		Data::MemoryOffset::MemoryOffsetType memoryOffsetType;
 		Data::ASM::EInstruction instruction; //the current instruction
 		Data::Datatype::DTKDatatypeType datatype;
+
 		uint64_t symbolID; //the symbol ID
 	};
 
@@ -154,6 +163,53 @@ namespace PPC::Token
 			default:
 				fmt::print("Line: {}, Char: {} || {}\n", lineCount, charCount, data);
 				break;
+
+			}
+		}
+
+		//emits C++
+		inline std::string EmitCpp() const
+		{
+			switch (type)
+			{
+			case TokenType::BlockComment:
+				return std::string("/* ") + data + "*/";
+
+			case TokenType::Literal_String:
+				return std::string("\"") + data + "\"";
+
+			case TokenType::JumpLabel:
+				return data + ": //this is a jump label";
+
+			case TokenType::Datatype:
+				switch (dataForSpecificTokenTypes.datatype)
+				{
+				case PPC::Data::Datatype::DTKDatatypeType::Byte:
+					return "uint8_t";
+				case PPC::Data::Datatype::DTKDatatypeType::Byte2:
+					return "uint16_t";
+				case PPC::Data::Datatype::DTKDatatypeType::Byte4:
+					return "uint32_t";
+				case PPC::Data::Datatype::DTKDatatypeType::Double:
+					return "double";
+				case PPC::Data::Datatype::DTKDatatypeType::Float:
+					return "float";
+				case PPC::Data::Datatype::DTKDatatypeType::Skip:
+					return "uint32_t";
+				case PPC::Data::Datatype::DTKDatatypeType::String:
+					return "const char*";
+
+				default:
+					return "void*";
+				}
+
+				break;
+
+			case TokenType::Register:
+				return "context->" + data;
+
+			default:
+				return data;
 
 			}
 		}

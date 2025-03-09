@@ -10,6 +10,10 @@ Splits a ROM and generates the needed extra data for static recomping
 #include <PPCAnalyse/ASM/Stage1/Stage1_StripStructComments.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_Subpass1_StringsAndOperators.hpp>
 
+#include <PPCAnalyse/ASM/Stage2/Stage2_MarkJumpLabel.hpp>
+#include <PPCAnalyse/ASM/Stage2/Stage2_MarkDatatypes.hpp>
+#include <PPCAnalyse/ASM/Stage2/Stage2_MarkRegisters.hpp>
+
 //entry point
 int main(int args, const char* argv[])
 {
@@ -164,6 +168,20 @@ int main(int args, const char* argv[])
 			}
 
 			//perform a second subpass that will mark out jump labels, digit literals, and datatypes
+			for (size_t i = 0; i < funcTokens.size(); ++i)
+			{
+				PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkJumpLabels(funcTokens[i]);
+				PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkDataBytes(funcTokens[i]);
+				PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkRegisters(funcTokens[i]);
+				//PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkMemoryOffsetKeywords(funcTokens[i]);
+			}
+			for (size_t i = 0; i < structTokens.size(); ++i)
+			{
+				PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkJumpLabels(structTokens[i]);
+				PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkDataBytes(structTokens[i]);
+				PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkRegisters(structTokens[i]);
+				//PPC::Analyse::ASM::Stage2::Subpass::PerformSubpass_MarkMemoryOffsetKeywords(structTokens[i]);
+			}
 
 			//emit C++
 			for (size_t i = 0; i < funcTokens.size(); ++i)
@@ -178,7 +196,7 @@ int main(int args, const char* argv[])
 				for (size_t t = 1; t < tokenCount; ++t)
 				{
 					PPC::Token::Token token = (funcTokens[i][t]);
-					body += token.data;
+					body += token.EmitCpp();
 
 					//if we need a space
 					if (t + 1 < tokenCount && token.type != PPC::Token::TokenType::NewLine)
@@ -206,7 +224,7 @@ int main(int args, const char* argv[])
 				for (size_t t = 1; t < tokenCount; ++t)
 				{
 					PPC::Token::Token token = (structTokens[i][t]);
-					body += token.data;
+					body += token.EmitCpp();
 
 					//if we need a space
 					if (t + 1 < tokenCount && token.type != PPC::Token::TokenType::NewLine)
