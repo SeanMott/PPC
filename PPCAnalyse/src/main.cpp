@@ -24,6 +24,8 @@ int main(int args, const char* argv[])
 	settings.generateTypeNames = true;
 	settings.splitIntoOwnFiles = true;
 
+	const std::filesystem::path recompDir_CppCode = "C:/Decomps/GameCube/TODDecomp/Recomp/Cpp";
+
 	//extracts ROM
 
 	//generates DTK config
@@ -36,8 +38,11 @@ int main(int args, const char* argv[])
 	//	std::filesystem::path(settings.PPC_symbolMapDir.string() + "/Map" + PPC_MAP_FILE_EXTENSION));
 	//const size_t symbolCount = symbols.size();
 	
+	//scan the types and rename the structs and remove any annoying names with strings
+
+	//regen the assembly
+
 	//goes through the asm and perform lexing
-	size_t fileIndex = 0;
 	for (const auto& entry : std::filesystem::directory_iterator(settings.DTK_asmDir))
 	{
 		if (entry.is_regular_file() && entry.path().extension() == ".s")
@@ -53,71 +58,7 @@ int main(int args, const char* argv[])
 
 			//purns everything that isn't a function, struct, or sym define
 			std::vector<std::string> funcBodyStrs, structBodyStrs, funcPrototypeStrs, structPrototypeStrs;
-			funcBodyStrs.reserve(15); structBodyStrs.reserve(15); funcPrototypeStrs.reserve(15); structPrototypeStrs.reserve(15);
-			std::vector<std::string> lines = PPC::Analyse::ASM::Stage1::SplitTextIntoLines(code);
-			const size_t lineCount = lines.size();
-			for (size_t i = 0; i < lineCount; ++i)
-			{
-				//split into words
-				std::vector<std::string> words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(lines[i]);
-
-				//gets if it's the start of something we can define
-				enum class DefType
-				{
-					None = 0,
-					Object,
-					Function,
-
-					Count
-				};
-				DefType type = DefType::None;
-
-				//if struct
-				if (words[0] == ".obj")
-					type = DefType::Object;
-
-				//if function
-				else if (words[0] == ".fn")
-					type = DefType::Function;
-				
-				//if we do a skip-y cuz it ain't the define
-				else
-					continue;
-
-				//adds the prototype
-				if (type == DefType::Object)
-					structPrototypeStrs.emplace_back(lines[i]);
-				else
-					funcPrototypeStrs.emplace_back(lines[i]);
-
-				//gets the rest of the body
-				std::string prunedCode = "";
-				while (i < lineCount)
-				{
-					i++;
-					words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(lines[i]);
-					
-					//if it's the end of the body
-					if (type == DefType::Object && words[0] == ".endobj" || type == DefType::Function && words[0] == ".endfn")
-					{
-						prunedCode += lines[i];
-						break;
-					}
-
-					//if it starts with ".hidden" skip it
-					else if (words[0] == ".hidden")
-						continue;
-
-					//otherwise add the line
-					prunedCode += lines[i] + "\n";
-				}
-
-				//adds the define string
-				if (type == DefType::Object)
-					structBodyStrs.emplace_back(prunedCode);
-				else
-					funcBodyStrs.emplace_back(prunedCode);
-			}
+			PPC::Analyse::ASM::Stage1::ExtractDefinitions(code, funcPrototypeStrs, funcBodyStrs, structPrototypeStrs, structBodyStrs);
 
 			//lexes the file into a token stream
 			
@@ -137,7 +78,7 @@ int main(int args, const char* argv[])
 				//stitches it togeather
 				const std::string cppCode = prototype + body;
 
-				std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + identifier + ".cpp";
+				std::string filepath = recompDir_CppCode.string() + "/" + identifier + ".cpp";
 				std::ofstream cGen(filepath);
 				cGen.write(cppCode.c_str(), cppCode.size());
 			}
@@ -155,7 +96,7 @@ int main(int args, const char* argv[])
 				//stitches it togeather
 				const std::string cppCode = prototype + body;
 
-				std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + identifier + ".hpp";
+				std::string filepath = recompDir_CppCode.string() + "/" + identifier + ".hpp";
 				std::ofstream cGen(filepath);
 				cGen.write(cppCode.c_str(), cppCode.size());
 			}
