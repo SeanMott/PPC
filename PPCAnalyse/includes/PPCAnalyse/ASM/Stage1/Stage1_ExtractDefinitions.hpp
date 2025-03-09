@@ -103,8 +103,8 @@ namespace PPC::Analyse::ASM::Stage1
 				//if it's the end of the body
 				if (type == DefType::Object && words[0] == ".endobj" || type == DefType::Function && words[0] == ".endfn")
 				{
-					prunedCode += lines[i]; //add it so we can clean the token stream afterwards
-					//prunedCode.resize(prunedCode.size() - 1); //remove the extra new line
+					//prunedCode += lines[i]; //don't need the ending
+					prunedCode.resize(prunedCode.size() - 1); //remove the extra new line
 					break;
 				}
 

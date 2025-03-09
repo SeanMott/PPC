@@ -18,6 +18,8 @@ int main(int args, const char* argv[])
 
 	//temp set
 	settings.DTK_asmDir = "C:/Decomps/GameCube/TODDecomp/RawASM/asm";
+	//settings.DTK_asmDir = "C:/Decomps/GameCube/KAR-Decomp/NA/asm";
+
 	settings.DTK_splitsNSymbolsDir = "C:/Decomps/GameCube/TODDecomp/RawASM/DTKSymbolsNSplits";
 	settings.PPC_symbolMapDir = "C:/Decomps/GameCube/TODDecomp/Recomped/SymbolMaps";
 	settings.PPC_tokenizedASMFilesDir = "C:/Decomps/GameCube/TODDecomp/Recomped/TokenizedASM";
@@ -25,6 +27,7 @@ int main(int args, const char* argv[])
 	settings.splitIntoOwnFiles = true;
 
 	const std::filesystem::path recompDir_CppCode = "C:/Decomps/GameCube/TODDecomp/Recomp/Cpp";
+	//const std::filesystem::path recompDir_CppCode = "C:/Decomps/GameCube/KAR-Decomp/NA/PsudoC";
 
 	//extracts ROM
 
