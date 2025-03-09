@@ -106,8 +106,7 @@ int main(int args, const char* argv[])
 				const std::string identifier = funcTokens[i][0].data;
 				const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
 			
-				//std::string body = "\n{\n" + funcStrs[i] + "\n}";
-
+				//generates the body
 				std::string body = "\n{";
 				const size_t tokenCount = funcTokens[i].size();
 				for (size_t t = 1; t < tokenCount; ++t)
@@ -136,7 +135,18 @@ int main(int args, const char* argv[])
 				const std::string prototype = "struct " + identifier;
 
 				//generates the body
-				std::string body = "\n{\n" + structStrs[i] + "\n}";
+				std::string body = "\n{";
+				const size_t tokenCount = structTokens[i].size();
+				for (size_t t = 1; t < tokenCount; ++t)
+				{
+					PPC::Token::Token token = (structTokens[i][t]);
+					body += token.data;
+
+					//if we need a space
+					if (t + 1 < tokenCount && token.type != PPC::Token::TokenType::NewLine)
+						body += ' ';
+				}
+				body += "\n};";
 
 				//stitches it togeather
 				const std::string cppCode = prototype + body;
