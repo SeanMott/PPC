@@ -59,11 +59,10 @@ namespace PPC::Analyse::ASM::Stage1
 
 	//extracts the chunks of code for definition any functions, structs, and syms
 	static inline void ExtractDefinitions(const std::string& code,
-		std::vector<std::string>& funcPrototypeStrs, std::vector<std::string>& funcBodyStrs,
-		std::vector<std::string>& structPrototypeStrs, std::vector<std::string>& structBodyStrs)
+		std::vector<std::string>& funcStrs, std::vector<std::string>& structStrs)
 	{
 		//purns everything that isn't a function, struct, or sym define
-		funcBodyStrs.reserve(15); structBodyStrs.reserve(15); funcPrototypeStrs.reserve(15); structPrototypeStrs.reserve(15);
+		funcStrs.reserve(15); structStrs.reserve(15);
 		std::vector<std::string> lines = SplitTextIntoLines(code);
 		const size_t lineCount = lines.size();
 		for (size_t i = 0; i < lineCount; ++i)
@@ -94,14 +93,8 @@ namespace PPC::Analyse::ASM::Stage1
 			else
 				continue;
 
-			//adds the prototype
-			if (type == DefType::Object)
-				structPrototypeStrs.emplace_back(lines[i]);
-			else
-				funcPrototypeStrs.emplace_back(lines[i]);
-
 			//gets the rest of the body
-			std::string prunedCode = "";
+			std::string prunedCode = lines[i] + "\n";
 			while (i < lineCount)
 			{
 				i++;
@@ -110,8 +103,8 @@ namespace PPC::Analyse::ASM::Stage1
 				//if it's the end of the body
 				if (type == DefType::Object && words[0] == ".endobj" || type == DefType::Function && words[0] == ".endfn")
 				{
-					//prunedCode += lines[i]; //we don't add the .endobj or .fn cuz it's unneeded
-					prunedCode.resize(prunedCode.size() - 1); //remove the extra new line
+					prunedCode += lines[i]; //add it so we can clean the token stream afterwards
+					//prunedCode.resize(prunedCode.size() - 1); //remove the extra new line
 					break;
 				}
 
@@ -125,9 +118,9 @@ namespace PPC::Analyse::ASM::Stage1
 
 			//adds the define string
 			if (type == DefType::Object)
-				structBodyStrs.emplace_back(prunedCode);
+				structStrs.emplace_back(prunedCode);
 			else
-				funcBodyStrs.emplace_back(prunedCode);
+				funcStrs.emplace_back(prunedCode);
 		}
 	}
 }

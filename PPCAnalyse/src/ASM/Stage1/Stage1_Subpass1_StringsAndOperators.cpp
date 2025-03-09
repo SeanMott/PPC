@@ -22,7 +22,7 @@ static inline PPC::Token::Token MakeToken_CommentBlock(const std::string& code, 
 		t.data += code[sourceIndex];
 		sourceIndex++;
 	}
-	sourceIndex++;
+	sourceIndex += 2;
 
 	return t;
 }
@@ -40,14 +40,14 @@ static inline PPC::Token::Token MakeToken_StringLiteral(const std::string& code,
 	while (sourceIndex < codeLength)
 	{
 		//if it's the end
-		if (sourceIndex > 0 && code[sourceIndex - 1] != '\\' && code[sourceIndex] == '"')
+		if (sourceIndex + 1 < codeLength && code[sourceIndex] != '\\' && code[sourceIndex + 1] == '"')
 			break;
 
 		//add char
 		t.data += code[sourceIndex];
 		sourceIndex++;
 	}
-	sourceIndex++;
+	sourceIndex += 2;
 
 	return t;
 }
@@ -57,7 +57,7 @@ static inline PPC::Token::Token MakeToken_Operator(const char& op)
 {
 	PPC::Token::Token t;
 	t.type = PPC::Token::TokenType::Operator;
-	t.data = std::string((&op));
+	t.data = std::string(1, op);
 	return t;
 }
 

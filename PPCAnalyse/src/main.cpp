@@ -57,16 +57,16 @@ int main(int args, const char* argv[])
 			fclose(file);
 
 			//purns everything that isn't a function, struct, or sym define
-			std::vector<std::string> funcBodyStrs, structBodyStrs, funcPrototypeStrs, structPrototypeStrs;
-			PPC::Analyse::ASM::Stage1::ExtractDefinitions(code, funcPrototypeStrs, funcBodyStrs, structPrototypeStrs, structBodyStrs);
-			PPC::Analyse::ASM::Stage1::StripUnneededComments(structBodyStrs);
+			std::vector<std::string> funcStrs, structStrs;
+			PPC::Analyse::ASM::Stage1::ExtractDefinitions(code, funcStrs, structStrs);
+			PPC::Analyse::ASM::Stage1::StripUnneededComments(structStrs);
 
 			//lexes the code into tokens
 			std::vector<std::vector<PPC::Token::Token>> funcTokens, structTokens;
 			funcTokens.reserve(15); structTokens.reserve(15);
-			for (size_t i = 0; i < funcBodyStrs.size(); ++i)
+			for (size_t i = 0; i < funcStrs.size(); ++i)
 			{
-				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(funcPrototypeStrs[i] + "\n" + funcBodyStrs[i]);
+				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(funcStrs[i]);
 
 				/*
 				0 = .fn or .obj starting word
@@ -81,9 +81,9 @@ int main(int args, const char* argv[])
 				funcTokens.emplace_back(tokens);
 			}
 
-			for (size_t i = 0; i < structBodyStrs.size(); ++i)
+			for (size_t i = 0; i < structStrs.size(); ++i)
 			{
-				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(structPrototypeStrs[i] + "\n" + structBodyStrs[i]);
+				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(structStrs[i]);
 
 				/*
 				0 = .fn or .obj starting word
@@ -105,14 +105,27 @@ int main(int args, const char* argv[])
 				//generate the prototype
 				const std::string identifier = funcTokens[i][0].data;
 				const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
+			
+				//std::string body = "\n{\n" + funcStrs[i] + "\n}";
 
-				std::string body = "\n{\n" + funcBodyStrs[i] + "\n}";
+				std::string body = "\n{";
+				const size_t tokenCount = funcTokens[i].size();
+				for (size_t t = 1; t < tokenCount; ++t)
+				{
+					PPC::Token::Token token = (funcTokens[i][t]);
+					body += token.data;
+
+					//if we need a space
+					if (t + 1 < tokenCount && token.type != PPC::Token::TokenType::NewLine)
+						body += ' ';
+				}
+				body += "\n}";
 
 				//stitches it togeather
 				const std::string cppCode = prototype + body;
-
+			
 				std::string filepath = recompDir_CppCode.string() + "/" + identifier + ".cpp";
-				std::ofstream cGen(filepath);
+				std::ofstream cGen(filepath, std::ios::trunc);
 				cGen.write(cppCode.c_str(), cppCode.size());
 			}
 
@@ -123,13 +136,13 @@ int main(int args, const char* argv[])
 				const std::string prototype = "struct " + identifier;
 
 				//generates the body
-				std::string body = "\n{\n" + structBodyStrs[i] + "\n}";
+				std::string body = "\n{\n" + structStrs[i] + "\n}";
 
 				//stitches it togeather
 				const std::string cppCode = prototype + body;
 
 				std::string filepath = recompDir_CppCode.string() + "/" + identifier + ".hpp";
-				std::ofstream cGen(filepath);
+				std::ofstream cGen(filepath, std::ios::trunc);
 				cGen.write(cppCode.c_str(), cppCode.size());
 			}
 
