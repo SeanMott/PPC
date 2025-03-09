@@ -100,8 +100,8 @@ std::vector<PPC::Token::Token> PPC::Analyse::ASM::Stage1::Subpass::PerformSubpas
 			//continue;
 		}
 
-		//if space
-		else if (code[c] == ' ')
+		//if space or tab
+		else if (code[c] == ' ' || code[c] == '\t')
 		{
 			if (word != "")
 			{

@@ -45,6 +45,9 @@ int main(int args, const char* argv[])
 
 	//regen the assembly
 
+	//symbol list of every identifier
+	std::vector<std::string> identifierNames; identifierNames.reserve(100);
+
 	//goes through the asm and perform lexing
 	for (const auto& entry : std::filesystem::directory_iterator(settings.DTK_asmDir))
 	{
@@ -71,6 +74,8 @@ int main(int args, const char* argv[])
 			{
 				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(funcStrs[i]);
 
+				//ignore the whole first chunk and just store the name
+				//since this block of tokens is scoped around the define, we know it's just gonna be that
 				/*
 				0 = .fn or .obj starting word
 				1 = identifier name
@@ -80,7 +85,13 @@ int main(int args, const char* argv[])
 				*/
 				tokens[0] = tokens[1];
 				tokens.erase(tokens.begin() + 1, tokens.begin() + 4);
-
+			
+				//stores the name in the identifier name list
+				identifierNames.emplace_back(tokens[0].data);
+				tokens[0].type = PPC::Token::TokenType::Symbol_ID;
+				tokens[0].dataForSpecificTokenTypes.symbolID = identifierNames.size() - 1;
+			
+				//adds to the total func defs
 				funcTokens.emplace_back(tokens);
 			}
 
@@ -88,6 +99,8 @@ int main(int args, const char* argv[])
 			{
 				std::vector<PPC::Token::Token> tokens = PPC::Analyse::ASM::Stage1::Subpass::PerformSubpass1(structStrs[i]);
 
+				//ignore the whole first chunk and just store the name
+				//since this block of tokens is scoped around the define, we know it's just gonna be that
 				/*
 				0 = .fn or .obj starting word
 				1 = identifier name
@@ -95,18 +108,68 @@ int main(int args, const char* argv[])
 				3 = scope
 				4 = new line
 				*/
-				tokens[0] = tokens[1];
+				tokens[0] = tokens[1]; 
 				tokens.erase(tokens.begin() + 1, tokens.begin() + 4);
 
+				//stores the name in the identifier name list
+				identifierNames.emplace_back(tokens[0].data);
+				tokens[0].type = PPC::Token::TokenType::Symbol_ID;
+				tokens[0].dataForSpecificTokenTypes.symbolID = identifierNames.size() - 1;
+
+				//adds to the total struct defs
 				structTokens.emplace_back(tokens);
 			}
 
-			//generate symbol IDs
+			//replace the identifiers with symbol IDs
+			const size_t symbolCount = identifierNames.size();
+			const size_t funcCount = funcTokens.size();
+			for (size_t i = 0; i < funcTokens.size(); ++i)
+			{
+				for (size_t t = 1; t < funcTokens[i].size(); ++t)
+				{
+					PPC::Token::Token token = (funcTokens[i][t]);
+					if (token.type == PPC::Token::TokenType::Genaric)
+					{
+						for (size_t s = 0; s < symbolCount; ++s)
+						{
+							if (identifierNames[s] == token.data)
+							{
+								funcTokens[i][t].type = PPC::Token::TokenType::Symbol_ID;
+								funcTokens[i][t].dataForSpecificTokenTypes.symbolID = s;
+								break;
+							}
+						}
+					}
+				}
+			}
+			const size_t structCount = structTokens.size();
+			for (size_t i = 0; i < structTokens.size(); ++i)
+			{
+				for (size_t t = 1; t < structTokens[i].size(); ++t)
+				{
+					PPC::Token::Token token = (structTokens[i][t]);
+					if (token.type == PPC::Token::TokenType::Genaric)
+					{
+						for (size_t s = 0; s < symbolCount; ++s)
+						{
+							if (identifierNames[s] == token.data)
+							{
+								structTokens[i][t].type = PPC::Token::TokenType::Symbol_ID;
+								structTokens[i][t].dataForSpecificTokenTypes.symbolID = s;
+								break;
+							}
+						}
+					}
+				}
+			}
 
+			//perform a second subpass that will mark out jump labels, digit literals, and datatypes
+
+			//emit C++
 			for (size_t i = 0; i < funcTokens.size(); ++i)
 			{
 				//generate the prototype
-				const std::string identifier = funcTokens[i][0].data;
+				const std::string identifier = identifierNames[funcTokens[i][0].dataForSpecificTokenTypes.symbolID];
 				const std::string prototype = "void " + identifier + "(PPC::Runtime::GCContext* context)";
 			
 				//generates the body
