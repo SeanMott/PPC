@@ -110,7 +110,8 @@ namespace PPC::Analyse::ASM::Stage1
 				//if it's the end of the body
 				if (type == DefType::Object && words[0] == ".endobj" || type == DefType::Function && words[0] == ".endfn")
 				{
-					prunedCode += lines[i];
+					//prunedCode += lines[i]; //we don't add the .endobj or .fn cuz it's unneeded
+					prunedCode.resize(prunedCode.size() - 1); //remove the extra new line
 					break;
 				}
 
