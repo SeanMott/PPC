@@ -41,4 +41,16 @@ with open(DTKConfig, "a") as file:
 #generates the assembly
 subprocess.run([DTK, "dol", "split", DTKConfig, DTKRawAssembly], text=True)
 
+#goes into the symbol list and changes any @s, 
+#so we don't have annoying "" in the identifier names
+with open(DTKRawAssembly_Symbols[2:] + "/symbols.txt", 'r', encoding='utf-8') as file:
+    lines = file.readlines()
+    modified_lines = [line.replace('@', 'AT_', 1) if line.startswith('@') else line for line in lines]
+
+with open(DTKRawAssembly_Symbols[2:] + "/symbols.txt", 'w', encoding='utf-8') as file:
+    file.writelines(modified_lines)
+
+#if there were any, regenerate the assembly
+subprocess.run([DTK, "dol", "split", DTKConfig, DTKRawAssembly], text=True)
+
 #cleans up the directory
