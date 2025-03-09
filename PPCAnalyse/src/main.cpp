@@ -142,6 +142,24 @@ int main(int args, const char* argv[])
 				cGen.write(cppCode.c_str(), cppCode.size());
 			}
 
+			for (size_t i = 0; i < structBodyStrs.size(); ++i)
+			{
+				//generate the prototype
+				const std::vector<std::string> words = PPC::Analyse::ASM::Stage1::SplitLineIntoWords(structPrototypeStrs[i]);
+				std::string identifier = words[1]; identifier.resize(identifier.size() - 1);
+				const std::string prototype = "struct " + identifier;
+
+				//generates the body
+				std::string body = "\n{\n" + structBodyStrs[i] + "\n}";
+
+				//stitches it togeather
+				const std::string cppCode = prototype + body;
+
+				std::string filepath = settings.PPC_tokenizedASMFilesDir.string() + "/" + identifier + ".hpp";
+				std::ofstream cGen(filepath);
+				cGen.write(cppCode.c_str(), cppCode.size());
+			}
+
 		}
 	}
 
