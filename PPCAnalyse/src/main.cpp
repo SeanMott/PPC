@@ -8,6 +8,7 @@ Splits a ROM and generates the needed extra data for static recomping
 
 #include <PPCAnalyse/ASM/Stage1/Stage1ASM.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_ExtractDefinitions.hpp>
+#include <PPCAnalyse/ASM/Stage1/Stage1_StripStructComments.hpp>
 #include <PPCAnalyse/ASM/Stage1/Stage1_Subpass1_StringsAndOperators.hpp>
 
 //entry point
@@ -59,6 +60,7 @@ int main(int args, const char* argv[])
 			//purns everything that isn't a function, struct, or sym define
 			std::vector<std::string> funcBodyStrs, structBodyStrs, funcPrototypeStrs, structPrototypeStrs;
 			PPC::Analyse::ASM::Stage1::ExtractDefinitions(code, funcPrototypeStrs, funcBodyStrs, structPrototypeStrs, structBodyStrs);
+			PPC::Analyse::ASM::Stage1::StripUnneededComments(funcBodyStrs);
 
 			//lexes the file into a token stream
 			
