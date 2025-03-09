@@ -60,7 +60,7 @@ int main(int args, const char* argv[])
 			//purns everything that isn't a function, struct, or sym define
 			std::vector<std::string> funcBodyStrs, structBodyStrs, funcPrototypeStrs, structPrototypeStrs;
 			PPC::Analyse::ASM::Stage1::ExtractDefinitions(code, funcPrototypeStrs, funcBodyStrs, structPrototypeStrs, structBodyStrs);
-			PPC::Analyse::ASM::Stage1::StripUnneededComments(funcBodyStrs);
+			PPC::Analyse::ASM::Stage1::StripUnneededComments(structBodyStrs);
 
 			//lexes the file into a token stream
 			

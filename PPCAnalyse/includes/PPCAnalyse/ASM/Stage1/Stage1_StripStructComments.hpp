@@ -37,7 +37,7 @@ namespace PPC::Analyse::ASM::Stage1
 					const size_t commentEndIndex = c;
 
 					//erases the comment and reset the char counter
-					structBodyStrs[i].erase(structBodyStrs[i].begin() + commentStartIndex, structBodyStrs[i].begin() + commentEndIndex);
+					structBodyStrs[i].erase(structBodyStrs[i].begin() + commentStartIndex, structBodyStrs[i].begin() + commentEndIndex + 1);
 					codeLength = structBodyStrs[i].size();
 					c = -1;
 				}
